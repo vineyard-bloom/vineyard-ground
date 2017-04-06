@@ -1,0 +1,9 @@
+{
+  "database": {
+    "host": "localhost",
+    "database": "vineyard_model",
+    "username": "",
+    "password": "",
+    "dialect": "postgres"
+  }
+}
