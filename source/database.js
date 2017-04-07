@@ -63,21 +63,21 @@ function create_field(property, library) {
         field.defaultValue = property.default;
     return field;
 }
-// function convert_relationship(property: Property, trellis: Trellis) {
-//   if (property.type.get_category() == Type_Category.trellis) {
-//     const reference = property as Reference
-//     if (!reference.other_property)
-//       trellis.table.belongsTo(reference.get_other_trellis().table, {foreignKey: reference.name, constraints: false})
-//   }
-//   else if (property.type.get_category() == Type_Category.list) {
-//     const list = property as Reference
-//     trellis.table.hasMany(list.get_other_trellis().table, {
-//       as: list.name,
-//       foreignKey: list.other_property.name,
-//       constraints: false
-//     })
-//   }
-// }
+function convert_relationship(property, trellis) {
+    if (property.type.get_category() == vineyard_schema_1.Type_Category.trellis) {
+        var reference = property;
+        if (!reference.other_property)
+            trellis['table'].belongsTo(reference.get_other_trellis()['table'], { foreignKey: reference.name, constraints: false });
+    }
+    else if (property.type.get_category() == vineyard_schema_1.Type_Category.list) {
+        var list = property;
+        trellis['table'].hasMany(list.get_other_trellis()['table'], {
+            as: list.name,
+            foreignKey: list.other_property.name,
+            constraints: false
+        });
+    }
+}
 function vineyard_to_sequelize(schema, sequelize) {
     var result = {};
     for (var name_1 in schema.trellises) {
@@ -96,7 +96,7 @@ function vineyard_to_sequelize(schema, sequelize) {
                 fields[i] = field;
             }
         }
-        var table = result[trellis.name] = sequelize.define(trellis.name, fields, {
+        var table = trellis['table'] = result[trellis.name] = sequelize.define(trellis.name, fields, {
             underscored: true,
             createdAt: 'created',
             updatedAt: 'modified',
@@ -107,6 +107,7 @@ function vineyard_to_sequelize(schema, sequelize) {
         var trellis = schema.trellises[name_2];
         for (var i in trellis.properties) {
             var property = trellis.properties[i];
+            convert_relationship(property, trellis);
         }
     }
     return result;

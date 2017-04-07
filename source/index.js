@@ -5,4 +5,5 @@ function __export(m) {
 __export(require('./database'));
 __export(require('./model'));
 __export(require('./collection'));
+__export(require('./query'));
 //# sourceMappingURL=index.js.map

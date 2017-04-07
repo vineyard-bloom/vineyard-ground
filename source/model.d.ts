@@ -1,7 +1,7 @@
 import { Schema } from 'vineyard-schema';
-import { Collection } from "./Collection";
+import { ICollection } from "./Collection";
 export declare type Collection_Map = {
-    [name: string]: Collection;
+    [name: string]: ICollection;
 };
 export declare class Model {
     private schema;
@@ -9,4 +9,5 @@ export declare class Model {
     collections: Collection_Map;
     constructor(db: any, schema: Schema);
     sync_database(options?: any): any;
+    regenerate(): any;
 }

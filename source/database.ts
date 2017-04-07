@@ -75,21 +75,21 @@ function create_field(property: Property, library: Library): any {
   return field
 }
 
-// function convert_relationship(property: Property, trellis: Trellis) {
-//   if (property.type.get_category() == Type_Category.trellis) {
-//     const reference = property as Reference
-//     if (!reference.other_property)
-//       trellis.table.belongsTo(reference.get_other_trellis().table, {foreignKey: reference.name, constraints: false})
-//   }
-//   else if (property.type.get_category() == Type_Category.list) {
-//     const list = property as Reference
-//     trellis.table.hasMany(list.get_other_trellis().table, {
-//       as: list.name,
-//       foreignKey: list.other_property.name,
-//       constraints: false
-//     })
-//   }
-// }
+function convert_relationship(property: Property, trellis: Trellis) {
+  if (property.type.get_category() == Type_Category.trellis) {
+    const reference = property as Reference
+    if (!reference.other_property)
+      trellis['table'].belongsTo(reference.get_other_trellis()['table'], {foreignKey: reference.name, constraints: false})
+  }
+  else if (property.type.get_category() == Type_Category.list) {
+    const list = property as Reference
+    trellis['table'].hasMany(list.get_other_trellis()['table'], {
+      as: list.name,
+      foreignKey: list.other_property.name,
+      constraints: false
+    })
+  }
+}
 
 export function vineyard_to_sequelize(schema: Schema, sequelize) {
   const result = {}
@@ -114,7 +114,7 @@ export function vineyard_to_sequelize(schema: Schema, sequelize) {
       }
     }
 
-    const table = result [trellis.name] = sequelize.define(trellis.name, fields, {
+    const table = trellis['table'] = result [trellis.name] = sequelize.define(trellis.name, fields, {
       underscored: true,
       createdAt: 'created',
       updatedAt: 'modified',
@@ -126,7 +126,7 @@ export function vineyard_to_sequelize(schema: Schema, sequelize) {
     const trellis = schema.trellises [name]
     for (let i in trellis.properties) {
       const property = trellis.properties [i]
-      // convert_relationship(property, trellis)
+      convert_relationship(property, trellis)
     }
   }
 

@@ -18,6 +18,9 @@ var Model = (function () {
     Model.prototype.sync_database = function (options) {
         return this.db.sync(options);
     };
+    Model.prototype.regenerate = function () {
+        return this.db.sync({ force: true });
+    };
     return Model;
 }());
 exports.Model = Model;

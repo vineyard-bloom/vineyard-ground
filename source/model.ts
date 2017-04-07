@@ -1,8 +1,8 @@
 import {Schema} from 'vineyard-schema'
-import {Collection} from "./Collection";
+import {Collection, ICollection} from "./Collection";
 import {vineyard_to_sequelize} from "./database";
 
-export type Collection_Map = {[name: string]: Collection}
+export type Collection_Map = {[name: string]: ICollection}
 
 function sync_collections(schema: Schema, collections: Collection_Map, sequelize_models) {
   for (let name in schema.trellises) {
@@ -27,4 +27,7 @@ export class Model {
     return this.db.sync(options)
   }
 
+  regenerate() {
+    return this.db.sync({force: true})
+  }
 }

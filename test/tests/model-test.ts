@@ -13,5 +13,15 @@ describe('Model Test', function () {
     const schema = new Schema(game_schema)
     const model = new Model(db, schema)
     return model.sync_database({force: true})
+      .then(() => model.collections.World.create({}))
+      .then((world) => model.collections.Creature.create({
+        name: "ogre",
+        world: world,
+        health: 5
+      }))
+      .then((ogre) => model.collections.Creature.update({
+        id: ogre.id,
+        health: 10
+      }))
   })
 })
