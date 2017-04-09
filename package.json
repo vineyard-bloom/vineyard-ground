@@ -1,6 +1,6 @@
 {
   "name": "vineyard-model",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Vineyard Model",
   "main": "source/index.js",
   "types": "source/index.d.ts",
