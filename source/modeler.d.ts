@@ -3,7 +3,7 @@ import { ICollection } from "./Collection";
 export declare type Collection_Map = {
     [name: string]: ICollection;
 };
-export declare class Model {
+export declare class Modeler {
     private schema;
     private db;
     collections: Collection_Map;

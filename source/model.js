@@ -7,21 +7,20 @@ function sync_collections(schema, collections, sequelize_models) {
         collections[name_1] = new Collection_1.Collection(trellis, sequelize_models[name_1]);
     }
 }
-var Model = (function () {
-    function Model(db, schema) {
+var Modeler = (function () {
+    function Modeler(db, schema) {
         this.collections = {};
         this.schema = schema;
         this.db = db;
         var sequelize_models = database_1.vineyard_to_sequelize(schema, db);
         sync_collections(schema, this.collections, sequelize_models);
     }
-    Model.prototype.sync_database = function (options) {
+    Modeler.prototype.sync_database = function (options) {
         return this.db.sync(options);
     };
-    Model.prototype.regenerate = function () {
+    Modeler.prototype.regenerate = function () {
         return this.db.sync({ force: true });
     };
-    return Model;
+    return Modeler;
 }());
-exports.Model = Model;
-//# sourceMappingURL=model.js.map
+exports.Modeler = Modeler;

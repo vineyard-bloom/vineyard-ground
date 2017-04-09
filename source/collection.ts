@@ -56,4 +56,8 @@ export class Collection<T> implements ICollection {
   get_sequelize() {
     return this.sequelize
   }
+
+  get(identity){
+    return this.filter({id: identity}).first()
+  }
 }

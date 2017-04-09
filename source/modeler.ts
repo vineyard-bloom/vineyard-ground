@@ -11,7 +11,7 @@ function sync_collections(schema: Schema, collections: Collection_Map, sequelize
   }
 }
 
-export class Model {
+export class Modeler {
   private schema: Schema
   private db
   collections: Collection_Map = {}

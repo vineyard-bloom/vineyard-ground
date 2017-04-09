@@ -13,4 +13,5 @@ export declare class Collection<T> implements ICollection {
     all(): Query<T>;
     filter(options: any): Query<T>;
     get_sequelize(): any;
+    get(identity: any): any;
 }

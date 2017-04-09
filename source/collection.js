@@ -39,7 +39,10 @@ var Collection = (function () {
     Collection.prototype.get_sequelize = function () {
         return this.sequelize;
     };
+    Collection.prototype.get = function (identity) {
+        return this.filter({ id: identity }).first();
+    };
     return Collection;
 }());
 exports.Collection = Collection;
-//# sourceMappingURL=Collection.js.map
+//# sourceMappingURL=collection.js.map

@@ -65,6 +65,12 @@ export class Query_Implementation<T> implements Query<T> {
   }
 
   filter(options): Query<T> {
+    for (var i in options) {
+      const option = options [i]
+      if(option && option.id) {
+        options[i] = option.id
+      }
+    }
     options.where = options
     return this
   }

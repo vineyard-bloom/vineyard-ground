@@ -44,6 +44,12 @@ var Query_Implementation = (function () {
             .then(callback);
     };
     Query_Implementation.prototype.filter = function (options) {
+        for (var i in options) {
+            var option = options[i];
+            if (option && option.id) {
+                options[i] = option.id;
+            }
+        }
         options.where = options;
         return this;
     };
