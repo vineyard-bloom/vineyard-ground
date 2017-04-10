@@ -22,10 +22,14 @@ var Query_Implementation = (function () {
             throw new Error("Reduce mode already set.");
         this.reduce_mode = value;
     };
+    Query_Implementation.prototype.get_other_collection = function (path) {
+        var reference = this.trellis.properties[path];
+        return reference.get_other_trellis()['collection'];
+    };
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;
         var promises = Promise.all(results.map(function (result) { return Promise.all(_this.get_expansions()
-            .map(function (path) { return _this.trellis.collection.get(result.dataValues[path])
+            .map(function (path) { return _this.get_other_collection(path).get(result.dataValues[path])
             .then(function (child) { return result.dataValues[path] = child; }); })); }));
         return Promise.all(promises)
             .then(function () { return results; }); // Not needed but a nice touch.

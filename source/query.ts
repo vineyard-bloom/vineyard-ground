@@ -1,4 +1,4 @@
-import {Trellis} from "vineyard-schema"
+import {Trellis, Reference} from "vineyard-schema"
 import {ICollection} from "./collection"
 import * as sequelize from 'sequelize'
 import {Collection_Trellis} from './types'
@@ -37,9 +37,14 @@ export class Query_Implementation<T> implements Query<T> {
     this.reduce_mode = value
   }
 
+  private get_other_collection(path: string){
+    const reference = this.trellis.properties[path] as viewReference
+    return reference.get_other_trellis()['collection']
+  }
+
   private handle_expansions(results) {
     let promises = Promise.all(results.map(result => Promise.all(this.get_expansions()
-        .map(path => this.trellis.collection.get(result.dataValues[path])
+        .map(path => this.get_other_collection(path).get(result.dataValues[path])
           .then(child => result.dataValues[path] = child)
         )
       ))

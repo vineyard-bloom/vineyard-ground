@@ -19,6 +19,7 @@ export declare class Query_Implementation<T> implements Query<T> {
     private reduce_mode;
     private expansions;
     private set_reduce_mode(value);
+    private get_other_collection(path);
     private handle_expansions(results);
     private process_result(result);
     private process_result_with_expansions(result);
