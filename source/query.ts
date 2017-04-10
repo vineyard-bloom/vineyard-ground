@@ -37,18 +37,17 @@ export class Query_Implementation<T> implements Query<T> {
     this.reduce_mode = value
   }
 
-  private get_other_collection(path: string){
-    const reference = this.trellis.properties[path] as viewReference
+  private get_other_collection(path: string) {
+    const reference = this.trellis.properties[path] as Reference
     return reference.get_other_trellis()['collection']
   }
 
   private handle_expansions(results) {
-    let promises = Promise.all(results.map(result => Promise.all(this.get_expansions()
-        .map(path => this.get_other_collection(path).get(result.dataValues[path])
-          .then(child => result.dataValues[path] = child)
-        )
-      ))
-    )
+    let promises = results.map(result => Promise.all(this.get_expansions()
+      .map(path => this.get_other_collection(path).get(result.dataValues[path])
+        .then(child => result.dataValues[path] = child)
+      )
+    ))
 
     return Promise.all(promises)
       .then(() => results) // Not needed but a nice touch.

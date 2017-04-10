@@ -9,16 +9,24 @@ function prepare_seed(seed, trellis) {
             if (property.is_reference()) {
                 var reference = property;
                 var other_primary_key = reference.get_other_trellis().primary_key.name;
-                if (typeof value === 'object' && value[other_primary_key]) {
-                    new_seed[i] = value[other_primary_key];
+                if (typeof value === 'object') {
+                    if (value[other_primary_key])
+                        new_seed[i] = value[other_primary_key];
+                    else
+                        throw new Error(trellis.name + "." + i + 'cannot be an object');
                 }
                 else {
                     new_seed[i] = value;
                 }
             }
             else {
+                if (typeof value === 'object' && property.type.name != 'json' && property.type.name != 'jsonb')
+                    throw new Error(trellis.name + "." + i + 'cannot be an object');
                 new_seed[i] = value;
             }
+        }
+        else {
+            throw new Error("Invalid property: " + trellis.name + "." + i + '.');
         }
     }
     return new_seed;
@@ -40,7 +48,7 @@ var Collection = (function () {
         var new_seed = prepare_seed(changes || seed, this.trellis);
         var filter = {};
         filter[this.primary_key] = identity;
-        return this.sequelize.update(changes, {
+        return this.sequelize.update(new_seed, {
             where: filter
         })
             .then(function (result) { return result.dataValues; });
@@ -64,4 +72,4 @@ var Collection = (function () {
     return Collection;
 }());
 exports.Collection = Collection;
-//# sourceMappingURL=Collection.js.map
+//# sourceMappingURL=collection.js.map

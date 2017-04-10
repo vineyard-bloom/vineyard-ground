@@ -28,9 +28,9 @@ var Query_Implementation = (function () {
     };
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;
-        var promises = Promise.all(results.map(function (result) { return Promise.all(_this.get_expansions()
+        var promises = results.map(function (result) { return Promise.all(_this.get_expansions()
             .map(function (path) { return _this.get_other_collection(path).get(result.dataValues[path])
-            .then(function (child) { return result.dataValues[path] = child; }); })); }));
+            .then(function (child) { return result.dataValues[path] = child; }); })); });
         return Promise.all(promises)
             .then(function () { return results; }); // Not needed but a nice touch.
     };
