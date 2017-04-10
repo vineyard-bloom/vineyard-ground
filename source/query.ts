@@ -1,11 +1,14 @@
 import {Trellis} from "vineyard-schema"
 import {ICollection} from "./collection"
 import * as sequelize from 'sequelize'
+import {Collection_Trellis} from './types'
 
 export interface Query<T> {
   then(any: any): Promise<any>
   exec(): Promise<any>
+  expand<T2>(path: string): Query<T2>
   filter(options): Query<T>
+  first(): Query<T>
   join<N>(collection: ICollection): Query<N>
   select<N>(options): Query<N>
 }
@@ -19,9 +22,10 @@ enum Reduce_Mode {
 
 export class Query_Implementation<T> implements Query<T> {
   private sequelize
-  private trellis: Trellis
+  private trellis: Collection_Trellis<T>
   private options: any = {}
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
+  private expansions = {}
 
   private set_reduce_mode(value: Reduce_Mode) {
     if (this.reduce_mode == value)
@@ -33,7 +37,46 @@ export class Query_Implementation<T> implements Query<T> {
     this.reduce_mode = value
   }
 
-  constructor(sequelize, trellis: Trellis) {
+  private handle_expansions(results) {
+    let promises = Promise.all(results.map(result => Promise.all(this.get_expansions()
+        .map(path => this.trellis.collection.get(result.dataValues[path])
+          .then(child => result.dataValues[path] = child)
+        )
+      ))
+    )
+
+    return Promise.all(promises)
+      .then(() => results) // Not needed but a nice touch.
+  }
+
+  private process_result(result) {
+    if (this.reduce_mode == Reduce_Mode.first) {
+      if (result.length == 0)
+        throw Error("Query.first called on empty result set.")
+
+      return result [0].dataValues
+    }
+    else if (this.reduce_mode == Reduce_Mode.single_value) {
+      return result[0].dataValues._value
+    }
+
+    return result.map(item => item.dataValues)
+  }
+
+  private process_result_with_expansions(result) {
+    return this.handle_expansions(result)
+      .then(result => this.process_result(result))
+  }
+
+  private get_expansions() {
+    return Object.keys(this.expansions)
+  }
+
+  private has_expansions() {
+    return this.get_expansions().length > 0
+  }
+
+  constructor(sequelize, trellis: Collection_Trellis<T>) {
     this.sequelize = sequelize
     this.trellis = trellis
   }
@@ -41,22 +84,10 @@ export class Query_Implementation<T> implements Query<T> {
   exec(): Promise<any> {
     console.log(this.options)
     return this.sequelize.findAll(this.options)
-      .then(result => {
-        if (this.reduce_mode == Reduce_Mode.first) {
-          if (result.length == 0)
-            throw Error("Query.first called on empty result set.")
-
-          return result [0].dataValues
-        }
-        else if (this.reduce_mode == Reduce_Mode.single_value) {
-          return result[0].dataValues._value
-        }
-
-        // if (!Array.isArray(result))
-        //   return result.dataValues
-
-        return result.map(item => item.dataValues)
-      })
+      .then(result => this.has_expansions()
+        ? this.process_result_with_expansions(result)
+        : this.process_result(result)
+      )
   }
 
   then(callback): Promise<any> {
@@ -67,8 +98,8 @@ export class Query_Implementation<T> implements Query<T> {
   filter(options): Query<T> {
     for (var i in options) {
       const option = options [i]
-      if(option && option.id) {
-        options[i] = option.id
+      if (option && option[this.trellis.primary_key.name]) {
+        options[i] = option[this.trellis.primary_key.name]
       }
     }
     options.where = options
@@ -95,6 +126,14 @@ export class Query_Implementation<T> implements Query<T> {
 
   first<N>(): Query<N> {
     this.set_reduce_mode(Reduce_Mode.first)
+    return this
+  }
+
+  expand<T2>(path: string): Query<T2> {
+    if (!this.trellis.properties[path])
+      throw new Error("No such property: " + this.trellis.name + '.' + path + '.')
+
+    this.expansions[path] = null
     return this
   }
 }
