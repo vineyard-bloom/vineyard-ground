@@ -1,37 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var query_1 = require("./query");
-function prepare_seed(seed, trellis) {
-    var new_seed = {};
-    for (var i in seed) {
-        var property = trellis.properties[i];
-        if (property) {
-            var value = seed[i];
-            if (property.is_reference()) {
-                var reference = property;
-                var other_primary_key = reference.get_other_trellis().primary_key.name;
-                if (typeof value === 'object') {
-                    if (value[other_primary_key])
-                        new_seed[i] = value[other_primary_key];
-                    else
-                        throw new Error(trellis.name + "." + i + 'cannot be an object');
-                }
-                else {
-                    new_seed[i] = value;
-                }
-            }
-            else {
-                if (typeof value === 'object' && property.type.name != 'json' && property.type.name != 'jsonb')
-                    throw new Error(trellis.name + "." + i + 'cannot be an object');
-                new_seed[i] = value;
-            }
-        }
-        else {
-            throw new Error("Invalid property: " + trellis.name + "." + i + '.');
-        }
-    }
-    return new_seed;
-}
+var update_1 = require("./update");
 var Collection = (function () {
     function Collection(trellis, sequelize_model) {
         this.trellis = trellis;
@@ -40,30 +10,22 @@ var Collection = (function () {
         trellis.collection = this;
     }
     Collection.prototype.create = function (seed) {
-        var new_seed = prepare_seed(seed, this.trellis);
-        return this.sequelize.create(new_seed)
-            .then(function (result) { return result.dataValues; });
+        return update_1.create(seed, this.trellis, this.sequelize);
     };
     Collection.prototype.create_or_update = function (seed) {
-        var new_seed = prepare_seed(seed, this.trellis);
-        return this.sequelize.upsert(new_seed)
-            .then(function (result) { return result.dataValues; });
+        return update_1.create_or_update(seed, this.trellis, this.sequelize);
     };
     Collection.prototype.update = function (seed, changes) {
-        var identity = seed[this.primary_key] || seed;
-        var new_seed = prepare_seed(changes || seed, this.trellis);
-        var filter = {};
-        filter[this.primary_key] = identity;
-        return this.sequelize.update(new_seed, {
-            where: filter
-        })
-            .then(function (result) { return result.dataValues; });
+        return update_1.update(seed, this.trellis, this.sequelize, changes);
     };
     Collection.prototype.all = function () {
         return new query_1.Query_Implementation(this.sequelize, this.trellis);
     };
     Collection.prototype.filter = function (options) {
         return this.all().filter(options);
+    };
+    Collection.prototype.first = function () {
+        return this.all().first();
     };
     Collection.prototype.first_or_null = function () {
         return this.all().first_or_null();

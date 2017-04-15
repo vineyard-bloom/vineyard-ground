@@ -16,11 +16,12 @@
         "type": "int"
       },
       "world": {
-        "type": "World"
+        "type": "World",
+        "nullable": false
       },
       "tags": {
-        "type":"list",
-        "trellis":"Tag"
+        "type": "list",
+        "trellis": "Tag"
       }
     }
   },

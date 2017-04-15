@@ -57,8 +57,9 @@ function get_field(property, library) {
 }
 function create_field(property, library) {
     var field = get_field(property, library);
-    if (field)
-        field.allowNull = property.is_nullable;
+    if (!field)
+        return null;
+    field.allowNull = property.is_nullable;
     if (property.default !== undefined)
         field.defaultValue = property.default;
     if (property.is_unique)
@@ -87,25 +88,30 @@ function get_cross_table_name(trellises) {
 function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
     var table_trellises = [list.trellis, list.other_property.trellis];
     var cross_table_name = get_cross_table_name(table_trellises);
-    if (!tables[cross_table_name]) {
-        // const cross_table = create_cross_table(cross_table_name, table_trellises, tables, schema.library, sequelize)
-        trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
-            as: list.name,
-            foreignKey: list.other_property.trellis.name.toLowerCase(),
-            otherKey: list.trellis.name.toLowerCase(),
-            constraints: false,
-            through: cross_table_name
-        });
-    }
+    // if (!tables [cross_table_name]) {
+    // const cross_table = create_cross_table(cross_table_name, table_trellises, tables, schema.library, sequelize)
+    var relationship = trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
+        as: list.name,
+        otherKey: list.other_property.trellis.name.toLowerCase(),
+        foreignKey: list.trellis.name.toLowerCase(),
+        constraints: false,
+        through: cross_table_name
+    });
+    // tables [cross_table_name] = relationship.through.model
+    // }
+    // list['cross_table'] = tables [cross_table_name]
+    list['cross_table'] = relationship.through.model;
 }
 function initialize_relationship(property, trellis, schema, tables, sequelize) {
     if (property.type.get_category() == vineyard_schema_1.Type_Category.trellis) {
         var reference = property;
-        if (!reference.other_property)
-            trellis['table'].belongsTo(reference.get_other_trellis()['table'], {
+        if (!reference.other_property) {
+            var other_table = reference.get_other_trellis()['table'];
+            other_table.hasMany(trellis['table'], {
                 foreignKey: reference.name,
-                constraints: false
+                constraints: true
             });
+        }
     }
     else if (property.type.get_category() == vineyard_schema_1.Type_Category.list) {
         var list = property;
@@ -116,7 +122,7 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
             trellis['table'].hasMany(list.get_other_trellis()['table'], {
                 as: list.name,
                 foreignKey: list.other_property.name,
-                constraints: false
+                constraints: true
             });
         }
     }

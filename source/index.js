@@ -6,4 +6,5 @@ __export(require('./database'));
 __export(require('./modeler'));
 __export(require('./collection'));
 __export(require('./query'));
+__export(require('./list-operations'));
 //# sourceMappingURL=index.js.map

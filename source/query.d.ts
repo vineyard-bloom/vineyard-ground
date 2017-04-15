@@ -21,6 +21,8 @@ export declare class Query_Implementation<T> implements Query<T> {
     private expansions;
     private set_reduce_mode(value);
     private get_other_collection(path);
+    private expand_cross_table(reference, identity);
+    private perform_expansion(path, data);
     private handle_expansions(results);
     private process_result(result);
     private process_result_with_expansions(result);

@@ -1,7 +1,8 @@
 require('source-map-support').install()
+import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
 import * as Sequelize from 'sequelize'
-import {Modeler} from '../../source'
+import {Modeler, Add, Remove} from '../../source'
 
 const config = require('../config/config.json')
 const game_schema = require('../schema/game.json')
@@ -12,17 +13,40 @@ describe('Model Test', function () {
     const db = new Sequelize(config.database)
     const schema = new Schema(game_schema)
     const modeler = new Modeler(db, schema)
-    const model:any = modeler.collections
+    const model: any = modeler.collections
     return modeler.regenerate()
-      .then(() => model.World.create({}))
-      .then((world) => model.Creature.create({
-        name: "ogre",
-        world: world,
-        health: 5
-      }))
-      .then((ogre) => model.Creature.update({
-        id: ogre.id,
-        health: 10
-      }))
+      .then(() => model.Tag.create({
+        name: "flying"
+      })
+        .then(() => model.World.create({}))
+        .then(world => model.Creature.create({
+          name: "ogre",
+          world: world,
+          health: 5
+        }))
+        .then(ogre => model.Tag.create({
+            name: "dangerous"
+          })
+            .then(tag => model.Creature.update(ogre, {
+                health: 10,
+                tags: Add(tag)
+              })
+                .then(() => model.Creature.first().expand('tags'))
+                .then(creature => {
+                  assert(Array.isArray(creature.tags))
+                  assert.equal(1, creature.tags.length)
+                  assert.equal('dangerous', creature.tags[0].name)
+                })
+                .then(() => model.Creature.update(ogre, {
+                    tags: Remove(tag)
+                  })
+                )
+                .then(() => model.Creature.first().expand('tags'))
+                .then(creature => {
+                  assert(Array.isArray(creature.tags))
+                  assert.equal(0, creature.tags.length)
+                })
+            )
+        )
   })
 })

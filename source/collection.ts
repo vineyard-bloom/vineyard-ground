@@ -1,43 +1,9 @@
-import {Trellis, Reference} from 'vineyard-schema'
 import {Query, Query_Implementation} from './query'
 import {Collection_Trellis} from './types'
+import {create, create_or_update, update} from './update'
 
 export interface ICollection {
   get_sequelize(): any
-}
-
-function prepare_seed(seed, trellis: Trellis) {
-  const new_seed = {}
-  for (let i in seed) {
-    const property = trellis.properties[i]
-    if (property) {
-      const value = seed[i]
-      if (property.is_reference()) {
-        const reference = property as Reference
-        const other_primary_key = reference.get_other_trellis().primary_key.name
-        if (typeof value === 'object') {
-          if (value[other_primary_key])
-            new_seed [i] = value[other_primary_key]
-          else
-            throw new Error(trellis.name + "." + i + 'cannot be an object')
-        }
-        else {
-          new_seed [i] = value
-        }
-      }
-      else {
-        if (typeof value === 'object' && property.type.name != 'json' && property.type.name != 'jsonb')
-          throw new Error(trellis.name + "." + i + 'cannot be an object')
-
-        new_seed [i] = value
-      }
-    }
-    else {
-      throw new Error("Invalid property: " + trellis.name + "." + i + '.')
-    }
-  }
-
-  return new_seed
 }
 
 export class Collection<T> implements ICollection {
@@ -53,30 +19,15 @@ export class Collection<T> implements ICollection {
   }
 
   create(seed): Promise<T> {
-    const new_seed = prepare_seed(seed, this.trellis)
-
-    return this.sequelize.create(new_seed)
-      .then(result => result.dataValues)
+    return create(seed, this.trellis, this.sequelize)
   }
 
   create_or_update(seed): Promise<T> {
-    const new_seed = prepare_seed(seed, this.trellis)
-
-    return this.sequelize.upsert(new_seed)
-      .then(result => result.dataValues)
+    return create_or_update(seed, this.trellis, this.sequelize)
   }
 
   update(seed, changes?): Promise<T> {
-    const identity = seed[this.primary_key] || seed
-    const new_seed = prepare_seed(changes || seed, this.trellis)
-
-    const filter = {}
-    filter[this.primary_key] = identity
-
-    return this.sequelize.update(new_seed, {
-      where: filter
-    })
-      .then(result => result.dataValues)
+    return update(seed, this.trellis, this.sequelize, changes)
   }
 
   all(): Query<T> {
@@ -85,6 +36,10 @@ export class Collection<T> implements ICollection {
 
   filter(options): Query<T> {
     return this.all().filter(options)
+  }
+
+  first(): Query<T> {
+    return this.all().first()
   }
 
   first_or_null(): Query<T> {

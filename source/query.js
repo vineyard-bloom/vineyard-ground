@@ -1,6 +1,6 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var sequelize = require("sequelize");
+var sequelize = require('sequelize');
+var utility_1 = require("./utility");
 var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
@@ -27,10 +27,31 @@ var Query_Implementation = (function () {
         var reference = this.trellis.properties[path];
         return reference.get_other_trellis()['collection'];
     };
+    Query_Implementation.prototype.expand_cross_table = function (reference, identity) {
+        var where = {};
+        where[utility_1.to_lower(reference.trellis.name)] = identity;
+        // where[to_lower(reference.get_other_trellis().name)] =
+        //   sequelize.col(reference.get_other_trellis().primary_key.name)
+        return reference.other_property.trellis['table'].findAll({
+            include: {
+                model: reference.trellis['table'],
+                through: { where: where },
+                as: reference.other_property.name,
+                required: true
+            }
+        })
+            .then(function (result) { return result.map(function (r) { return r.dataValues; }); });
+    };
+    Query_Implementation.prototype.perform_expansion = function (path, data) {
+        var property = this.trellis.properties[path];
+        return property.is_list()
+            ? this.expand_cross_table(property, this.trellis.get_identity(data))
+            : this.get_other_collection(path).get(data[path]).then(function (result) { return result.dataValues; });
+    };
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;
         var promises = results.map(function (result) { return Promise.all(_this.get_expansions()
-            .map(function (path) { return _this.get_other_collection(path).get(result.dataValues[path])
+            .map(function (path) { return _this.perform_expansion(path, result.dataValues)
             .then(function (child) { return result.dataValues[path] = child; }); })); });
         return Promise.all(promises)
             .then(function () { return results; }); // Not needed but a nice touch.

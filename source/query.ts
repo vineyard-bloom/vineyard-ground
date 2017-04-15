@@ -2,6 +2,7 @@ import {Trellis, Reference} from "vineyard-schema"
 import {ICollection} from "./collection"
 import * as sequelize from 'sequelize'
 import {Collection_Trellis} from './types'
+import {to_lower} from "./utility";
 
 export interface Query<T> {
   then(any: any): Promise<any>
@@ -17,7 +18,7 @@ export interface Query<T> {
 enum Reduce_Mode {
   none,
   first,
-    first_or_null,
+  first_or_null,
   single_value,
 }
 
@@ -43,9 +44,33 @@ export class Query_Implementation<T> implements Query<T> {
     return reference.get_other_trellis()['collection']
   }
 
+  private expand_cross_table(reference: Reference, identity) {
+    const where = {}
+    where[to_lower(reference.trellis.name)] = identity
+    // where[to_lower(reference.get_other_trellis().name)] =
+    //   sequelize.col(reference.get_other_trellis().primary_key.name)
+
+    return reference.other_property.trellis['table'].findAll({
+      include: {
+        model: reference.trellis['table'],
+        through: {where: where},
+        as: reference.other_property.name,
+        required: true
+      }
+    })
+      .then(result => result.map(r => r.dataValues))
+  }
+
+  private perform_expansion(path: string, data) {
+    const property = this.trellis.properties[path]
+    return property.is_list()
+      ? this.expand_cross_table(property as Reference, this.trellis.get_identity(data))
+      : this.get_other_collection(path).get(data[path]).then(result => result.dataValues)
+  }
+
   private handle_expansions(results) {
     let promises = results.map(result => Promise.all(this.get_expansions()
-      .map(path => this.get_other_collection(path).get(result.dataValues[path])
+      .map(path => this.perform_expansion(path, result.dataValues)
         .then(child => result.dataValues[path] = child)
       )
     ))
