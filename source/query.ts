@@ -9,6 +9,7 @@ export interface Query<T> {
   expand<T2>(path: string): Query<T2>
   filter(options): Query<T>
   first(): Query<T>
+  first_or_null(): Query<T>
   join<N>(collection: ICollection): Query<N>
   select<N>(options): Query<N>
 }
@@ -16,7 +17,7 @@ export interface Query<T> {
 enum Reduce_Mode {
   none,
   first,
-    // first_or_null,
+    first_or_null,
   single_value,
 }
 
@@ -57,6 +58,12 @@ export class Query_Implementation<T> implements Query<T> {
     if (this.reduce_mode == Reduce_Mode.first) {
       if (result.length == 0)
         throw Error("Query.first called on empty result set.")
+
+      return result [0].dataValues
+    }
+    else if (this.reduce_mode == Reduce_Mode.first_or_null) {
+      if (result.length == 0)
+        return null
 
       return result [0].dataValues
     }
@@ -130,6 +137,11 @@ export class Query_Implementation<T> implements Query<T> {
 
   first<N>(): Query<N> {
     this.set_reduce_mode(Reduce_Mode.first)
+    return this
+  }
+
+  first_or_null<N>(): Query<N> {
+    this.set_reduce_mode(Reduce_Mode.first_or_null)
     return this
   }
 

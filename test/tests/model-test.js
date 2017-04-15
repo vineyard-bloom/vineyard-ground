@@ -10,15 +10,16 @@ describe('Model Test', function () {
     it('sync_database', function () {
         var db = new Sequelize(config.database);
         var schema = new vineyard_schema_1.Schema(game_schema);
-        var model = new source_1.Model(db, schema);
-        return model.sync_database({ force: true })
-            .then(function () { return model.collections.World.create({}); })
-            .then(function (world) { return model.collections.Creature.create({
+        var modeler = new source_1.Modeler(db, schema);
+        var model = modeler.collections;
+        return modeler.regenerate()
+            .then(function () { return model.World.create({}); })
+            .then(function (world) { return model.Creature.create({
             name: "ogre",
             world: world,
             health: 5
         }); })
-            .then(function (ogre) { return model.collections.Creature.update({
+            .then(function (ogre) { return model.Creature.update({
             id: ogre.id,
             health: 10
         }); });

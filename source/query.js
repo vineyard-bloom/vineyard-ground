@@ -1,11 +1,12 @@
 "use strict";
-var sequelize = require('sequelize');
+Object.defineProperty(exports, "__esModule", { value: true });
+var sequelize = require("sequelize");
 var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
     Reduce_Mode[Reduce_Mode["first"] = 1] = "first";
-    // first_or_null,
-    Reduce_Mode[Reduce_Mode["single_value"] = 2] = "single_value";
+    Reduce_Mode[Reduce_Mode["first_or_null"] = 2] = "first_or_null";
+    Reduce_Mode[Reduce_Mode["single_value"] = 3] = "single_value";
 })(Reduce_Mode || (Reduce_Mode = {}));
 var Query_Implementation = (function () {
     function Query_Implementation(sequelize, trellis) {
@@ -38,6 +39,11 @@ var Query_Implementation = (function () {
         if (this.reduce_mode == Reduce_Mode.first) {
             if (result.length == 0)
                 throw Error("Query.first called on empty result set.");
+            return result[0].dataValues;
+        }
+        else if (this.reduce_mode == Reduce_Mode.first_or_null) {
+            if (result.length == 0)
+                return null;
             return result[0].dataValues;
         }
         else if (this.reduce_mode == Reduce_Mode.single_value) {
@@ -96,6 +102,10 @@ var Query_Implementation = (function () {
     };
     Query_Implementation.prototype.first = function () {
         this.set_reduce_mode(Reduce_Mode.first);
+        return this;
+    };
+    Query_Implementation.prototype.first_or_null = function () {
+        this.set_reduce_mode(Reduce_Mode.first_or_null);
         return this;
     };
     Query_Implementation.prototype.expand = function (path) {

@@ -1,7 +1,7 @@
 require('source-map-support').install()
 import {Schema} from 'vineyard-schema'
 import * as Sequelize from 'sequelize'
-import {Model} from '../../source'
+import {Modeler} from '../../source'
 
 const config = require('../config/config.json')
 const game_schema = require('../schema/game.json')
@@ -11,15 +11,16 @@ describe('Model Test', function () {
   it('sync_database', function () {
     const db = new Sequelize(config.database)
     const schema = new Schema(game_schema)
-    const model = new Model(db, schema)
-    return model.sync_database({force: true})
-      .then(() => model.collections.World.create({}))
-      .then((world) => model.collections.Creature.create({
+    const modeler = new Modeler(db, schema)
+    const model:any = modeler.collections
+    return modeler.regenerate()
+      .then(() => model.World.create({}))
+      .then((world) => model.Creature.create({
         name: "ogre",
         world: world,
         health: 5
       }))
-      .then((ogre) => model.collections.Creature.update({
+      .then((ogre) => model.Creature.update({
         id: ogre.id,
         health: 10
       }))

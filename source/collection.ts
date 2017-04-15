@@ -59,6 +59,13 @@ export class Collection<T> implements ICollection {
       .then(result => result.dataValues)
   }
 
+  create_or_update(seed): Promise<T> {
+    const new_seed = prepare_seed(seed, this.trellis)
+
+    return this.sequelize.upsert(new_seed)
+      .then(result => result.dataValues)
+  }
+
   update(seed, changes?): Promise<T> {
     const identity = seed[this.primary_key] || seed
     const new_seed = prepare_seed(changes || seed, this.trellis)
@@ -80,6 +87,10 @@ export class Collection<T> implements ICollection {
     return this.all().filter(options)
   }
 
+  first_or_null(): Query<T> {
+    return this.all().first_or_null()
+  }
+
   get_sequelize() {
     return this.sequelize
   }
@@ -93,4 +104,5 @@ export class Collection<T> implements ICollection {
 
     return this.filter(filter).first()
   }
+
 }

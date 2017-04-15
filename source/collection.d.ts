@@ -10,9 +10,11 @@ export declare class Collection<T> implements ICollection {
     private primary_key;
     constructor(trellis: Collection_Trellis<T>, sequelize_model: any);
     create(seed: any): Promise<T>;
+    create_or_update(seed: any): Promise<T>;
     update(seed: any, changes?: any): Promise<T>;
     all(): Query<T>;
     filter(options: any): Query<T>;
+    first_or_null(): Query<T>;
     get_sequelize(): any;
     get(identity: any): Query<T>;
 }

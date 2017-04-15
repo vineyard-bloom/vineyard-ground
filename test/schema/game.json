@@ -17,6 +17,21 @@
       },
       "world": {
         "type": "World"
+      },
+      "tags": {
+        "type":"list",
+        "trellis":"Tag"
+      }
+    }
+  },
+  "Tag": {
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "creatures": {
+        "type": "list",
+        "trellis": "Creature"
       }
     }
   }

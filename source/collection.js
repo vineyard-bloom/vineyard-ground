@@ -1,5 +1,6 @@
 "use strict";
-var query_1 = require('./query');
+Object.defineProperty(exports, "__esModule", { value: true });
+var query_1 = require("./query");
 function prepare_seed(seed, trellis) {
     var new_seed = {};
     for (var i in seed) {
@@ -43,6 +44,11 @@ var Collection = (function () {
         return this.sequelize.create(new_seed)
             .then(function (result) { return result.dataValues; });
     };
+    Collection.prototype.create_or_update = function (seed) {
+        var new_seed = prepare_seed(seed, this.trellis);
+        return this.sequelize.upsert(new_seed)
+            .then(function (result) { return result.dataValues; });
+    };
     Collection.prototype.update = function (seed, changes) {
         var identity = seed[this.primary_key] || seed;
         var new_seed = prepare_seed(changes || seed, this.trellis);
@@ -58,6 +64,9 @@ var Collection = (function () {
     };
     Collection.prototype.filter = function (options) {
         return this.all().filter(options);
+    };
+    Collection.prototype.first_or_null = function () {
+        return this.all().first_or_null();
     };
     Collection.prototype.get_sequelize = function () {
         return this.sequelize;

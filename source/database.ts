@@ -1,134 +1,200 @@
 import {Property, Type_Category, Reference, Trellis_Type, Trellis, Library, Schema} from "vineyard-schema"
 import * as Sequelize from 'sequelize'
+import {Table_Trellis} from "./types";
 
 const node_uuid = require('uuid')
 
 function get_field(property: Property, library: Library): any {
   const type = property.type
-  if (type.get_category() == Type_Category.primitive) {
-    if (type === library.types.int) {
-      return {
-        type: Sequelize.INTEGER,
-        defaultValue: 0
-      }
-    }
+  switch (type.get_category()) {
+    case Type_Category.primitive:
 
-    if (type === library.types.string) {
-      return {
-        type: Sequelize.STRING,
-        defaultValue: ""
-      }
-    }
+      if (type === library.types.long)
+        return {
+          type: Sequelize.BIGINT,
+          defaultValue: 0
+        }
 
-    if (type === library.types.json) {
-      return {
-        type: Sequelize.JSON
-      }
-    }
+      if (type === library.types.int)
+        return {
+          type: Sequelize.INTEGER,
+          defaultValue: 0
+        }
 
-    if (type === library.types.bool) {
-      return {
-        type: Sequelize.BOOLEAN,
-        defaultValue: false
-      }
-    }
+      if (type === library.types.string)
+        return {
+          type: Sequelize.STRING,
+          defaultValue: ""
+        }
 
-    if (type === library.types.guid) {
-      return {
-        type: Sequelize.UUID
-      }
-    }
+      if (type === library.types.json)
+        return {
+          type: Sequelize.JSON
+        }
 
-    if (type === library.types.float) {
-      return {
-        type: Sequelize.FLOAT,
-        defaultValue: 0
-      }
-    }
+      if (type === library.types.bool)
+        return {
+          type: Sequelize.BOOLEAN,
+          defaultValue: false
+        }
 
-    if (type === library.types.date) {
-      return {
-        type: Sequelize.DATE
+      if (type === library.types.guid)
+        return {
+          type: Sequelize.UUID
+        }
+
+      if (type === library.types.float)
+        return {
+          type: Sequelize.FLOAT,
+          defaultValue: 0
+        }
+
+      if (type === library.types.date)
+        return {
+          type: Sequelize.DATE
+        }
+
+      throw new Error("Unknown primitive: " + type.name + '.')
+
+    case Type_Category.list:
+      return null
+
+    case Type_Category.trellis:
+      if (library.types[type.name]) {
+        return get_field((type as Trellis_Type).trellis.primary_key, library)
       }
-    }
+
+      throw new Error("Unknown trellis reference: " + type.name + '.')
+
+    default:
+      throw Error("Invalid type category: " + type.get_category() + '.')
   }
-  else if (type.get_category() == Type_Category.list) {
-    return null
-  }
-  else if (type.get_category() == Type_Category.trellis) {
-    if (library.types[type.name]) {
-      return get_field((type as Trellis_Type).trellis.primary_key, library)
-    }
-  }
-
-  throw Error("Not implemented or supported")
 }
 
 function create_field(property: Property, library: Library): any {
   const field = get_field(property, library)
   if (field)
-    field.allowNull = property.nullable
+    field.allowNull = property.is_nullable
 
   if (property.default !== undefined)
     field.defaultValue = property.default
 
+  if (property.is_unique)
+    field.unique = true
+
   return field
 }
 
-function convert_relationship(property: Property, trellis: Trellis) {
-  if (property.type.get_category() == Type_Category.trellis) {
-    const reference = property as Reference
-    if (!reference.other_property)
-      trellis['table'].belongsTo(reference.get_other_trellis()['table'], {foreignKey: reference.name, constraints: false})
-  }
-  else if (property.type.get_category() == Type_Category.list) {
-    const list = property as Reference
-    trellis['table'].hasMany(list.get_other_trellis()['table'], {
+function get_cross_table_name(trellises: Trellis []) {
+  return trellises.map(t => t['table'].getTableName()).sort().join('_')
+}
+
+// function create_cross_table(table_name: string, trellises: Trellis [], tables, library: Library, sequelize) {
+//   const fields = {}
+//   for (let trellis of trellises) {
+//     const field = get_field(trellis.primary_key, library)
+//     field.primaryKey = true
+//     fields[trellis.name.toLowerCase()]= field
+//   }
+//   const table = tables [table_name] = sequelize.define(table_name, fields, {
+//     underscored: true,
+//     createdAt: 'created',
+//     updatedAt: 'modified',
+//     freezeTableName: true
+//   })
+//
+//   return table
+// }
+
+function initialize_many_to_many(list: Reference, trellis: Trellis, schema: Schema, tables, sequelize) {
+  const table_trellises = [list.trellis, list.other_property.trellis]
+  const cross_table_name = get_cross_table_name(table_trellises)
+
+  if (!tables [cross_table_name]) {
+    // const cross_table = create_cross_table(cross_table_name, table_trellises, tables, schema.library, sequelize)
+
+    trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
       as: list.name,
-      foreignKey: list.other_property.name,
-      constraints: false
+      foreignKey: list.other_property.trellis.name.toLowerCase(),
+      otherKey: list.trellis.name.toLowerCase(),
+      constraints: false,
+      through: cross_table_name
     })
   }
 }
 
-export function vineyard_to_sequelize(schema: Schema, sequelize) {
-  const result = {}
-
-  for (let name in schema.trellises) {
-    const trellis = schema.trellises [name]
-    const fields = {}
-
-    // Create the primary key field first for DB UX
-    const primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library)
-    primary_key.primaryKey = true
-    primary_key.defaultValue = node_uuid.v4
-
-    for (let i in trellis.properties) {
-      if (i == trellis.primary_key.name)
-        continue
-
-      const property = trellis.properties[i]
-      const field = create_field(property, schema.library)
-      if (field) {
-        fields[i] = field
-      }
-    }
-
-    const table = trellis['table'] = result [trellis.name] = sequelize.define(trellis.name, fields, {
-      underscored: true,
-      createdAt: 'created',
-      updatedAt: 'modified',
-      freezeTableName: true
-    })
+function initialize_relationship(property: Property, trellis: Trellis, schema: Schema, tables, sequelize) {
+  if (property.type.get_category() == Type_Category.trellis) {
+    const reference = property as Reference
+    if (!reference.other_property)
+      trellis['table'].belongsTo(reference.get_other_trellis()['table'], {
+        foreignKey: reference.name,
+        constraints: false
+      })
   }
+  else if (property.type.get_category() == Type_Category.list) {
+    const list = property as Reference
+    if (list.other_property.type.get_category() == Type_Category.list) {
+      initialize_many_to_many(list, trellis, schema, tables, sequelize)
+    }
+    else {
+      trellis['table'].hasMany(list.get_other_trellis()['table'], {
+        as: list.name,
+        foreignKey: list.other_property.name,
+        constraints: false
+      })
+    }
+  }
+}
 
+function initialize_relationships(schema: Schema, tables, sequelize) {
   for (let name in schema.trellises) {
     const trellis = schema.trellises [name]
     for (let i in trellis.properties) {
       const property = trellis.properties [i]
-      convert_relationship(property, trellis)
+      initialize_relationship(property, trellis, schema, tables, sequelize)
     }
   }
 
-  return result
+}
+
+function create_table(trellis: Trellis, schema: Schema, sequelize) {
+  const fields = {}
+
+  // Create the primary key field first for DB UX
+  const primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library)
+  primary_key.primaryKey = true
+  primary_key.defaultValue = node_uuid.v4
+
+  for (let i in trellis.properties) {
+    if (i == trellis.primary_key.name)
+      continue
+
+    const property = trellis.properties[i]
+    const field = create_field(property, schema.library)
+    if (field) {
+      fields[i] = field
+    }
+  }
+
+  const table = trellis['table'] = sequelize.define(trellis.name.toLowerCase(), fields, {
+    underscored: true,
+    createdAt: 'created',
+    updatedAt: 'modified'
+    // freezeTableName: true
+  })
+
+  return table
+}
+
+export function vineyard_to_sequelize(schema: Schema, sequelize) {
+  const tables = {}
+
+  for (let name in schema.trellises) {
+    tables [name] = create_table(schema.trellises [name], schema, sequelize)
+  }
+
+  initialize_relationships(schema, tables, sequelize)
+
+  return tables
 }

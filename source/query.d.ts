@@ -9,6 +9,7 @@ export interface Query<T> {
     expand<T2>(path: string): Query<T2>;
     filter(options: any): Query<T>;
     first(): Query<T>;
+    first_or_null(): Query<T>;
     join<N>(collection: ICollection): Query<N>;
     select<N>(options: any): Query<N>;
 }
@@ -32,6 +33,7 @@ export declare class Query_Implementation<T> implements Query<T> {
     join(collection: ICollection): Query<T>;
     select<N>(options: any): Query<N>;
     first<N>(): Query<N>;
+    first_or_null<N>(): Query<N>;
     expand<T2>(path: string): Query<T2>;
 }
 export declare function Path(path: any): sequelize.col;
