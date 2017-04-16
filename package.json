@@ -1,18 +1,19 @@
 {
-  "name": "vineyard-model",
-  "version": "0.2.1",
-  "description": "Vineyard Model",
+  "name": "vineyard-ground",
+  "version": "0.2.2",
+  "description": "Vineyard Ground",
   "main": "source/index.js",
   "types": "source/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": "git@github.com:silentorb/vineyard-model.git",
+  "repository": "git@github.com:silentorb/vineyard-ground.git",
   "author": "Christopher W. Johnson",
   "license": "MIT",
   "dependencies": {
     "sequelize": "^3.30.4",
-    "uuid": "^3.0.1"
+    "uuid": "^3.0.1",
+    "vineyard-schema": "^0.2.0"
   },
   "devDependencies": {
     "@types/sequelize": "^3.4.43",
@@ -20,7 +21,6 @@
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.5",
     "mocha": "^3.2.0",
-    "source-map-support": "^0.4.14",
-    "vineyard-schema": "^0.2.0"
+    "source-map-support": "^0.4.14"
   }
 }
