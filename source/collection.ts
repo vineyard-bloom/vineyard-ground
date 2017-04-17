@@ -9,12 +9,10 @@ export interface ICollection {
 export class Collection<T> implements ICollection {
   private sequelize
   private trellis: Collection_Trellis<T>
-  private primary_key: string
 
   constructor(trellis: Collection_Trellis<T>, sequelize_model) {
     this.trellis = trellis
     this.sequelize = sequelize_model
-    this.primary_key = this.trellis.primary_key.name
     trellis.collection = this
   }
 
@@ -55,7 +53,7 @@ export class Collection<T> implements ICollection {
       throw new Error("Cannot get empty identity of type " + this.trellis.name + '.')
 
     const filter = {}
-    filter[this.primary_key] = identity
+    filter[this.trellis.primary_key.name] = identity
 
     return this.filter(filter).first()
   }

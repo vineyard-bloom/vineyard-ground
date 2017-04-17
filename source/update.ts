@@ -2,11 +2,6 @@ import {Property, Trellis, Reference} from 'vineyard-schema'
 import {Operation, Operation_Type} from './list-operations'
 import {to_lower} from "./utility";
 
-function get_identity(seed, trellis: Trellis) {
-  const primary_key = trellis.primary_key.name
-  return seed[primary_key] || seed
-}
-
 function prepare_reference(reference: Reference, value) {
   const other_primary_key = reference.get_other_trellis().primary_key.name
   if (typeof value === 'object') {
@@ -54,14 +49,14 @@ function perform_operation(identity, seed, list: Reference, sequelize, operation
     case Operation_Type.add: {
       const fields = {}
       fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.other_property.trellis.name)] = get_identity(operation.item, list.other_property.trellis)
+      fields [to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item)
       return list['cross_table'].create(fields)
     }
 
     case Operation_Type.remove: {
       const fields = {}
       fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.other_property.trellis.name)] = get_identity(operation.item, list.other_property.trellis)
+      fields [to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item)
       return list['cross_table'].destroy({
         where: fields,
         force: true
@@ -103,19 +98,19 @@ export function create<T>(seed, trellis: Trellis, sequelize): Promise<T> {
   const new_seed = prepare_seed(seed, trellis)
 
   return sequelize.create(new_seed)
-    .then(result => post_process(result, get_identity(seed, trellis), seed, trellis, sequelize))
+    .then(result => post_process(result, trellis.get_identity(result.dataValues), seed, trellis, sequelize))
 }
 
 export function create_or_update<T>(seed, trellis: Trellis, sequelize): Promise<T> {
   const new_seed = prepare_seed(seed, trellis)
 
   return sequelize.upsert(new_seed)
-    .then(result => post_process(result, get_identity(seed, trellis), seed, trellis, sequelize))
+    .then(result => post_process(result, trellis.get_identity(result), seed, trellis, sequelize))
 }
 
 export function update<T>(seed, trellis: Trellis, sequelize, changes?): Promise<T> {
   const primary_key = trellis.primary_key.name
-  const identity = get_identity(seed, trellis)
+  const identity = trellis.get_identity(seed)
   const new_seed = prepare_seed(changes || seed, trellis)
 
   const filter = {}

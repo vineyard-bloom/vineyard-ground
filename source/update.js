@@ -1,10 +1,6 @@
 "use strict";
 var list_operations_1 = require('./list-operations');
 var utility_1 = require("./utility");
-function get_identity(seed, trellis) {
-    var primary_key = trellis.primary_key.name;
-    return seed[primary_key] || seed;
-}
 function prepare_reference(reference, value) {
     var other_primary_key = reference.get_other_trellis().primary_key.name;
     if (typeof value === 'object') {
@@ -44,13 +40,13 @@ function perform_operation(identity, seed, list, sequelize, operation) {
         case list_operations_1.Operation_Type.add: {
             var fields = {};
             fields[utility_1.to_lower(list.trellis.name)] = identity;
-            fields[utility_1.to_lower(list.other_property.trellis.name)] = get_identity(operation.item, list.other_property.trellis);
+            fields[utility_1.to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item);
             return list['cross_table'].create(fields);
         }
         case list_operations_1.Operation_Type.remove: {
             var fields = {};
             fields[utility_1.to_lower(list.trellis.name)] = identity;
-            fields[utility_1.to_lower(list.other_property.trellis.name)] = get_identity(operation.item, list.other_property.trellis);
+            fields[utility_1.to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item);
             return list['cross_table'].destroy({
                 where: fields,
                 force: true
@@ -88,18 +84,18 @@ function post_process(result, identity, seed, trellis, sequelize) {
 function create(seed, trellis, sequelize) {
     var new_seed = prepare_seed(seed, trellis);
     return sequelize.create(new_seed)
-        .then(function (result) { return post_process(result, get_identity(seed, trellis), seed, trellis, sequelize); });
+        .then(function (result) { return post_process(result, trellis.get_identity(result.dataValues), seed, trellis, sequelize); });
 }
 exports.create = create;
 function create_or_update(seed, trellis, sequelize) {
     var new_seed = prepare_seed(seed, trellis);
     return sequelize.upsert(new_seed)
-        .then(function (result) { return post_process(result, get_identity(seed, trellis), seed, trellis, sequelize); });
+        .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, sequelize); });
 }
 exports.create_or_update = create_or_update;
 function update(seed, trellis, sequelize, changes) {
     var primary_key = trellis.primary_key.name;
-    var identity = get_identity(seed, trellis);
+    var identity = trellis.get_identity(seed);
     var new_seed = prepare_seed(changes || seed, trellis);
     var filter = {};
     filter[primary_key] = identity;

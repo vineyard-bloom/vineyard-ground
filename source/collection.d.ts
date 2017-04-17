@@ -7,7 +7,6 @@ export interface ICollection {
 export declare class Collection<T> implements ICollection {
     private sequelize;
     private trellis;
-    private primary_key;
     constructor(trellis: Collection_Trellis<T>, sequelize_model: any);
     create(seed: any): Promise<T>;
     create_or_update(seed: any): Promise<T>;

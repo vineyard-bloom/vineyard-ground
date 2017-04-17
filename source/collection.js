@@ -1,11 +1,11 @@
 "use strict";
-var query_1 = require('./query');
-var update_1 = require('./update');
+Object.defineProperty(exports, "__esModule", { value: true });
+var query_1 = require("./query");
+var update_1 = require("./update");
 var Collection = (function () {
     function Collection(trellis, sequelize_model) {
         this.trellis = trellis;
         this.sequelize = sequelize_model;
-        this.primary_key = this.trellis.primary_key.name;
         trellis.collection = this;
     }
     Collection.prototype.create = function (seed) {
@@ -36,7 +36,7 @@ var Collection = (function () {
         if (!identity)
             throw new Error("Cannot get empty identity of type " + this.trellis.name + '.');
         var filter = {};
-        filter[this.primary_key] = identity;
+        filter[this.trellis.primary_key.name] = identity;
         return this.filter(filter).first();
     };
     return Collection;
