@@ -27,6 +27,9 @@
   },
   "Tag": {
     "properties": {
+      "id": {
+        "type": "int"
+      },
       "name": {
         "type": "string"
       },

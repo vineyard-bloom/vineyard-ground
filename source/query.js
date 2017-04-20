@@ -1,6 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var sequelize = require("sequelize");
+var sequelize = require('sequelize');
 var utility_1 = require("./utility");
 var Reduce_Mode;
 (function (Reduce_Mode) {

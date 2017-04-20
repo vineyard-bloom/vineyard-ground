@@ -154,7 +154,14 @@ function create_table(trellis, schema, sequelize) {
     // Create the primary key field first for DB UX
     var primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library);
     primary_key.primaryKey = true;
-    primary_key.defaultValue = node_uuid.v4;
+    if (trellis.primary_key.type === schema.library.types.uuid) {
+        primary_key.defaultValue = node_uuid.v4;
+    }
+    else if (trellis.primary_key.type === schema.library.types.int ||
+        trellis.primary_key.type === schema.library.types.long) {
+        primary_key.autoIncrement = true;
+        delete primary_key.defaultValue;
+    }
     for (var i in trellis.properties) {
         if (i == trellis.primary_key.name)
             continue;
