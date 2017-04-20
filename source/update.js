@@ -1,5 +1,6 @@
 "use strict";
-var list_operations_1 = require('./list-operations');
+Object.defineProperty(exports, "__esModule", { value: true });
+var list_operations_1 = require("./list-operations");
 var utility_1 = require("./utility");
 function prepare_reference(reference, value) {
     var other_primary_key = reference.get_other_trellis().primary_key.name;
@@ -67,7 +68,7 @@ function update_list(identity, seed, list, sequelize) {
 }
 function update_lists(identity, seed, trellis, sequelize) {
     var promise = Promise.resolve();
-    var _loop_1 = function(list) {
+    var _loop_1 = function (list) {
         if (seed[list.name])
             promise = promise.then(function () { return update_list(identity, seed, list, sequelize); });
     };

@@ -1,6 +1,7 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var vineyard_schema_1 = require("vineyard-schema");
-var Sequelize = require('sequelize');
+var Sequelize = require("sequelize");
 var node_uuid = require('uuid');
 function get_field(property, library) {
     var type = property.type;
@@ -41,7 +42,15 @@ function get_field(property, library) {
                 };
             if (type === library.types.date)
                 return {
+                    type: Sequelize.DATEONLY
+                };
+            if (type === library.types.datetime)
+                return {
                     type: Sequelize.DATE
+                };
+            if (type === library.types.time)
+                return {
+                    type: Sequelize.TIME
                 };
             throw new Error("Unknown primitive: " + type.name + '.');
         case vineyard_schema_1.Type_Category.list:
@@ -112,6 +121,10 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
                 constraints: true
             });
         }
+        // trellis['table'].belongsTo(reference.get_other_trellis()['table'], {
+        //   foreignKey: reference.name,
+        //   constraints: false
+        // })
     }
     else if (property.type.get_category() == vineyard_schema_1.Type_Category.list) {
         var list = property;
@@ -155,6 +168,7 @@ function create_table(trellis, schema, sequelize) {
         underscored: true,
         createdAt: 'created',
         updatedAt: 'modified'
+        // freezeTableName: true
     });
     return table;
 }

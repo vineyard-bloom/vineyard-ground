@@ -51,7 +51,17 @@ function get_field(property: Property, library: Library): any {
 
       if (type === library.types.date)
         return {
+          type: Sequelize.DATEONLY
+        }
+
+      if (type === library.types.datetime)
+        return {
           type: Sequelize.DATE
+        }
+
+      if (type === library.types.time)
+        return {
+          type: Sequelize.TIME
         }
 
       throw new Error("Unknown primitive: " + type.name + '.')
