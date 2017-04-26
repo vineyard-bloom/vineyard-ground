@@ -36,12 +36,12 @@ export class Collection<T> implements ICollection {
     return this.all().filter(options)
   }
 
-  first(): Query<T> {
-    return this.all().first()
+  first(options?): Query<T> {
+    return this.all().first(options)
   }
 
-  first_or_null(): Query<T> {
-    return this.all().first_or_null()
+  first_or_null(options?): Query<T> {
+    return this.all().first_or_null(options)
   }
 
   get_sequelize() {

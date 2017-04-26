@@ -9,8 +9,8 @@ export interface Query<T> {
   exec(): Promise<any>
   expand<T2>(path: string): Query<T2>
   filter(options): Query<T>
-  first(): Query<T>
-  first_or_null(): Query<T>
+  first(options?): Query<T>
+  first_or_null(options?): Query<T>
   join<N>(collection: ICollection): Query<N>
   select<N>(options): Query<N>
 }
@@ -18,7 +18,6 @@ export interface Query<T> {
 enum Reduce_Mode {
   none,
   first,
-  first_or_null,
   single_value,
 }
 
@@ -28,13 +27,15 @@ export class Query_Implementation<T> implements Query<T> {
   private options: any = {}
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
   private expansions = {}
+  private allow_null: boolean = true
 
   private set_reduce_mode(value: Reduce_Mode) {
     if (this.reduce_mode == value)
       return
 
-    if (this.reduce_mode != Reduce_Mode.none)
+    if (this.reduce_mode != Reduce_Mode.none && value != Reduce_Mode.single_value) {
       throw new Error("Reduce mode already set.")
+    }
 
     this.reduce_mode = value
   }
@@ -81,18 +82,23 @@ export class Query_Implementation<T> implements Query<T> {
 
   private process_result(result) {
     if (this.reduce_mode == Reduce_Mode.first) {
-      if (result.length == 0)
-        throw Error("Query.first called on empty result set.")
+      if (result.length == 0) {
+        if (this.allow_null)
+          return null
 
-      return result [0].dataValues
-    }
-    else if (this.reduce_mode == Reduce_Mode.first_or_null) {
-      if (result.length == 0)
-        return null
+        throw Error("Query.first called on empty result set.")
+      }
 
       return result [0].dataValues
     }
     else if (this.reduce_mode == Reduce_Mode.single_value) {
+      if (result.length == 0) {
+        if (this.allow_null)
+          return null
+
+        throw Error("Query.select single value called on empty result set.")
+      }
+
       return result[0].dataValues._value
     }
 
@@ -138,7 +144,7 @@ export class Query_Implementation<T> implements Query<T> {
         options[i] = option[this.trellis.primary_key.name]
       }
     }
-    options.where = options
+    this.options.where = options
     return this
   }
 
@@ -149,6 +155,9 @@ export class Query_Implementation<T> implements Query<T> {
   }
 
   select<N>(options): Query<N> {
+    if (typeof options === 'string')
+      options = [options]
+
     if (options.length == 1) {
       const entry = options[0]
       options = Array.isArray(entry)
@@ -160,14 +169,19 @@ export class Query_Implementation<T> implements Query<T> {
     return this
   }
 
-  first<N>(): Query<N> {
+  first<N>(options?): Query<N> {
     this.set_reduce_mode(Reduce_Mode.first)
-    return this
+    return options
+      ? this.filter(options)
+      : this
   }
 
-  first_or_null<N>(): Query<N> {
-    this.set_reduce_mode(Reduce_Mode.first_or_null)
-    return this
+  first_or_null<N>(options?): Query<N> {
+    this.set_reduce_mode(Reduce_Mode.first)
+    this.allow_null = true
+    return options
+      ? this.filter(options)
+      : this
   }
 
   expand<T2>(path: string): Query<T2> {

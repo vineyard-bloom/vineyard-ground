@@ -22,11 +22,11 @@ var Collection = (function () {
     Collection.prototype.filter = function (options) {
         return this.all().filter(options);
     };
-    Collection.prototype.first = function () {
-        return this.all().first();
+    Collection.prototype.first = function (options) {
+        return this.all().first(options);
     };
-    Collection.prototype.first_or_null = function () {
-        return this.all().first_or_null();
+    Collection.prototype.first_or_null = function (options) {
+        return this.all().first_or_null(options);
     };
     Collection.prototype.get_sequelize = function () {
         return this.sequelize;
@@ -41,4 +41,3 @@ var Collection = (function () {
     return Collection;
 }());
 exports.Collection = Collection;
-//# sourceMappingURL=Collection.js.map

@@ -10,4 +10,3 @@ function to_lower(text) {
     return text[0].toLowerCase() + text.substr(1);
 }
 exports.to_lower = to_lower;
-//# sourceMappingURL=utility.js.map

@@ -5,22 +5,23 @@ var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
     Reduce_Mode[Reduce_Mode["first"] = 1] = "first";
-    Reduce_Mode[Reduce_Mode["first_or_null"] = 2] = "first_or_null";
-    Reduce_Mode[Reduce_Mode["single_value"] = 3] = "single_value";
+    Reduce_Mode[Reduce_Mode["single_value"] = 2] = "single_value";
 })(Reduce_Mode || (Reduce_Mode = {}));
 var Query_Implementation = (function () {
     function Query_Implementation(sequelize, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;
         this.expansions = {};
+        this.allow_null = true;
         this.sequelize = sequelize;
         this.trellis = trellis;
     }
     Query_Implementation.prototype.set_reduce_mode = function (value) {
         if (this.reduce_mode == value)
             return;
-        if (this.reduce_mode != Reduce_Mode.none)
+        if (this.reduce_mode != Reduce_Mode.none && value != Reduce_Mode.single_value) {
             throw new Error("Reduce mode already set.");
+        }
         this.reduce_mode = value;
     };
     Query_Implementation.prototype.get_other_collection = function (path) {
@@ -58,16 +59,19 @@ var Query_Implementation = (function () {
     };
     Query_Implementation.prototype.process_result = function (result) {
         if (this.reduce_mode == Reduce_Mode.first) {
-            if (result.length == 0)
+            if (result.length == 0) {
+                if (this.allow_null)
+                    return null;
                 throw Error("Query.first called on empty result set.");
-            return result[0].dataValues;
-        }
-        else if (this.reduce_mode == Reduce_Mode.first_or_null) {
-            if (result.length == 0)
-                return null;
+            }
             return result[0].dataValues;
         }
         else if (this.reduce_mode == Reduce_Mode.single_value) {
+            if (result.length == 0) {
+                if (this.allow_null)
+                    return null;
+                throw Error("Query.select single value called on empty result set.");
+            }
             return result[0].dataValues._value;
         }
         return result.map(function (item) { return item.dataValues; });
@@ -102,7 +106,7 @@ var Query_Implementation = (function () {
                 options[i] = option[this.trellis.primary_key.name];
             }
         }
-        options.where = options;
+        this.options.where = options;
         return this;
     };
     Query_Implementation.prototype.join = function (collection) {
@@ -111,6 +115,8 @@ var Query_Implementation = (function () {
         return this;
     };
     Query_Implementation.prototype.select = function (options) {
+        if (typeof options === 'string')
+            options = [options];
         if (options.length == 1) {
             var entry = options[0];
             options = Array.isArray(entry)
@@ -121,13 +127,18 @@ var Query_Implementation = (function () {
         this.options.attributes = options;
         return this;
     };
-    Query_Implementation.prototype.first = function () {
+    Query_Implementation.prototype.first = function (options) {
         this.set_reduce_mode(Reduce_Mode.first);
-        return this;
+        return options
+            ? this.filter(options)
+            : this;
     };
-    Query_Implementation.prototype.first_or_null = function () {
-        this.set_reduce_mode(Reduce_Mode.first_or_null);
-        return this;
+    Query_Implementation.prototype.first_or_null = function (options) {
+        this.set_reduce_mode(Reduce_Mode.first);
+        this.allow_null = true;
+        return options
+            ? this.filter(options)
+            : this;
     };
     Query_Implementation.prototype.expand = function (path) {
         if (!this.trellis.properties[path])
@@ -150,4 +161,3 @@ function Count(path) {
     return sequelize.fn('COUNT', sequelize.col(path));
 }
 exports.Count = Count;
-//# sourceMappingURL=query.js.map

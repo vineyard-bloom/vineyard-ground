@@ -182,4 +182,3 @@ function vineyard_to_sequelize(schema, sequelize) {
     return tables;
 }
 exports.vineyard_to_sequelize = vineyard_to_sequelize;
-//# sourceMappingURL=database.js.map

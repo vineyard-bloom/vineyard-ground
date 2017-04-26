@@ -1,5 +1,4 @@
 /// <reference types="es6-promise" />
-/// <reference types="sequelize" />
 import { ICollection } from "./collection";
 import * as sequelize from 'sequelize';
 import { Collection_Trellis } from './types';
@@ -34,8 +33,8 @@ export declare class Query_Implementation<T> implements Query<T> {
     filter(options: any): Query<T>;
     join(collection: ICollection): Query<T>;
     select<N>(options: any): Query<N>;
-    first<N>(): Query<N>;
-    first_or_null<N>(): Query<N>;
+    first<N>(options?: any): Query<N>;
+    first_or_null<N>(options?: any): Query<N>;
     expand<T2>(path: string): Query<T2>;
 }
 export declare function Path(path: any): sequelize.col;

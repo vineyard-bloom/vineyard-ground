@@ -24,4 +24,3 @@ var Modeler = (function () {
     return Modeler;
 }());
 exports.Modeler = Modeler;
-//# sourceMappingURL=modeler.js.map

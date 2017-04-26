@@ -13,8 +13,8 @@ export declare class Collection<T> implements ICollection {
     update(seed: any, changes?: any): Promise<T>;
     all(): Query<T>;
     filter(options: any): Query<T>;
-    first(): Query<T>;
-    first_or_null(): Query<T>;
+    first(options?: any): Query<T>;
+    first_or_null(options?: any): Query<T>;
     get_sequelize(): any;
     get(identity: any): Query<T>;
 }
