@@ -1,5 +1,5 @@
 import {Schema} from 'vineyard-schema'
-import {Collection, ICollection} from "./Collection";
+import {Collection, ICollection} from "./collection";
 import {vineyard_to_sequelize} from "./database";
 
 export type Collection_Map = {[name: string]: ICollection}

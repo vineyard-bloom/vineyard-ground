@@ -7,8 +7,8 @@ export interface Query<T> {
     exec(): Promise<any>;
     expand<T2>(path: string): Query<T2>;
     filter(options: any): Query<T>;
-    first(): Query<T>;
-    first_or_null(): Query<T>;
+    first(options?: any): Query<T>;
+    first_or_null(options?: any): Query<T>;
     join<N>(collection: ICollection): Query<N>;
     select<N>(options: any): Query<N>;
 }
@@ -18,6 +18,7 @@ export declare class Query_Implementation<T> implements Query<T> {
     private options;
     private reduce_mode;
     private expansions;
+    private allow_null;
     private set_reduce_mode(value);
     private get_other_collection(path);
     private expand_cross_table(reference, identity);

@@ -1,5 +1,5 @@
 import { Schema } from 'vineyard-schema';
-import { ICollection } from "./Collection";
+import { ICollection } from "./collection";
 export declare type Collection_Map = {
     [name: string]: ICollection;
 };

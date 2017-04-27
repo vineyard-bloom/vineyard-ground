@@ -105,3 +105,4 @@ function update(seed, trellis, sequelize, changes) {
         .then(function (result) { return post_process(result, identity, changes, trellis, sequelize); });
 }
 exports.update = update;
+//# sourceMappingURL=update.js.map

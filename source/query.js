@@ -161,3 +161,4 @@ function Count(path) {
     return sequelize.fn('COUNT', sequelize.col(path));
 }
 exports.Count = Count;
+//# sourceMappingURL=query.js.map
