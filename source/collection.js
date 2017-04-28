@@ -41,4 +41,4 @@ var Collection = (function () {
     return Collection;
 }());
 exports.Collection = Collection;
-//# sourceMappingURL=Collection.js.map
+//# sourceMappingURL=collection.js.map

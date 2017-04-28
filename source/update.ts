@@ -5,10 +5,13 @@ import {to_lower} from "./utility";
 function prepare_reference(reference: Reference, value) {
   const other_primary_key = reference.get_other_trellis().primary_key.name
   if (typeof value === 'object') {
+    if (!value)
+      throw new Error(reference.get_path() + ' cannot be null')
+
     if (value[other_primary_key])
       return value[other_primary_key]
     else
-      throw new Error(reference.get_path() + 'cannot be an object')
+      throw new Error(reference.get_path() + ' cannot be an object')
   }
   else {
     return value
@@ -20,8 +23,8 @@ function prepare_property(property: Property, value) {
     return prepare_reference(property as Reference, value)
   }
   else {
-    if (typeof value === 'object' && property.type.name != 'json' && property.type.name != 'jsonb')
-      throw new Error(property.get_path() + 'cannot be an object')
+    if (typeof value === 'object' && ['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
+      throw new Error(property.get_path() + ' cannot be an object')
 
     return value
   }

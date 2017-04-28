@@ -1,9 +1,10 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require('source-map-support').install();
-var assert = require('assert');
-var vineyard_schema_1 = require('vineyard-schema');
-var Sequelize = require('sequelize');
-var source_1 = require('../../source');
+var assert = require("assert");
+var vineyard_schema_1 = require("vineyard-schema");
+var Sequelize = require("sequelize");
+var source_1 = require("../../source");
 var config = require('../config/config.json');
 var game_schema = require('../schema/game.json');
 describe('Model Test', function () {
