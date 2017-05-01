@@ -1,4 +1,3 @@
-/// <reference types="es6-promise" />
 import { Query } from './query';
 import { Collection_Trellis } from './types';
 export interface ICollection {

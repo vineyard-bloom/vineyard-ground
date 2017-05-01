@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 var collection_1 = require("./collection");
 var database_1 = require("./database");
 function sync_collections(schema, collections, sequelize_models) {

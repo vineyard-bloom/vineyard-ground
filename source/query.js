@@ -1,5 +1,6 @@
 "use strict";
-var sequelize = require('sequelize');
+Object.defineProperty(exports, "__esModule", { value: true });
+var sequelize = require("sequelize");
 var utility_1 = require("./utility");
 var Reduce_Mode;
 (function (Reduce_Mode) {
@@ -47,7 +48,7 @@ var Query_Implementation = (function () {
         var property = this.trellis.properties[path];
         return property.is_list()
             ? this.expand_cross_table(property, this.trellis.get_identity(data))
-            : this.get_other_collection(path).get(data[path]).then(function (result) { return result.dataValues; });
+            : this.get_other_collection(path).get(data[path]);
     };
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;

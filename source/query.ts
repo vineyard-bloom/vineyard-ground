@@ -66,7 +66,7 @@ export class Query_Implementation<T> implements Query<T> {
     const property = this.trellis.properties[path]
     return property.is_list()
       ? this.expand_cross_table(property as Reference, this.trellis.get_identity(data))
-      : this.get_other_collection(path).get(data[path]).then(result => result.dataValues)
+      : this.get_other_collection(path).get(data[path])
   }
 
   private handle_expansions(results) {

@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 function to_lower_snake_case(text) {
     if (text.length == 1)
         return text;

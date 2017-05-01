@@ -1,4 +1,3 @@
-/// <reference types="es6-promise" />
 import { Trellis } from 'vineyard-schema';
 export declare function create<T>(seed: any, trellis: Trellis, sequelize: any): Promise<T>;
 export declare function create_or_update<T>(seed: any, trellis: Trellis, sequelize: any): Promise<T>;

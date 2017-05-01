@@ -1,4 +1,3 @@
-/// <reference types="es6-promise" />
 import { ICollection } from "./collection";
 import * as sequelize from 'sequelize';
 import { Collection_Trellis } from './types';
