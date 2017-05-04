@@ -187,7 +187,9 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
   const primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library)
   primary_key.primaryKey = true
   if (trellis.primary_key.type === schema.library.types.uuid) {
-    primary_key.defaultValue = node_uuid.v4
+    primary_key.defaultValue = sequelize.getDialect() == 'mysql'
+      ? () => node_uuid.v4().replace(/-/g, '')
+      : node_uuid.v4
   }
   else if (trellis.primary_key.type === schema.library.types.int ||
     trellis.primary_key.type === schema.library.types.long) {
