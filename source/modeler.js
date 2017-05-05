@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var vineyard_schema_1 = require("vineyard-schema");
 var collection_1 = require("./collection");
 var database_1 = require("./database");
 function sync_collections(schema, collections, sequelize_models) {
@@ -11,10 +12,12 @@ function sync_collections(schema, collections, sequelize_models) {
 var Modeler = (function () {
     function Modeler(db, schema) {
         this.collections = {};
-        this.schema = schema;
+        this.schema = schema instanceof vineyard_schema_1.Schema
+            ? schema
+            : new vineyard_schema_1.Schema(schema);
         this.db = db;
-        var sequelize_models = database_1.vineyard_to_sequelize(schema, db);
-        sync_collections(schema, this.collections, sequelize_models);
+        var sequelize_models = database_1.vineyard_to_sequelize(this.schema, db);
+        sync_collections(this.schema, this.collections, sequelize_models);
     }
     Modeler.prototype.sync_database = function (options) {
         return this.db.sync(options);
