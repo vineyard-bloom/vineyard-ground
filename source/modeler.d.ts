@@ -10,4 +10,6 @@ export declare class Modeler {
     constructor(db: any, schema: Schema | any);
     sync_database(options?: any): any;
     regenerate(): any;
+    query(sql: any, replacements?: any): any;
+    querySingle(sql: any, replacements?: any): any;
 }

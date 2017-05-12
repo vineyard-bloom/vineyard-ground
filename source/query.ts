@@ -21,6 +21,18 @@ enum Reduce_Mode {
   single_value,
 }
 
+function processFields(result, trellis: Trellis) {
+  if (trellis['table'].sequelize.getDialect() == 'mysql') {
+    for (var i in trellis.properties) {
+      const property = trellis.properties[i]
+      if (property.type.name == 'json') {
+        result[i] = JSON.parse(result[i])
+      }
+    }
+  }
+  return result
+}
+
 export class Query_Implementation<T> implements Query<T> {
   private sequelize
   private trellis: Collection_Trellis<T>
@@ -59,7 +71,7 @@ export class Query_Implementation<T> implements Query<T> {
         required: true
       }
     })
-      .then(result => result.map(r => r.dataValues))
+      .then(result => result.map(r => processFields(r.dataValues, reference.other_property.trellis)))
   }
 
   private perform_expansion(path: string, data) {
@@ -89,7 +101,7 @@ export class Query_Implementation<T> implements Query<T> {
         throw Error("Query.first called on empty result set.")
       }
 
-      return result [0].dataValues
+      return processFields(result [0].dataValues, this.trellis)
     }
     else if (this.reduce_mode == Reduce_Mode.single_value) {
       if (result.length == 0) {
@@ -102,7 +114,7 @@ export class Query_Implementation<T> implements Query<T> {
       return result[0].dataValues._value
     }
 
-    return result.map(item => item.dataValues)
+    return result.map(item => processFields(item.dataValues, this.trellis))
   }
 
   private process_result_with_expansions(result) {

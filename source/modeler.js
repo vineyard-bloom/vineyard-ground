@@ -25,6 +25,16 @@ var Modeler = (function () {
     Modeler.prototype.regenerate = function () {
         return this.db.sync({ force: true });
     };
+    Modeler.prototype.query = function (sql, replacements) {
+        return this.db.query(sql, {
+            replacements: replacements
+        })
+            .then(function (result) { return result[0]; });
+    };
+    Modeler.prototype.querySingle = function (sql, replacements) {
+        return this.query(sql, replacements)
+            .then(function (result) { return result[0]; });
+    };
     return Modeler;
 }());
 exports.Modeler = Modeler;

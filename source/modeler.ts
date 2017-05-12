@@ -6,7 +6,7 @@ export type Collection_Map = { [name: string]: ICollection }
 
 function sync_collections(schema: Schema, collections: Collection_Map, sequelize_models) {
   for (let name in schema.trellises) {
-    const trellis = schema.trellises [name]
+    const trellis = schema.trellises [name] as any
     collections [name] = new Collection(trellis, sequelize_models [name])
   }
 }
@@ -32,5 +32,17 @@ export class Modeler {
 
   regenerate() {
     return this.db.sync({force: true})
+  }
+
+  query(sql, replacements?) {
+    return this.db.query(sql, {
+      replacements: replacements
+    })
+      .then(result => result [0])
+  }
+
+  querySingle(sql, replacements?){
+    return this.query(sql, replacements)
+      .then(result => result [0])
   }
 }

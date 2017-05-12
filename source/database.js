@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var vineyard_schema_1 = require("vineyard-schema");
 var Sequelize = require("sequelize");
 var node_uuid = require('uuid');
-function get_field(property, library) {
+function get_field(property, library, dialect) {
     var type = property.type;
     switch (type.get_category()) {
         case vineyard_schema_1.Type_Category.primitive:
@@ -23,9 +23,9 @@ function get_field(property, library) {
                     defaultValue: ""
                 };
             if (type === library.types.json)
-                return {
-                    type: Sequelize.JSON
-                };
+                return dialect == 'mysql'
+                    ? { type: Sequelize.TEXT }
+                    : { type: Sequelize.JSON };
             if (type === library.types.bool)
                 return {
                     type: Sequelize.BOOLEAN,
@@ -57,15 +57,15 @@ function get_field(property, library) {
             return null;
         case vineyard_schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
-                return get_field(type.trellis.primary_key, library);
+                return get_field(type.trellis.primary_key, library, dialect);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');
         default:
             throw Error("Invalid type category: " + type.get_category() + '.');
     }
 }
-function create_field(property, library) {
-    var field = get_field(property, library);
+function create_field(property, library, dialect) {
+    var field = get_field(property, library, dialect);
     if (!field)
         return null;
     field.allowNull = property.is_nullable;
@@ -78,27 +78,9 @@ function create_field(property, library) {
 function get_cross_table_name(trellises) {
     return trellises.map(function (t) { return t['table'].getTableName(); }).sort().join('_');
 }
-// function create_cross_table(table_name: string, trellises: Trellis [], tables, library: Library, sequelize) {
-//   const fields = {}
-//   for (let trellis of trellises) {
-//     const field = get_field(trellis.primary_key, library)
-//     field.primaryKey = true
-//     fields[trellis.name.toLowerCase()]= field
-//   }
-//   const table = tables [table_name] = sequelize.define(table_name, fields, {
-//     underscored: true,
-//     createdAt: 'created',
-//     updatedAt: 'modified',
-//     freezeTableName: true
-//   })
-//
-//   return table
-// }
 function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
     var table_trellises = [list.trellis, list.other_property.trellis];
     var cross_table_name = get_cross_table_name(table_trellises);
-    // if (!tables [cross_table_name]) {
-    // const cross_table = create_cross_table(cross_table_name, table_trellises, tables, schema.library, sequelize)
     var relationship = trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
         as: list.name,
         otherKey: list.other_property.trellis.name.toLowerCase(),
@@ -106,9 +88,6 @@ function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
         constraints: false,
         through: cross_table_name
     });
-    // tables [cross_table_name] = relationship.through.model
-    // }
-    // list['cross_table'] = tables [cross_table_name]
     list['cross_table'] = relationship.through.model;
 }
 function initialize_relationship(property, trellis, schema, tables, sequelize) {
@@ -121,10 +100,6 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
                 constraints: true
             });
         }
-        // trellis['table'].belongsTo(reference.get_other_trellis()['table'], {
-        //   foreignKey: reference.name,
-        //   constraints: false
-        // })
     }
     else if (property.type.get_category() == vineyard_schema_1.Type_Category.list) {
         var list = property;
@@ -152,7 +127,8 @@ function initialize_relationships(schema, tables, sequelize) {
 function create_table(trellis, schema, sequelize) {
     var fields = {};
     // Create the primary key field first for DB UX
-    var primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library);
+    var primary_key = fields[trellis.primary_key.name] =
+        create_field(trellis.primary_key, schema.library, sequelize.getDialect());
     primary_key.primaryKey = true;
     if (trellis.primary_key.type === schema.library.types.uuid) {
         primary_key.defaultValue = sequelize.getDialect() == 'mysql'
@@ -168,7 +144,7 @@ function create_table(trellis, schema, sequelize) {
         if (i == trellis.primary_key.name)
             continue;
         var property = trellis.properties[i];
-        var field = create_field(property, schema.library);
+        var field = create_field(property, schema.library, sequelize.getDialect());
         if (field) {
             fields[i] = field;
         }

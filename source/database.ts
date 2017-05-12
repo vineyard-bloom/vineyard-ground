@@ -4,7 +4,7 @@ import {Table_Trellis} from "./types";
 
 const node_uuid = require('uuid')
 
-function get_field(property: Property, library: Library): any {
+function get_field(property: Property, library: Library, dialect: string): any {
   const type = property.type
   switch (type.get_category()) {
     case Type_Category.primitive:
@@ -28,9 +28,9 @@ function get_field(property: Property, library: Library): any {
         }
 
       if (type === library.types.json)
-        return {
-          type: Sequelize.JSON
-        }
+        return dialect == 'mysql'
+          ? {type: Sequelize.TEXT}
+          : {type: Sequelize.JSON}
 
       if (type === library.types.bool)
         return {
@@ -71,7 +71,7 @@ function get_field(property: Property, library: Library): any {
 
     case Type_Category.trellis:
       if (library.types[type.name]) {
-        return get_field((type as Trellis_Type).trellis.primary_key, library)
+        return get_field((type as Trellis_Type).trellis.primary_key, library, dialect)
       }
 
       throw new Error("Unknown trellis reference: " + type.name + '.')
@@ -81,8 +81,8 @@ function get_field(property: Property, library: Library): any {
   }
 }
 
-function create_field(property: Property, library: Library): any {
-  const field = get_field(property, library)
+function create_field(property: Property, library: Library, dialect: string): any {
+  const field = get_field(property, library, dialect)
   if (!field)
     return null
 
@@ -101,29 +101,9 @@ function get_cross_table_name(trellises: Trellis []) {
   return trellises.map(t => t['table'].getTableName()).sort().join('_')
 }
 
-// function create_cross_table(table_name: string, trellises: Trellis [], tables, library: Library, sequelize) {
-//   const fields = {}
-//   for (let trellis of trellises) {
-//     const field = get_field(trellis.primary_key, library)
-//     field.primaryKey = true
-//     fields[trellis.name.toLowerCase()]= field
-//   }
-//   const table = tables [table_name] = sequelize.define(table_name, fields, {
-//     underscored: true,
-//     createdAt: 'created',
-//     updatedAt: 'modified',
-//     freezeTableName: true
-//   })
-//
-//   return table
-// }
-
 function initialize_many_to_many(list: Reference, trellis: Trellis, schema: Schema, tables, sequelize) {
   const table_trellises = [list.trellis, list.other_property.trellis]
   const cross_table_name = get_cross_table_name(table_trellises)
-
-  // if (!tables [cross_table_name]) {
-  // const cross_table = create_cross_table(cross_table_name, table_trellises, tables, schema.library, sequelize)
 
   const relationship = trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
     as: list.name,
@@ -132,10 +112,7 @@ function initialize_many_to_many(list: Reference, trellis: Trellis, schema: Sche
     constraints: false,
     through: cross_table_name
   })
-  // tables [cross_table_name] = relationship.through.model
-  // }
 
-  // list['cross_table'] = tables [cross_table_name]
   list['cross_table'] = relationship.through.model
 }
 
@@ -149,10 +126,6 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
         constraints: true
       })
     }
-    // trellis['table'].belongsTo(reference.get_other_trellis()['table'], {
-    //   foreignKey: reference.name,
-    //   constraints: false
-    // })
   }
   else if (property.type.get_category() == Type_Category.list) {
     const list = property as Reference
@@ -184,7 +157,9 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
   const fields = {}
 
   // Create the primary key field first for DB UX
-  const primary_key = fields[trellis.primary_key.name] = create_field(trellis.primary_key, schema.library)
+  const primary_key = fields[trellis.primary_key.name] =
+    create_field(trellis.primary_key, schema.library, sequelize.getDialect())
+
   primary_key.primaryKey = true
   if (trellis.primary_key.type === schema.library.types.uuid) {
     primary_key.defaultValue = sequelize.getDialect() == 'mysql'
@@ -202,7 +177,7 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
       continue
 
     const property = trellis.properties[i]
-    const field = create_field(property, schema.library)
+    const field = create_field(property, schema.library, sequelize.getDialect())
     if (field) {
       fields[i] = field
     }

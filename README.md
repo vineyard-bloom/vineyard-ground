@@ -2,6 +2,14 @@
 
 SQL ORM for Node.js.  Uses [Sequelize](https://github.com/sequelize/sequelize) and [Vineyard Schema](https://github.com/silentorb/vineyard-schema).
 
+## Features
+
+* Uses POD (Plain Old Data) objects.
+* Schema can be defined entirely in JSON.
+* Comprehensive understanding of table relationships (something most JavaScript ORMs lack.)
+* Chainable query API.
+* Automatic identity resolution.  (Functions requiring an entity identifier can be passed either an object or scalar identity value.)
+
 ## API
 
 ### Collection

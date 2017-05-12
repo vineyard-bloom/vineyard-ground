@@ -20,6 +20,9 @@ function prepare_property(property, value) {
     if (property.is_reference()) {
         return prepare_reference(property, value);
     }
+    else if (property.type.name == 'json' && property.trellis['table'].sequelize.getDialect() == 'mysql') {
+        return JSON.stringify(value);
+    }
     else {
         if (typeof value === 'object' && ['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
             throw new Error(property.get_path() + ' cannot be an object');

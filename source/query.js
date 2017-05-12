@@ -8,6 +8,17 @@ var Reduce_Mode;
     Reduce_Mode[Reduce_Mode["first"] = 1] = "first";
     Reduce_Mode[Reduce_Mode["single_value"] = 2] = "single_value";
 })(Reduce_Mode || (Reduce_Mode = {}));
+function processFields(result, trellis) {
+    if (trellis['table'].sequelize.getDialect() == 'mysql') {
+        for (var i in trellis.properties) {
+            var property = trellis.properties[i];
+            if (property.type.name == 'json') {
+                result[i] = JSON.parse(result[i]);
+            }
+        }
+    }
+    return result;
+}
 var Query_Implementation = (function () {
     function Query_Implementation(sequelize, trellis) {
         this.options = {};
@@ -42,7 +53,7 @@ var Query_Implementation = (function () {
                 required: true
             }
         })
-            .then(function (result) { return result.map(function (r) { return r.dataValues; }); });
+            .then(function (result) { return result.map(function (r) { return processFields(r.dataValues, reference.other_property.trellis); }); });
     };
     Query_Implementation.prototype.perform_expansion = function (path, data) {
         var property = this.trellis.properties[path];
@@ -59,13 +70,14 @@ var Query_Implementation = (function () {
             .then(function () { return results; }); // Not needed but a nice touch.
     };
     Query_Implementation.prototype.process_result = function (result) {
+        var _this = this;
         if (this.reduce_mode == Reduce_Mode.first) {
             if (result.length == 0) {
                 if (this.allow_null)
                     return null;
                 throw Error("Query.first called on empty result set.");
             }
-            return result[0].dataValues;
+            return processFields(result[0].dataValues, this.trellis);
         }
         else if (this.reduce_mode == Reduce_Mode.single_value) {
             if (result.length == 0) {
@@ -75,7 +87,7 @@ var Query_Implementation = (function () {
             }
             return result[0].dataValues._value;
         }
-        return result.map(function (item) { return item.dataValues; });
+        return result.map(function (item) { return processFields(item.dataValues, _this.trellis); });
     };
     Query_Implementation.prototype.process_result_with_expansions = function (result) {
         var _this = this;

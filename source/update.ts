@@ -1,6 +1,6 @@
 import {Property, Trellis, Reference} from 'vineyard-schema'
 import {Operation, Operation_Type} from './list-operations'
-import {to_lower} from "./utility";
+import {to_lower} from "./utility"
 
 function prepare_reference(reference: Reference, value) {
   const other_primary_key = reference.get_other_trellis().primary_key.name
@@ -21,6 +21,9 @@ function prepare_reference(reference: Reference, value) {
 function prepare_property(property: Property, value) {
   if (property.is_reference()) {
     return prepare_reference(property as Reference, value)
+  }
+  else if (property.type.name == 'json' && property.trellis['table'].sequelize.getDialect() == 'mysql') {
+    return JSON.stringify(value)
   }
   else {
     if (typeof value === 'object' && ['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
