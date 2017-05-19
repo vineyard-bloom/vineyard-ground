@@ -7,8 +7,8 @@ export declare class Modeler {
     private schema;
     private db;
     collections: Collection_Map;
-    constructor(db: any, schema: Schema | any);
-    sync_database(options?: any): any;
+    devMode: boolean;
+    constructor(db: any, schema: Schema | any, devMode?: boolean);
     regenerate(): any;
     query(sql: any, replacements?: any): any;
     querySingle(sql: any, replacements?: any): any;

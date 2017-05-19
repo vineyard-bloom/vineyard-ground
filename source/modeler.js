@@ -10,19 +10,26 @@ function sync_collections(schema, collections, sequelize_models) {
     }
 }
 var Modeler = (function () {
-    function Modeler(db, schema) {
+    function Modeler(db, schema, devMode) {
+        if (devMode === void 0) { devMode = false; }
         this.collections = {};
+        this.devMode = false;
         this.schema = schema instanceof vineyard_schema_1.Schema
             ? schema
             : new vineyard_schema_1.Schema(schema);
         this.db = db;
+        this.devMode = devMode;
         var sequelize_models = database_1.vineyard_to_sequelize(this.schema, db);
         sync_collections(this.schema, this.collections, sequelize_models);
     }
-    Modeler.prototype.sync_database = function (options) {
-        return this.db.sync(options);
-    };
+    // sync_database(options?) {
+    //   return this.db.sync(options)
+    // }
     Modeler.prototype.regenerate = function () {
+        if (!this.devMode)
+            throw new Error("regenerate() can only be run in dev mode. (In the database config set devMode to true).");
+        if (this.db.config.host != 'localhost')
+            throw new Error("To minimize accidental data loss, regenerate() can only be run on a local database.");
         return this.db.sync({ force: true });
     };
     Modeler.prototype.query = function (sql, replacements) {

@@ -15,22 +15,30 @@ export class Modeler {
   private schema: Schema
   private db
   collections: Collection_Map = {}
+  devMode:boolean = false
 
-  constructor(db, schema: Schema | any) {
+  constructor(db, schema: Schema | any, devMode = false) {
     this.schema = schema instanceof Schema
       ? schema
       : new Schema(schema)
 
     this.db = db
+    this.devMode = devMode
     const sequelize_models = vineyard_to_sequelize(this.schema, db)
     sync_collections(this.schema, this.collections, sequelize_models)
   }
 
-  sync_database(options?) {
-    return this.db.sync(options)
-  }
+  // sync_database(options?) {
+  //   return this.db.sync(options)
+  // }
 
   regenerate() {
+    if (!this.devMode)
+      throw new Error("regenerate() can only be run in dev mode. (In the database config set devMode to true).")
+
+    if (this.db.config.host != 'localhost')
+      throw new Error("To minimize accidental data loss, regenerate() can only be run on a local database.")
+
     return this.db.sync({force: true})
   }
 
