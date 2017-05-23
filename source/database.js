@@ -127,27 +127,33 @@ function initialize_relationships(schema, tables, sequelize) {
 function create_table(trellis, schema, sequelize) {
     var fields = {};
     // Create the primary key field first for DB UX
-    var primary_key = fields[trellis.primary_key.name] =
-        create_field(trellis.primary_key, schema.library, sequelize.getDialect());
-    primary_key.primaryKey = true;
-    if (trellis.primary_key.type === schema.library.types.uuid) {
-        primary_key.defaultValue = sequelize.getDialect() == 'mysql'
-            ? function () { return node_uuid.v4().replace(/-/g, ''); }
-            : node_uuid.v4;
+    for (var i = 0; i < trellis.primary_keys.length; ++i) {
+        var property = trellis.primary_keys[i];
+        var primary_key = fields[property.name] =
+            create_field(property, schema.library, sequelize.getDialect());
+        primary_key.primaryKey = true;
+        if (property.type === schema.library.types.uuid) {
+            primary_key.defaultValue = sequelize.getDialect() == 'mysql'
+                ? function () { return node_uuid.v4().replace(/-/g, ''); }
+                : node_uuid.v4;
+        }
+        else if (property.type === schema.library.types.int ||
+            property.type === schema.library.types.long) {
+            primary_key.autoIncrement = true;
+            delete primary_key.defaultValue;
+        }
     }
-    else if (trellis.primary_key.type === schema.library.types.int ||
-        trellis.primary_key.type === schema.library.types.long) {
-        primary_key.autoIncrement = true;
-        delete primary_key.defaultValue;
-    }
-    for (var i in trellis.properties) {
-        if (i == trellis.primary_key.name)
-            continue;
+    var _loop_1 = function (i) {
+        if (trellis.primary_keys.some(function (k) { return k.name == i; }))
+            return "continue";
         var property = trellis.properties[i];
         var field = create_field(property, schema.library, sequelize.getDialect());
         if (field) {
             fields[i] = field;
         }
+    };
+    for (var i in trellis.properties) {
+        _loop_1(i);
     }
     var table = trellis['table'] = sequelize.define(trellis.name.toLowerCase(), fields, {
         underscored: true,

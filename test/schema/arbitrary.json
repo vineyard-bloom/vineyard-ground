@@ -1,0 +1,13 @@
+{
+  "Odd": {
+    "primary": ["strange", "unknown"],
+    "properties": {
+      "strange": {
+        "type": "int"
+      },
+      "unknown": {
+        "type": "string"
+      }
+    }
+  }
+}

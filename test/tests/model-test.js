@@ -6,13 +6,12 @@ var vineyard_schema_1 = require("vineyard-schema");
 var Sequelize = require("sequelize");
 var source_1 = require("../../source");
 var config = require('../config/config.json');
-var game_schema = require('../schema/game.json');
-describe('Model Test', function () {
+describe('Game', function () {
     this.timeout(4000);
     it('sync_database', function () {
         var db = new Sequelize(config.database);
-        var schema = new vineyard_schema_1.Schema(game_schema);
-        var modeler = new source_1.Modeler(db, schema);
+        var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
+        var modeler = new source_1.Modeler(db, schema, true);
         var model = modeler.collections;
         return modeler.regenerate()
             .then(function () { return model.Tag.create({
@@ -45,6 +44,20 @@ describe('Model Test', function () {
             assert(Array.isArray(creature.tags));
             assert.equal(0, creature.tags.length);
         }); }); }); });
+    });
+});
+describe('Arbitrary', function () {
+    this.timeout(4000);
+    it('sync_database', function () {
+        var db = new Sequelize(config.database);
+        var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
+        var modeler = new source_1.Modeler(db, schema, true);
+        var model = modeler.collections;
+        return modeler.regenerate()
+            .then(function () { return model.Odd.create({
+            strange: 10,
+            unknown: "mist"
+        }); });
     });
 });
 //# sourceMappingURL=model-test.js.map

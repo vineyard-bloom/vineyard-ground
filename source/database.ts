@@ -150,30 +150,32 @@ function initialize_relationships(schema: Schema, tables, sequelize) {
       initialize_relationship(property, trellis, schema, tables, sequelize)
     }
   }
-
 }
 
 function create_table(trellis: Trellis, schema: Schema, sequelize) {
   const fields = {}
 
   // Create the primary key field first for DB UX
-  const primary_key = fields[trellis.primary_key.name] =
-    create_field(trellis.primary_key, schema.library, sequelize.getDialect())
+  for (let i = 0; i < trellis.primary_keys.length; ++i) {
+    const property = trellis.primary_keys[i]
+    const primary_key = fields[property.name] =
+      create_field(property, schema.library, sequelize.getDialect())
 
-  primary_key.primaryKey = true
-  if (trellis.primary_key.type === schema.library.types.uuid) {
-    primary_key.defaultValue = sequelize.getDialect() == 'mysql'
-      ? () => node_uuid.v4().replace(/-/g, '')
-      : node_uuid.v4
-  }
-  else if (trellis.primary_key.type === schema.library.types.int ||
-    trellis.primary_key.type === schema.library.types.long) {
-    primary_key.autoIncrement = true
-    delete primary_key.defaultValue
+    primary_key.primaryKey = true
+    if (property.type === schema.library.types.uuid) {
+      primary_key.defaultValue = sequelize.getDialect() == 'mysql'
+        ? () => node_uuid.v4().replace(/-/g, '')
+        : node_uuid.v4
+    }
+    else if (property.type === schema.library.types.int ||
+      property.type === schema.library.types.long) {
+      primary_key.autoIncrement = true
+      delete primary_key.defaultValue
+    }
   }
 
   for (let i in trellis.properties) {
-    if (i == trellis.primary_key.name)
+    if (trellis.primary_keys.some(k => k.name == i))
       continue
 
     const property = trellis.properties[i]

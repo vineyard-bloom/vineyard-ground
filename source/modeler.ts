@@ -28,10 +28,6 @@ export class Modeler {
     sync_collections(this.schema, this.collections, sequelize_models)
   }
 
-  // sync_database(options?) {
-  //   return this.db.sync(options)
-  // }
-
   regenerate() {
     if (!this.devMode)
       throw new Error("regenerate() can only be run in dev mode. (In the database config set devMode to true).")

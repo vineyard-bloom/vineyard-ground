@@ -4,6 +4,7 @@
     "database": "vineyard_model",
     "username": "",
     "password": "",
-    "dialect": "postgres"
+    "dialect": "postgres",
+    "devMode": true
   }
 }
