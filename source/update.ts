@@ -5,8 +5,12 @@ import {to_lower} from "./utility"
 function prepare_reference(reference: Reference, value) {
   const other_primary_key = reference.get_other_trellis().primary_key.name
   if (typeof value === 'object') {
-    if (!value)
+    if (!value) {
+      if (reference.is_nullable)
+        return null
+
       throw new Error(reference.get_path() + ' cannot be null')
+    }
 
     if (value[other_primary_key])
       return value[other_primary_key]
