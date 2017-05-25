@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var modeler_1 = require("../../source/modeler");
 require('source-map-support').install();
 var assert = require("assert");
 var vineyard_schema_1 = require("vineyard-schema");
@@ -11,7 +12,7 @@ describe('Game', function () {
     it('sync_database', function () {
         var db = new Sequelize(config.database);
         var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
-        var modeler = new source_1.Modeler(db, schema, true);
+        var modeler = new modeler_1.DevModeler(db, schema);
         var model = modeler.collections;
         return modeler.regenerate()
             .then(function () { return model.Tag.create({
@@ -51,7 +52,7 @@ describe('Arbitrary', function () {
     it('sync_database', function () {
         var db = new Sequelize(config.database);
         var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
-        var modeler = new source_1.Modeler(db, schema, true);
+        var modeler = new modeler_1.DevModeler(db, schema);
         var model = modeler.collections;
         return modeler.regenerate()
             .then(function () { return model.Odd.create({

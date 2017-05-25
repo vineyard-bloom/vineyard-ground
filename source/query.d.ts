@@ -1,4 +1,3 @@
-/// <reference types="sequelize" />
 import { ICollection } from "./collection";
 import * as sequelize from 'sequelize';
 import { Collection_Trellis } from './types';
@@ -9,8 +8,11 @@ export interface Query<T> {
     filter(options: any): Query<T>;
     first(options?: any): Query<T>;
     first_or_null(options?: any): Query<T>;
+    firstOrNull(options?: any): Query<T>;
     join<N>(collection: ICollection): Query<N>;
     select<N>(options: any): Query<N>;
+    range(start?: number, length?: number): Query<T>;
+    sort(args: string[]): Query<T>;
 }
 export declare class Query_Implementation<T> implements Query<T> {
     private sequelize;
@@ -36,6 +38,9 @@ export declare class Query_Implementation<T> implements Query<T> {
     select<N>(options: any): Query<N>;
     first<N>(options?: any): Query<N>;
     first_or_null<N>(options?: any): Query<N>;
+    firstOrNull<N>(options?: any): Query<N>;
+    range(start?: number, length?: number): Query<T>;
+    sort(args: string[]): Query<T>;
     expand<T2>(path: string): Query<T2>;
 }
 export declare function Path(path: any): sequelize.col;

@@ -1,4 +1,14 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 var vineyard_schema_1 = require("vineyard-schema");
 var collection_1 = require("./collection");
@@ -10,25 +20,15 @@ function sync_collections(schema, collections, sequelize_models) {
     }
 }
 var Modeler = (function () {
-    function Modeler(db, schema, devMode) {
-        if (devMode === void 0) { devMode = false; }
+    function Modeler(db, schema) {
         this.collections = {};
-        this.devMode = false;
         this.schema = schema instanceof vineyard_schema_1.Schema
             ? schema
             : new vineyard_schema_1.Schema(schema);
         this.db = db;
-        this.devMode = devMode;
         var sequelize_models = database_1.vineyard_to_sequelize(this.schema, db);
         sync_collections(this.schema, this.collections, sequelize_models);
     }
-    Modeler.prototype.regenerate = function () {
-        if (!this.devMode)
-            throw new Error("regenerate() can only be run in dev mode. (In the database config set devMode to true).");
-        if (this.db.config.host != 'localhost')
-            throw new Error("To minimize accidental data loss, regenerate() can only be run on a local database.");
-        return this.db.sync({ force: true });
-    };
     Modeler.prototype.query = function (sql, replacements) {
         return this.db.query(sql, {
             replacements: replacements
@@ -42,4 +42,18 @@ var Modeler = (function () {
     return Modeler;
 }());
 exports.Modeler = Modeler;
+var DevModeler = (function (_super) {
+    __extends(DevModeler, _super);
+    function DevModeler() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    DevModeler.prototype.regenerate = function () {
+        // An extra safe guard
+        if (this.db.config.host != 'localhost')
+            throw new Error("To minimize accidental data loss, regenerate() can only be run on a local database.");
+        return this.db.sync({ force: true });
+    };
+    return DevModeler;
+}(Modeler));
+exports.DevModeler = DevModeler;
 //# sourceMappingURL=modeler.js.map

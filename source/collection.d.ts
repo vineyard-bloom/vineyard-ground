@@ -14,6 +14,7 @@ export declare class Collection<T> implements ICollection {
     filter(options: any): Query<T>;
     first(options?: any): Query<T>;
     first_or_null(options?: any): Query<T>;
+    firstOrNull(options?: any): Query<T>;
     get_sequelize(): any;
     get(identity: any): Query<T>;
 }

@@ -147,11 +147,25 @@ var Query_Implementation = (function () {
             : this;
     };
     Query_Implementation.prototype.first_or_null = function (options) {
+        return this.firstOrNull(options);
+    };
+    Query_Implementation.prototype.firstOrNull = function (options) {
         this.set_reduce_mode(Reduce_Mode.first);
         this.allow_null = true;
         return options
             ? this.filter(options)
             : this;
+    };
+    Query_Implementation.prototype.range = function (start, length) {
+        if (start)
+            this.options.offset = start;
+        if (length)
+            this.options.limit = length;
+        return this;
+    };
+    Query_Implementation.prototype.sort = function (args) {
+        this.options.order = args;
+        return this;
     };
     Query_Implementation.prototype.expand = function (path) {
         if (!this.trellis.properties[path])

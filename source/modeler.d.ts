@@ -5,11 +5,12 @@ export declare type Collection_Map = {
 };
 export declare class Modeler {
     private schema;
-    private db;
+    protected db: any;
     collections: Collection_Map;
-    devMode: boolean;
-    constructor(db: any, schema: Schema | any, devMode?: boolean);
-    regenerate(): any;
+    constructor(db: any, schema: Schema | any);
     query(sql: any, replacements?: any): any;
     querySingle(sql: any, replacements?: any): any;
+}
+export declare class DevModeler extends Modeler {
+    regenerate(): any;
 }

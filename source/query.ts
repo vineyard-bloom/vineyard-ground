@@ -11,8 +11,11 @@ export interface Query<T> {
   filter(options): Query<T>
   first(options?): Query<T>
   first_or_null(options?): Query<T>
+  firstOrNull(options?): Query<T>
   join<N>(collection: ICollection): Query<N>
   select<N>(options): Query<N>
+  range(start?: number, length?: number): Query<T>
+  sort(args: string[]): Query<T>
 }
 
 enum Reduce_Mode {
@@ -33,10 +36,19 @@ function processFields(result, trellis: Trellis) {
   return result
 }
 
+interface QueryOptions {
+  where?: any
+  include?: any []
+  offset?: number
+  limit?: number
+  attributes?: any []
+  order?: string []
+}
+
 export class Query_Implementation<T> implements Query<T> {
   private sequelize
   private trellis: Collection_Trellis<T>
-  private options: any = {}
+  private options: QueryOptions = {}
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
   private expansions = {}
   private allow_null: boolean = true
@@ -189,11 +201,30 @@ export class Query_Implementation<T> implements Query<T> {
   }
 
   first_or_null<N>(options?): Query<N> {
+    return this.firstOrNull(options)
+  }
+
+  firstOrNull<N>(options?): Query<N> {
     this.set_reduce_mode(Reduce_Mode.first)
     this.allow_null = true
     return options
       ? this.filter(options)
       : this
+  }
+
+  range(start?: number, length?: number): Query<T> {
+    if (start)
+      this.options.offset = start
+
+    if (length)
+      this.options.limit = length
+
+    return this
+  }
+
+  sort(args: string[]): Query<T> {
+    this.options.order = args
+    return this
   }
 
   expand<T2>(path: string): Query<T2> {

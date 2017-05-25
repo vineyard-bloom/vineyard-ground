@@ -29,6 +29,9 @@ var Collection = (function () {
     Collection.prototype.first_or_null = function (options) {
         return this.all().first_or_null(options);
     };
+    Collection.prototype.firstOrNull = function (options) {
+        return this.all().first_or_null(options);
+    };
     Collection.prototype.get_sequelize = function () {
         return this.sequelize;
     };

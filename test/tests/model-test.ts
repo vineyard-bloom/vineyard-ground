@@ -1,3 +1,4 @@
+import {DevModeler} from "../../source/modeler";
 require('source-map-support').install()
 import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
@@ -11,7 +12,7 @@ describe('Game', function () {
   it('sync_database', function () {
     const db = new Sequelize(config.database)
     const schema = new Schema(require('../schema/game.json'))
-    const modeler = new Modeler(db, schema, true)
+    const modeler = new DevModeler(db, schema)
     const model: any = modeler.collections
     return modeler.regenerate()
       .then(() => model.Tag.create({
@@ -56,7 +57,7 @@ describe('Arbitrary', function () {
   it('sync_database', function () {
     const db = new Sequelize(config.database)
     const schema = new Schema(require('../schema/arbitrary.json'))
-    const modeler = new Modeler(db, schema, true)
+    const modeler = new DevModeler(db, schema)
     const model: any = modeler.collections
     return modeler.regenerate()
       .then(() => model.Odd.create({

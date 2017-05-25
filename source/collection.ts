@@ -44,6 +44,10 @@ export class Collection<T> implements ICollection {
     return this.all().first_or_null(options)
   }
 
+  firstOrNull(options?): Query<T> {
+    return this.all().first_or_null(options)
+  }
+
   get_sequelize() {
     return this.sequelize
   }
