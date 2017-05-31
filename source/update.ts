@@ -15,7 +15,7 @@ function prepare_reference(reference: Reference, value) {
     if (value[other_primary_key])
       return value[other_primary_key]
     else
-      throw new Error(reference.get_path() + ' cannot be an object')
+      throw new Error(reference.get_path() + ' is missing property "' + other_primary_key + '"')
   }
   else {
     return value
