@@ -191,20 +191,33 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
     }
   }
 
+  let created:string | boolean = 'created'
+  let modified:string | boolean = 'modified'
+
+  if (trellis.additional && Array.isArray(trellis.additional.autoFields)) {
+    const autoFields = trellis.additional.autoFields
+    if (autoFields.indexOf('created') == -1)
+      created = false
+
+    if (autoFields.indexOf('modified') == -1)
+      modified = false
+
+  }
+
   const table = trellis['table'] = sequelize.define(trellis.name.toLowerCase(), fields, {
     underscored: true,
-    createdAt: 'created',
-    updatedAt: 'modified'
+    createdAt: created,
+    updatedAt: modified,
     // freezeTableName: true
   })
 
   return table
 }
 
-export function vineyard_to_sequelize(schema: Schema, sequelize) {
+export function vineyard_to_sequelize(schema: Schema, keys, sequelize) {
   const tables = {}
 
-  for (let name in schema.trellises) {
+  for (let name in keys) {
     tables [name] = create_table(schema.trellises [name], schema, sequelize)
   }
 

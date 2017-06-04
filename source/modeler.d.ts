@@ -10,6 +10,7 @@ export declare class Modeler {
     constructor(db: any, schema: Schema | any);
     query(sql: any, replacements?: any): any;
     querySingle(sql: any, replacements?: any): any;
+    addDefinitions(definitions: any): void;
 }
 export declare class DevModeler extends Modeler {
     regenerate(): any;

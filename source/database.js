@@ -160,17 +160,25 @@ function create_table(trellis, schema, sequelize) {
     for (var i in trellis.properties) {
         _loop_1(i);
     }
+    var created = 'created';
+    var modified = 'modified';
+    if (trellis.additional && Array.isArray(trellis.additional.autoFields)) {
+        var autoFields = trellis.additional.autoFields;
+        if (autoFields.indexOf('created') == -1)
+            created = false;
+        if (autoFields.indexOf('modified') == -1)
+            modified = false;
+    }
     var table = trellis['table'] = sequelize.define(trellis.name.toLowerCase(), fields, {
         underscored: true,
-        createdAt: 'created',
-        updatedAt: 'modified'
-        // freezeTableName: true
+        createdAt: created,
+        updatedAt: modified,
     });
     return table;
 }
-function vineyard_to_sequelize(schema, sequelize) {
+function vineyard_to_sequelize(schema, keys, sequelize) {
     var tables = {};
-    for (var name_2 in schema.trellises) {
+    for (var name_2 in keys) {
         tables[name_2] = create_table(schema.trellises[name_2], schema, sequelize);
     }
     initialize_relationships(schema, tables, sequelize);
