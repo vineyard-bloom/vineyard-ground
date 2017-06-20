@@ -17,6 +17,14 @@ var Collection = (function () {
     Collection.prototype.update = function (seed, changes) {
         return update_1.update(seed, this.trellis, this.sequelize, changes);
     };
+    Collection.prototype.remove = function (seed) {
+        return this.sequelize.destroy({
+            where: (_a = {},
+                _a[this.trellis.primary_keys[0].name] = this.trellis.get_identity(seed),
+                _a)
+        });
+        var _a;
+    };
     Collection.prototype.all = function () {
         return new query_1.Query_Implementation(this.sequelize, this.trellis);
     };

@@ -10,6 +10,7 @@ export declare class Collection<T> implements ICollection {
     create(seed: any): Promise<T>;
     create_or_update(seed: any): Promise<T>;
     update(seed: any, changes?: any): Promise<T>;
+    remove(seed: any): Promise<T>;
     all(): Query<T>;
     filter(options: any): Query<T>;
     first(options?: any): Query<T>;

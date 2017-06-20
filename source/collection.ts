@@ -28,6 +28,14 @@ export class Collection<T> implements ICollection {
     return update(seed, this.trellis, this.sequelize, changes)
   }
 
+  remove(seed): Promise<T> {
+    return this.sequelize.destroy({
+      where: {
+        [this.trellis.primary_keys[0].name]: this.trellis.get_identity(seed)
+      }
+    })
+  }
+
   all(): Query<T> {
     return new Query_Implementation<T>(this.sequelize, this.trellis)
   }
