@@ -17,6 +17,14 @@ function processFields(result, trellis) {
             }
         }
     }
+    else {
+        for (var i in trellis.properties) {
+            var property = trellis.properties[i];
+            if (property.type.name == 'long') {
+                result[i] = parseInt(result[i]);
+            }
+        }
+    }
     return result;
 }
 var Query_Implementation = (function () {
@@ -102,11 +110,14 @@ var Query_Implementation = (function () {
     };
     Query_Implementation.prototype.exec = function () {
         var _this = this;
-        console.log(this.options);
         return this.sequelize.findAll(this.options)
             .then(function (result) { return _this.has_expansions()
             ? _this.process_result_with_expansions(result)
-            : _this.process_result(result); });
+            : _this.process_result(result); })
+            .catch(function (error) {
+            console.error(_this.options);
+            throw error;
+        });
     };
     Query_Implementation.prototype.then = function (callback) {
         return this.exec()

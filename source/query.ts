@@ -33,6 +33,14 @@ function processFields(result, trellis: Trellis) {
       }
     }
   }
+  else {
+    for (var i in trellis.properties) {
+      const property = trellis.properties[i]
+      if (property.type.name == 'long') {
+        result[i] = parseInt(result[i])
+      }
+    }
+  }
   return result
 }
 
@@ -148,12 +156,15 @@ export class Query_Implementation<T> implements Query<T> {
   }
 
   exec(): Promise<any> {
-    console.log(this.options)
     return this.sequelize.findAll(this.options)
       .then(result => this.has_expansions()
         ? this.process_result_with_expansions(result)
         : this.process_result(result)
       )
+      .catch(error => {
+        console.error(this.options)
+        throw error
+      })
   }
 
   then(callback): Promise<any> {
