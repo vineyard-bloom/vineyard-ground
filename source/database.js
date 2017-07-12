@@ -59,7 +59,7 @@ function get_field(property, library, dialect) {
                 };
             if (type === library.types.colossal)
                 return {
-                    type: Sequelize.STRING
+                    type: Sequelize.NUMERIC
                 };
             throw new Error("Unknown primitive: " + type.name + '.');
         case vineyard_schema_1.Type_Category.list:
