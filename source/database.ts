@@ -70,6 +70,11 @@ function get_field(property: Property, library: Library, dialect: string): any {
           type: Sequelize.TIME
         }
 
+      if (type === library.types.colossal)
+        return {
+          type: Sequelize.STRING
+        }
+
       throw new Error("Unknown primitive: " + type.name + '.')
 
     case Type_Category.list:

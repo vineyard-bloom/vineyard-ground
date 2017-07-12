@@ -3,6 +3,7 @@ import {ICollection} from "./collection"
 import * as sequelize from 'sequelize'
 import {Collection_Trellis} from './types'
 import {to_lower} from "./utility";
+let BigNumber = null
 
 export interface Query<T> {
   then(any: any): Promise<any>
@@ -26,19 +27,22 @@ enum Reduce_Mode {
 
 function processFields(result, trellis: Trellis) {
   if (trellis['table'].sequelize.getDialect() == 'mysql') {
-    for (var i in trellis.properties) {
+    for (let i in trellis.properties) {
       const property = trellis.properties[i]
       if (property.type.name == 'json') {
         result[i] = JSON.parse(result[i])
       }
     }
   }
-  else {
-    for (var i in trellis.properties) {
-      const property = trellis.properties[i]
-      if (property.type.name == 'long') {
-        result[i] = parseInt(result[i])
-      }
+
+  for (let i in trellis.properties) {
+    const property = trellis.properties[i]
+    if (property.type.name == 'long') {
+      result[i] = parseInt(result[i])
+    }
+    else if (property.type.name == 'colossal') {
+      BigNumber = BigNumber || require('bignumber.js')
+      result[i] = new BigNumber(result[i])
     }
   }
   return result

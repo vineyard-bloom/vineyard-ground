@@ -7,6 +7,9 @@
       },
       "unknown": {
         "type": "string"
+      },
+      "vast": {
+        "type": "colossal"
       }
     }
   }

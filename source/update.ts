@@ -33,8 +33,14 @@ function prepare_property(property: Property, value) {
     if ((value === null || value === undefined) && property.is_nullable)
       return null
 
-    if (typeof value === 'object' && ['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
-      throw new Error(property.get_path() + ' cannot be an object')
+    if (typeof value === 'object') {
+      if (property.type.name === 'colossal') {
+        return value.toString()
+      }
+
+      if (['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
+        throw new Error(property.get_path() + ' cannot be an object')
+    }
 
     return value
   }

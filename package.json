@@ -22,5 +22,8 @@
     "@types/node": "^7.0.5",
     "mocha": "^3.2.0",
     "source-map-support": "^0.4.14"
+  },
+  "peerDependencies": {
+    "bignumber.js": "4.0.2"
   }
 }

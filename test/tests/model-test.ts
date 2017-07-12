@@ -59,11 +59,24 @@ describe('Arbitrary', function () {
     const schema = new Schema(require('../schema/arbitrary.json'))
     const modeler = new DevModeler(db, schema)
     const model: any = modeler.collections
+    const BigNumber = require('bignumber.js')
     return modeler.regenerate()
       .then(() => model.Odd.create({
           strange: 10,
-          unknown: "mist"
+          unknown: "mist",
+          vast: "1000000000000000000000000000021"
         })
       )
+      .then(() => model.Odd.create({
+          strange: 11,
+          unknown: "mist2",
+          vast: new BigNumber("1000000000000000000000000000021")
+        })
+      )
+      .then(() => model.Odd.all())
+      .then(results => {
+        console.log('result', results)
+        assert(results[0].vast.equals(results[1].vast))
+      })
   })
 })

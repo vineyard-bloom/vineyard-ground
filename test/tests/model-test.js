@@ -54,11 +54,23 @@ describe('Arbitrary', function () {
         var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
         var modeler = new modeler_1.DevModeler(db, schema);
         var model = modeler.collections;
+        var BigNumber = require('bignumber.js');
         return modeler.regenerate()
             .then(function () { return model.Odd.create({
             strange: 10,
-            unknown: "mist"
-        }); });
+            unknown: "mist",
+            vast: "1000000000000000000000000000021"
+        }); })
+            .then(function () { return model.Odd.create({
+            strange: 11,
+            unknown: "mist2",
+            vast: new BigNumber("1000000000000000000000000000021")
+        }); })
+            .then(function () { return model.Odd.all(); })
+            .then(function (results) {
+            console.log('result', results);
+            assert(results[0].vast.equals(results[1].vast));
+        });
     });
 });
 //# sourceMappingURL=model-test.js.map
