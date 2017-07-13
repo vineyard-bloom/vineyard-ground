@@ -61,9 +61,7 @@ export class Collection<T> implements ICollection {
   }
 
   get(identity) {
-    if (!identity)
-      throw new Error("Cannot get empty identity of type " + this.trellis.name + '.')
-
+    identity = this.trellis.get_identity(identity)
     const filter = {}
     filter[this.trellis.primary_key.name] = identity
 

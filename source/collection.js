@@ -44,8 +44,7 @@ var Collection = (function () {
         return this.sequelize;
     };
     Collection.prototype.get = function (identity) {
-        if (!identity)
-            throw new Error("Cannot get empty identity of type " + this.trellis.name + '.');
+        identity = this.trellis.get_identity(identity);
         var filter = {};
         filter[this.trellis.primary_key.name] = identity;
         return this.filter(filter).first();
