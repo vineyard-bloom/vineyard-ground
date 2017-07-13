@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize = require("sequelize");
 var utility_1 = require("./utility");
-var BigNumber = null;
 var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
@@ -23,10 +22,9 @@ function processFields(result, trellis) {
         if (property.type.name == 'long') {
             result[i] = parseInt(result[i]);
         }
-        else if (property.type.name == 'colossal') {
-            BigNumber = BigNumber || require('bignumber.js');
-            result[i] = new BigNumber(result[i]);
-        }
+        // else if (property.type.name == 'colossal') {
+        //   result[i] = new BigNumber(result[i])
+        // }
     }
     return result;
 }

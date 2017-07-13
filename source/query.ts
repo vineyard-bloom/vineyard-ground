@@ -3,7 +3,7 @@ import {ICollection} from "./collection"
 import * as sequelize from 'sequelize'
 import {Collection_Trellis} from './types'
 import {to_lower} from "./utility";
-let BigNumber = null
+// let BigNumber = null
 
 export interface Query<T> {
   then(any: any): Promise<any>
@@ -40,10 +40,9 @@ function processFields(result, trellis: Trellis) {
     if (property.type.name == 'long') {
       result[i] = parseInt(result[i])
     }
-    else if (property.type.name == 'colossal') {
-      BigNumber = BigNumber || require('bignumber.js')
-      result[i] = new BigNumber(result[i])
-    }
+    // else if (property.type.name == 'colossal') {
+    //   result[i] = new BigNumber(result[i])
+    // }
   }
   return result
 }
