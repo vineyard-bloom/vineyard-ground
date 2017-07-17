@@ -24,8 +24,7 @@ function get_field(property, library, dialect) {
                 };
             if (type === library.types.text)
                 return {
-                    type: Sequelize.TEXT,
-                    defaultValue: ""
+                    type: Sequelize.TEXT
                 };
             if (type === library.types.json)
                 return dialect == 'mysql'

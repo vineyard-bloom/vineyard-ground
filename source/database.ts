@@ -29,8 +29,7 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.text)
         return {
-          type: Sequelize.TEXT,
-          defaultValue: ""
+          type: Sequelize.TEXT
         }
 
       if (type === library.types.json)
