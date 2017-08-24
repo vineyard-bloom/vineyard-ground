@@ -71,7 +71,8 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.colossal)
         return {
-          type: Sequelize.NUMERIC
+          type: Sequelize.NUMERIC,
+          defaultValue: 0
         }
 
       throw new Error("Unknown primitive: " + type.name + '.')
