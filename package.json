@@ -1,6 +1,6 @@
 {
   "name": "vineyard-ground",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Vineyard Ground",
   "main": "source/index.js",
   "types": "source/index.d.ts",
