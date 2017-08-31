@@ -136,8 +136,9 @@ export function update<T>(seed, trellis: Trellis, sequelize, changes?): Promise<
   filter[primary_key] = identity
 
   return sequelize.update(new_seed, {
-    where: filter
+    where: filter,
+    returning: true
   })
-    .then(result => post_process(result, identity, changes, trellis, sequelize))
+    .then(result => post_process(result[1][0], identity, changes, trellis, sequelize))
 
 }

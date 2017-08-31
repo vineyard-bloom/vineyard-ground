@@ -31,7 +31,10 @@ describe('Game', function () {
             health: 10,
             tags: source_1.Add(tag)
         })
-            .then(function () { return model.Creature.first().expand('tags'); })
+            .then(function (creature) {
+            assert.equal(creature.health, 10);
+            return model.Creature.first().expand('tags');
+        })
             .then(function (creature) {
             assert(Array.isArray(creature.tags));
             assert.equal(1, creature.tags.length);
@@ -69,7 +72,7 @@ describe('Arbitrary', function () {
             .then(function () { return model.Odd.all(); })
             .then(function (results) {
             console.log('result', results);
-            assert(results[0].vast.equals(results[1].vast));
+            assert(new BigNumber(results[0].vast).equals(results[1].vast));
         });
     });
 });

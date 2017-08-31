@@ -116,9 +116,10 @@ function update(seed, trellis, sequelize, changes) {
     var filter = {};
     filter[primary_key] = identity;
     return sequelize.update(new_seed, {
-        where: filter
+        where: filter,
+        returning: true
     })
-        .then(function (result) { return post_process(result, identity, changes, trellis, sequelize); });
+        .then(function (result) { return post_process(result[1][0], identity, changes, trellis, sequelize); });
 }
 exports.update = update;
 //# sourceMappingURL=update.js.map

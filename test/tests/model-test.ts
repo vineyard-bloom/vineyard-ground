@@ -31,7 +31,10 @@ describe('Game', function () {
                   health: 10,
                   tags: Add(tag)
                 })
-                  .then(() => model.Creature.first().expand('tags'))
+                  .then(creature => {
+                    assert.equal(creature.health,10)
+                    return model.Creature.first().expand('tags')
+                  })
                   .then(creature => {
                     assert(Array.isArray(creature.tags))
                     assert.equal(1, creature.tags.length)
@@ -76,7 +79,7 @@ describe('Arbitrary', function () {
       .then(() => model.Odd.all())
       .then(results => {
         console.log('result', results)
-        assert(results[0].vast.equals(results[1].vast))
+        assert(new BigNumber(results[0].vast).equals(results[1].vast))
       })
   })
 })
