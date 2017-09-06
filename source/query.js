@@ -66,9 +66,15 @@ var Query_Implementation = (function () {
     };
     Query_Implementation.prototype.perform_expansion = function (path, data) {
         var property = this.trellis.properties[path];
-        return property.is_list()
-            ? this.expand_cross_table(property, this.trellis.get_identity(data))
-            : this.get_other_collection(path).get(data[path]);
+        if (property.is_list()) {
+            return property.other_property.is_list()
+                ? this.expand_cross_table(property, this.trellis.get_identity(data))
+                : this.get_other_collection(path).filter((_a = {}, _a[property.other_property.name] = data, _a));
+        }
+        else {
+            return this.get_other_collection(path).get(data[path]);
+        }
+        var _a;
     };
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;

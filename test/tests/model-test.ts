@@ -1,4 +1,5 @@
 import {DevModeler} from "../../source/modeler";
+
 require('source-map-support').install()
 import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
@@ -6,9 +7,12 @@ import * as Sequelize from 'sequelize'
 import {Modeler, Add, Remove} from '../../source'
 
 const config = require('../config/config.json')
+let mainWorld,
+  dangerousTag,
+  flyingTag
 
 describe('Game', function () {
-  this.timeout(4000)
+  this.timeout(5000)
   it('sync_database', function () {
     const db = new Sequelize(config.database)
     const schema = new Schema(require('../schema/game.json'))
@@ -18,21 +22,24 @@ describe('Game', function () {
       .then(() => model.Tag.create({
           name: "flying"
         })
+          .then(tag => flyingTag = tag)
           .then(() => model.World.create({}))
-          .then(world => model.Creature.create({
+          .then(world => mainWorld = world)
+          .then(() => model.Creature.create({
             name: "ogre",
-            world: world,
+            world: mainWorld,
             health: 5
           }))
           .then(ogre => model.Tag.create({
               name: "dangerous"
             })
-              .then(tag => model.Creature.update(ogre, {
+              .then(tag => dangerousTag = tag)
+              .then(() => model.Creature.update(ogre, {
                   health: 10,
-                  tags: Add(tag)
+                  tags: Add(dangerousTag)
                 })
                   .then(creature => {
-                    assert.equal(creature.health,10)
+                    assert.equal(creature.health, 10)
                     return model.Creature.first().expand('tags')
                   })
                   .then(creature => {
@@ -41,17 +48,28 @@ describe('Game', function () {
                     assert.equal('dangerous', creature.tags[0].name)
                   })
                   .then(() => model.Creature.update(ogre, {
-                      tags: Remove(tag)
+                      tags: Remove(dangerousTag)
                     })
                   )
-                  .then(() => model.Creature.first().expand('tags'))
-                  .then(creature => {
-                    assert(Array.isArray(creature.tags))
-                    assert.equal(0, creature.tags.length)
-                  })
               )
           )
       )
+      .then(() => model.Creature.first().expand('tags'))
+      .then(creature => {
+        assert(Array.isArray(creature.tags))
+        assert.equal(0, creature.tags.length)
+      })
+      .then(() => model.Creature.create({
+        name: "hero",
+        world: mainWorld,
+        health: 4,
+        tags: Add(flyingTag)
+      }))
+      .then(() => model.World.first().expand('creatures'))
+      .then(world => {
+        assert(Array.isArray(world.creatures))
+        assert.equal(2, world.creatures.length)
+      })
   })
 })
 
