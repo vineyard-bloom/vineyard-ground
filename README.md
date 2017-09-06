@@ -19,10 +19,10 @@ SQL ORM for Node.js.  Uses [Sequelize](https://github.com/sequelize/sequelize) a
 Creates a new entity and saves it to the database.  Returns a copy of the new entity.
 
 #### `update(seed, changes): Promise<T>`
-    
+
 Updates a record.  
 
-`seed` can be either an id or a property with an id.
+`seed` can be either an id or an object with an id.
 
 `changes` is a dictionary of property key/value pairs to be changed.
 
@@ -40,7 +40,7 @@ Returns the first item in the collection, optionally filtered by key/value pairs
 
 #### `get(identity): Query<T>`
 
-Returns a single item that matches the provided id.
+Returns a single item that matches the provided id.  Shorthand for `.filter({id: x}).first()`
 
 ### Query
 
