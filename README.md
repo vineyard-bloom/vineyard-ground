@@ -1,6 +1,6 @@
 # Vineyard Ground
 
-SQL ORM for Node.js.  Uses [Sequelize](https://github.com/sequelize/sequelize) and [Vineyard Schema](https://github.com/silentorb/vineyard-schema).
+SQL ORM for Node.js.  Ground wraps aspects of [Sequelize](https://github.com/sequelize/sequelize).
 
 ## Features
 
@@ -9,6 +9,10 @@ SQL ORM for Node.js.  Uses [Sequelize](https://github.com/sequelize/sequelize) a
 * Comprehensive understanding of table relationships (something most JavaScript ORMs lack.)
 * Chainable query API.
 * Automatic identity resolution.  (Functions requiring an entity identifier can be passed either an object or scalar identity value.)
+
+## Schema Definitions
+
+Ground uses [Vineyard Schema](https://github.com/vineyard-bloom/vineyard-schema) to load and manage schema definitions.
 
 ## API
 

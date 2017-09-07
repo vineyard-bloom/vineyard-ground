@@ -226,6 +226,14 @@ export function vineyard_to_sequelize(schema: Schema, keys, sequelize) {
     tables [name] = create_table(schema.trellises [name], schema, sequelize)
   }
 
+  for (let name in keys) {
+    const trellis = schema.trellises[name]
+    if (trellis.parent) {
+
+    }
+    tables [name] = create_table(schema.trellises [name], schema, sequelize)
+  }
+
   initialize_relationships(schema, tables, sequelize)
 
   return tables

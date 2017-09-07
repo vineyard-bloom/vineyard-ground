@@ -185,6 +185,12 @@ function vineyard_to_sequelize(schema, keys, sequelize) {
     for (var name_2 in keys) {
         tables[name_2] = create_table(schema.trellises[name_2], schema, sequelize);
     }
+    for (var name_3 in keys) {
+        var trellis = schema.trellises[name_3];
+        if (trellis.parent) {
+        }
+        tables[name_3] = create_table(schema.trellises[name_3], schema, sequelize);
+    }
     initialize_relationships(schema, tables, sequelize);
     return tables;
 }
