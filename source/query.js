@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize = require("sequelize");
 var utility_1 = require("./utility");
+var query_builder_1 = require("./sql/query-builder");
 var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
@@ -27,6 +28,9 @@ function processFields(result, trellis) {
         // }
     }
     return result;
+}
+function getData(row) {
+    return row.dataValues || row;
 }
 var Query_Implementation = (function () {
     function Query_Implementation(sequelize, trellis) {
@@ -62,7 +66,7 @@ var Query_Implementation = (function () {
                 required: true
             }
         })
-            .then(function (result) { return result.map(function (r) { return processFields(r.dataValues, reference.other_property.trellis); }); });
+            .then(function (result) { return result.map(function (r) { return processFields(getData(r), reference.other_property.trellis); }); });
     };
     Query_Implementation.prototype.perform_expansion = function (path, data) {
         var property = this.trellis.properties[path];
@@ -79,8 +83,8 @@ var Query_Implementation = (function () {
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;
         var promises = results.map(function (result) { return Promise.all(_this.get_expansions()
-            .map(function (path) { return _this.perform_expansion(path, result.dataValues)
-            .then(function (child) { return result.dataValues[path] = child; }); })); });
+            .map(function (path) { return _this.perform_expansion(path, getData(result))
+            .then(function (child) { return getData(result)[path] = child; }); })); });
         return Promise.all(promises)
             .then(function () { return results; }); // Not needed but a nice touch.
     };
@@ -92,7 +96,7 @@ var Query_Implementation = (function () {
                     return null;
                 throw Error("Query.first called on empty result set.");
             }
-            return processFields(result[0].dataValues, this.trellis);
+            return processFields(getData(result[0]), this.trellis);
         }
         else if (this.reduce_mode == Reduce_Mode.single_value) {
             if (result.length == 0) {
@@ -100,9 +104,9 @@ var Query_Implementation = (function () {
                     return null;
                 throw Error("Query.select single value called on empty result set.");
             }
-            return result[0].dataValues._value;
+            return getData(result[0])._value;
         }
-        return result.map(function (item) { return processFields(item.dataValues, _this.trellis); });
+        return result.map(function (item) { return processFields(getData(item), _this.trellis); });
     };
     Query_Implementation.prototype.process_result_with_expansions = function (result) {
         var _this = this;
@@ -115,14 +119,26 @@ var Query_Implementation = (function () {
     Query_Implementation.prototype.has_expansions = function () {
         return this.get_expansions().length > 0;
     };
+    Query_Implementation.prototype.queryWithQueryBuilder = function () {
+        var builder = new query_builder_1.QueryBuilder(this.trellis);
+        this.bundle = builder.build(this.options);
+        return this.sequelize.sequelize.pgPool.query(this.bundle.sql, this.bundle.args)
+            .then(function (result) { return result.rows; });
+    };
     Query_Implementation.prototype.exec = function () {
         var _this = this;
-        return this.sequelize.findAll(this.options)
+        var find = this.sequelize.useQueryBuilder
+            ? this.queryWithQueryBuilder()
+            : this.sequelize.findAll(this.options);
+        return find
             .then(function (result) { return _this.has_expansions()
             ? _this.process_result_with_expansions(result)
             : _this.process_result(result); })
             .catch(function (error) {
-            console.error(_this.options);
+            if (_this.bundle)
+                console.error(_this.bundle);
+            else
+                console.error(_this.options);
             throw error;
         });
     };

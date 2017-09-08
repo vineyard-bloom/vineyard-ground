@@ -196,8 +196,8 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
     }
   }
 
-  let created:string | boolean = 'created'
-  let modified:string | boolean = 'modified'
+  let created: string | boolean = 'created'
+  let modified: string | boolean = 'modified'
 
   if (trellis.additional && Array.isArray(trellis.additional.autoFields)) {
     const autoFields = trellis.additional.autoFields
@@ -224,17 +224,24 @@ export function vineyard_to_sequelize(schema: Schema, keys, sequelize) {
 
   for (let name in keys) {
     tables [name] = create_table(schema.trellises [name], schema, sequelize)
+    if (sequelize.useQueryBuilder)
+      tables[name].useQueryBuilder = true
   }
 
-  for (let name in keys) {
-    const trellis = schema.trellises[name]
-    if (trellis.parent) {
-
-    }
-    tables [name] = create_table(schema.trellises [name], schema, sequelize)
-  }
+  // for (let name in keys) {
+  //   tables [name] = create_table(schema.trellises [name], schema, sequelize)
+  // }
 
   initialize_relationships(schema, tables, sequelize)
 
   return tables
+}
+
+export function usePostgres(db, databaseConfig) {
+  const pg = require('pg')
+  const pgConfig = Object.assign(databaseConfig, {
+    user: databaseConfig.username
+  })
+  db['pgPool'] = new pg.Pool(pgConfig)
+  db['useQueryBuilder'] = true
 }

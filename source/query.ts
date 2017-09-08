@@ -3,19 +3,31 @@ import {ICollection} from "./collection"
 import * as sequelize from 'sequelize'
 import {Collection_Trellis} from './types'
 import {to_lower} from "./utility";
+import {QueryBuilder} from "./sql/query-builder";
+
 // let BigNumber = null
 
 export interface Query<T> {
   then(any: any): Promise<any>
+
   exec(): Promise<any>
+
   expand<T2>(path: string): Query<T2>
+
   filter(options): Query<T>
+
   first(options?): Query<T>
+
   first_or_null(options?): Query<T>
+
   firstOrNull(options?): Query<T>
+
   join<N>(collection: ICollection): Query<N>
+
   select<N>(options): Query<N>
+
   range(start?: number, length?: number): Query<T>
+
   sort(args: string[]): Query<T>
 }
 
@@ -56,6 +68,10 @@ interface QueryOptions {
   order?: string []
 }
 
+function getData(row) {
+  return row.dataValues || row
+}
+
 export class Query_Implementation<T> implements Query<T> {
   private sequelize
   private trellis: Collection_Trellis<T>
@@ -63,6 +79,7 @@ export class Query_Implementation<T> implements Query<T> {
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
   private expansions = {}
   private allow_null: boolean = true
+  private bundle
 
   private set_reduce_mode(value: Reduce_Mode) {
     if (this.reduce_mode == value)
@@ -94,7 +111,7 @@ export class Query_Implementation<T> implements Query<T> {
         required: true
       }
     })
-      .then(result => result.map(r => processFields(r.dataValues, reference.other_property.trellis)))
+      .then(result => result.map(r => processFields(getData(r), reference.other_property.trellis)))
   }
 
   private perform_expansion(path: string, data) {
@@ -102,17 +119,17 @@ export class Query_Implementation<T> implements Query<T> {
     if (property.is_list()) {
       return property.other_property.is_list()
         ? this.expand_cross_table(property as Reference, this.trellis.get_identity(data))
-        : this.get_other_collection(path).filter({[property.other_property.name]: data })
+        : this.get_other_collection(path).filter({[property.other_property.name]: data})
     }
     else {
-     return this.get_other_collection(path).get(data[path])
+      return this.get_other_collection(path).get(data[path])
     }
   }
 
   private handle_expansions(results) {
     let promises = results.map(result => Promise.all(this.get_expansions()
-      .map(path => this.perform_expansion(path, result.dataValues)
-        .then(child => result.dataValues[path] = child)
+      .map(path => this.perform_expansion(path, getData(result))
+        .then(child => getData(result)[path] = child)
       )
     ))
 
@@ -129,7 +146,7 @@ export class Query_Implementation<T> implements Query<T> {
         throw Error("Query.first called on empty result set.")
       }
 
-      return processFields(result [0].dataValues, this.trellis)
+      return processFields(getData(result [0]), this.trellis)
     }
     else if (this.reduce_mode == Reduce_Mode.single_value) {
       if (result.length == 0) {
@@ -139,10 +156,10 @@ export class Query_Implementation<T> implements Query<T> {
         throw Error("Query.select single value called on empty result set.")
       }
 
-      return result[0].dataValues._value
+      return getData(result[0])._value
     }
 
-    return result.map(item => processFields(item.dataValues, this.trellis))
+    return result.map(item => processFields(getData(item), this.trellis))
   }
 
   private process_result_with_expansions(result) {
@@ -163,14 +180,29 @@ export class Query_Implementation<T> implements Query<T> {
     this.trellis = trellis
   }
 
+  private queryWithQueryBuilder() {
+    const builder = new QueryBuilder(this.trellis)
+    this.bundle = builder.build(this.options)
+    return this.sequelize.sequelize.pgPool.query(this.bundle.sql, this.bundle.args)
+      .then(result => result.rows)
+  }
+
   exec(): Promise<any> {
-    return this.sequelize.findAll(this.options)
+    const find = this.sequelize.useQueryBuilder
+      ? this.queryWithQueryBuilder()
+      : this.sequelize.findAll(this.options)
+
+    return find
       .then(result => this.has_expansions()
         ? this.process_result_with_expansions(result)
         : this.process_result(result)
       )
       .catch(error => {
-        console.error(this.options)
+        if (this.bundle)
+          console.error(this.bundle)
+        else
+          console.error(this.options)
+
         throw error
       })
   }

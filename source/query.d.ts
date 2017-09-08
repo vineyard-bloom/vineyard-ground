@@ -21,6 +21,7 @@ export declare class Query_Implementation<T> implements Query<T> {
     private reduce_mode;
     private expansions;
     private allow_null;
+    private bundle;
     private set_reduce_mode(value);
     private get_other_collection(path);
     private expand_cross_table(reference, identity);
@@ -31,6 +32,7 @@ export declare class Query_Implementation<T> implements Query<T> {
     private get_expansions();
     private has_expansions();
     constructor(sequelize: any, trellis: Collection_Trellis<T>);
+    private queryWithQueryBuilder();
     exec(): Promise<any>;
     then(callback: any): Promise<any>;
     filter(options: any): Query<T>;

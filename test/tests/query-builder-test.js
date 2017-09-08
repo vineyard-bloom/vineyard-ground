@@ -14,8 +14,19 @@ describe('query-builder-test', function () {
     this.timeout(5000);
     it('selection', function () {
         var builder = new query_builder_1.QueryBuilder(modeler.collections.Creature['trellis']);
-        var sql = builder.build({ where: { name: "ogre" } });
-        assert.equal(sql, "SELECT * FROM \"creatures\" WHERE \"name\" = 'ogre'");
+        var bundle = builder.build({ where: { name: "ogre" } });
+        assert.equal(bundle.sql, "SELECT * FROM \"creatures\" WHERE \"name\" = $1");
+        assert.equal(bundle.args.length, 1);
+        assert.equal(bundle.args[0], 'ogre');
+    });
+    it('advanced', function () {
+        var builder = new query_builder_1.QueryBuilder(modeler.collections.Creature['trellis']);
+        var bundle = builder.build({
+            order: ['name', 'health', 'desc'],
+            limit: 5,
+        });
+        assert.equal(bundle.sql, "SELECT * FROM \"creatures\" ORDER BY \"name\", \"health\" DESC LIMIT 5");
+        assert.equal(bundle.args.length, 0);
     });
 });
 //# sourceMappingURL=query-builder-test.js.map

@@ -184,15 +184,23 @@ function vineyard_to_sequelize(schema, keys, sequelize) {
     var tables = {};
     for (var name_2 in keys) {
         tables[name_2] = create_table(schema.trellises[name_2], schema, sequelize);
+        if (sequelize.useQueryBuilder)
+            tables[name_2].useQueryBuilder = true;
     }
-    for (var name_3 in keys) {
-        var trellis = schema.trellises[name_3];
-        if (trellis.parent) {
-        }
-        tables[name_3] = create_table(schema.trellises[name_3], schema, sequelize);
-    }
+    // for (let name in keys) {
+    //   tables [name] = create_table(schema.trellises [name], schema, sequelize)
+    // }
     initialize_relationships(schema, tables, sequelize);
     return tables;
 }
 exports.vineyard_to_sequelize = vineyard_to_sequelize;
+function usePostgres(db, databaseConfig) {
+    var pg = require('pg');
+    var pgConfig = Object.assign(databaseConfig, {
+        user: databaseConfig.username
+    });
+    db['pgPool'] = new pg.Pool(pgConfig);
+    db['useQueryBuilder'] = true;
+}
+exports.usePostgres = usePostgres;
 //# sourceMappingURL=database.js.map

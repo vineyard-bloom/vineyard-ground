@@ -5,6 +5,7 @@ import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
 import * as Sequelize from 'sequelize'
 import {Modeler, Add, Remove} from '../../source'
+import {usePostgres} from "../../source/database";
 
 const config = require('../config/config.json')
 let mainWorld,
@@ -15,6 +16,7 @@ describe('Game', function () {
   this.timeout(5000)
   it('sync_database', function () {
     const db = new Sequelize(config.database)
+    usePostgres(db, config.database)
     const schema = new Schema(require('../schema/game.json'))
     const modeler = new DevModeler(db, schema)
     const model: any = modeler.collections

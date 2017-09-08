@@ -15,8 +15,19 @@ describe('query-builder-test', function () {
 
   it('selection', function () {
     const builder = new QueryBuilder(modeler.collections.Creature['trellis'])
-    const sql = builder.build({where: {name: "ogre"}})
-    assert.equal(sql, `SELECT * FROM "creatures" WHERE "name" = 'ogre'`)
+    const bundle = builder.build({where: {name: "ogre"}})
+    assert.equal(bundle.sql, `SELECT * FROM "creatures" WHERE "name" = $1`)
+    assert.equal(bundle.args.length, 1)
+    assert.equal(bundle.args[0], 'ogre')
+  })
 
+  it('advanced', function () {
+    const builder = new QueryBuilder(modeler.collections.Creature['trellis'])
+    const bundle = builder.build({
+      order: ['name', 'health', 'desc'],
+      limit: 5,
+    })
+    assert.equal(bundle.sql, `SELECT * FROM "creatures" ORDER BY "name", "health" DESC LIMIT 5`)
+    assert.equal(bundle.args.length, 0)
   })
 })
