@@ -224,8 +224,6 @@ export function vineyard_to_sequelize(schema: Schema, keys, sequelize) {
 
   for (let name in keys) {
     tables [name] = create_table(schema.trellises [name], schema, sequelize)
-    if (sequelize.useQueryBuilder)
-      tables[name].useQueryBuilder = true
   }
 
   // for (let name in keys) {
@@ -244,4 +242,5 @@ export function usePostgres(db, databaseConfig) {
   })
   db['pgPool'] = new pg.Pool(pgConfig)
   db['useQueryBuilder'] = true
+  db['useUpdateBuilder'] = true
 }

@@ -29,4 +29,4 @@ describe('query-builder-test', function () {
         assert.equal(bundle.args.length, 0);
     });
 });
-//# sourceMappingURL=query-builder-test.js.map
+//# sourceMappingURL=sql-builder-test.js.map

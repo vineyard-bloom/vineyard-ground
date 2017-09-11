@@ -1,4 +1,5 @@
 import { Trellis } from "vineyard-schema";
+import { TrellisSqlBuilder } from "./sql-building";
 export interface QueryOptions {
     where?: any;
     order?: string[];
@@ -10,12 +11,8 @@ export interface QueryBundle {
     sql: string;
     args: any[];
 }
-export declare class QueryBuilder {
-    trellis: Trellis;
-    table: any;
+export declare class QueryBuilder extends TrellisSqlBuilder {
     constructor(trellis: Trellis);
-    private quote(text);
-    private sanitize(value);
     private buildWhere(where);
     private buildOrderBy(order);
     private buildRange(command, value);

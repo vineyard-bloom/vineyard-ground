@@ -127,7 +127,7 @@ var Query_Implementation = (function () {
     };
     Query_Implementation.prototype.exec = function () {
         var _this = this;
-        var find = this.sequelize.useQueryBuilder
+        var find = this.sequelize.sequelize.useQueryBuilder
             ? this.queryWithQueryBuilder()
             : this.sequelize.findAll(this.options);
         return find

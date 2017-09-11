@@ -9,11 +9,11 @@ var source_1 = require("../../source");
 var database_1 = require("../../source/database");
 var config = require('../config/config.json');
 var mainWorld, dangerousTag, flyingTag;
+var db = new Sequelize(config.database);
+database_1.usePostgres(db, config.database);
 describe('Game', function () {
     this.timeout(5000);
     it('sync_database', function () {
-        var db = new Sequelize(config.database);
-        database_1.usePostgres(db, config.database);
         var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
         var modeler = new modeler_1.DevModeler(db, schema);
         var model = modeler.collections;
@@ -70,7 +70,6 @@ describe('Game', function () {
 describe('Arbitrary', function () {
     this.timeout(4000);
     it('sync_database', function () {
-        var db = new Sequelize(config.database);
         var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
         var modeler = new modeler_1.DevModeler(db, schema);
         var model = modeler.collections;
@@ -79,17 +78,30 @@ describe('Arbitrary', function () {
             .then(function () { return model.Odd.create({
             strange: 10,
             unknown: "mist",
-            vast: "1000000000000000000000000000021"
+            vast: "1000000000000000000000000000021",
+            sampleDate: new Date("June 15, 2016"),
+            data: {
+                frogs: [
+                    { name: "Froggy" },
+                    { name: "Pac Frog" }
+                ]
+            }
         }); })
             .then(function () { return model.Odd.create({
             strange: 11,
             unknown: "mist2",
-            vast: new BigNumber("1000000000000000000000000000021")
+            vast: new BigNumber("1000000000000000000000000000021"),
+            sampleDate: new Date("August 3, 2002"),
+            data: {
+                "nothing": null
+            }
         }); })
             .then(function () { return model.Odd.all(); })
             .then(function (results) {
             console.log('result', results);
             assert(new BigNumber(results[0].vast).equals(results[1].vast));
+            assert(results[0].sampleDate instanceof Date);
+            assert.equal(results[0].data.frogs.length, 2);
         });
     });
 });

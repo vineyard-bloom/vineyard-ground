@@ -188,7 +188,7 @@ export class Query_Implementation<T> implements Query<T> {
   }
 
   exec(): Promise<any> {
-    const find = this.sequelize.useQueryBuilder
+    const find = this.sequelize.sequelize.useQueryBuilder
       ? this.queryWithQueryBuilder()
       : this.sequelize.findAll(this.options)
 

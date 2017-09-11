@@ -1,3 +1,4 @@
+/// <reference types="sequelize" />
 import { ICollection } from "./collection";
 import * as sequelize from 'sequelize';
 import { Collection_Trellis } from './types';

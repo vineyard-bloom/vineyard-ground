@@ -1,61 +1,33 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-function delimit(tokens, delimiter) {
-    var result = [];
-    for (var i = 0; i < tokens.length; ++i) {
-        if (i > 0)
-            result.push(delimiter);
-        result.push(tokens[i]);
-    }
-    return result;
-}
-var Flattener = (function () {
-    function Flattener() {
-        this.args = [];
-    }
-    Flattener.prototype.flatten = function (token) {
-        var _this = this;
-        if (typeof token == 'string')
-            return token;
-        if (Array.isArray(token)) {
-            return token
-                .map(function (t) { return _this.flatten(t); })
-                .filter(function (t) { return t != ''; })
-                .join(' ');
-        }
-        if (typeof token == 'object') {
-            this.args.push(token.value);
-            return '$' + this.args.length;
-        }
-        throw new Error("Invalid token type: " + typeof token);
-    };
-    return Flattener;
-}());
-var QueryBuilder = (function () {
+var sql_building_1 = require("./sql-building");
+var QueryBuilder = (function (_super) {
+    __extends(QueryBuilder, _super);
     function QueryBuilder(trellis) {
-        this.trellis = trellis;
-        this.table = trellis['table'];
+        return _super.call(this, trellis) || this;
     }
-    QueryBuilder.prototype.quote = function (text) {
-        return '"' + text + '"';
-    };
-    QueryBuilder.prototype.sanitize = function (value) {
-        if (typeof value == 'string')
-            return "'" + value + "'";
-        return value;
-    };
     QueryBuilder.prototype.buildWhere = function (where) {
         if (!where)
             return '';
         var conditions = [];
         for (var i in where) {
             conditions.push([
-                this.quote(i),
+                this.builder.quote(i),
                 '=',
                 { value: where[i] }
             ]);
         }
-        return ['WHERE', delimit(conditions, 'AND')];
+        return ['WHERE', sql_building_1.delimit(conditions, 'AND')];
     };
     QueryBuilder.prototype.buildOrderBy = function (order) {
         if (!order)
@@ -72,7 +44,7 @@ var QueryBuilder = (function () {
             else {
                 if (tokens.length > 0)
                     tokens[tokens.length - 1] += ',';
-                tokens.push(this.quote(item));
+                tokens.push(this.builder.quote(item));
             }
         }
         return ['ORDER BY', tokens];
@@ -93,20 +65,15 @@ var QueryBuilder = (function () {
             'SELECT',
             this.buildSelect(options.attributes),
             'FROM',
-            this.quote(this.table.tableName),
+            this.builder.quote(this.getTableName()),
             this.buildWhere(options.where),
             this.buildOrderBy(options.order),
             this.buildRange('LIMIT', options.limit),
             this.buildRange('OFFSET', options.offset),
         ];
-        var flattener = new Flattener();
-        var sql = flattener.flatten(finalToken);
-        return {
-            sql: sql,
-            args: flattener.args
-        };
+        return this.builder.flatten(finalToken);
     };
     return QueryBuilder;
-}());
+}(sql_building_1.TrellisSqlBuilder));
 exports.QueryBuilder = QueryBuilder;
 //# sourceMappingURL=query-builder.js.map

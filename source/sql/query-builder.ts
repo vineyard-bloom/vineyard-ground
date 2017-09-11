@@ -1,4 +1,5 @@
 import {Trellis} from "vineyard-schema"
+import {delimit, Flattener, TrellisSqlBuilder, Token} from "./sql-building";
 
 export interface QueryOptions {
   where?: any
@@ -8,70 +9,15 @@ export interface QueryOptions {
   attributes?: any
 }
 
-function delimit(tokens: Token[], delimiter: string): Token {
-  let result = []
-  for (let i = 0; i < tokens.length; ++i) {
-    if (i > 0)
-      result.push(delimiter)
-
-    result.push(tokens[i])
-  }
-
-  return result
-}
-
-interface Arg {
-  value: any
-}
-
-type Token = string | any[] | Arg
-
-class Flattener {
-  args = []
-
-  flatten(token: Token) {
-    if (typeof token == 'string')
-      return token
-
-    if (Array.isArray(token)) {
-      return token
-        .map(t => this.flatten(t))
-        .filter(t => t != '')
-        .join(' ')
-    }
-
-    if (typeof token == 'object') {
-      this.args.push(token.value)
-      return '$' + this.args.length
-    }
-
-    throw new Error("Invalid token type: " + typeof token)
-  }
-}
-
 export interface QueryBundle {
   sql: string
   args: any[]
 }
 
-export class QueryBuilder {
-  trellis: Trellis
-  table
+export class QueryBuilder extends TrellisSqlBuilder {
 
   constructor(trellis: Trellis) {
-    this.trellis = trellis;
-    this.table = trellis['table']
-  }
-
-  private quote(text: string) {
-    return '"' + text + '"'
-  }
-
-  private sanitize(value) {
-    if (typeof value == 'string')
-      return "'" + value + "'"
-
-    return value
+    super(trellis)
   }
 
   private buildWhere(where): Token {
@@ -82,7 +28,7 @@ export class QueryBuilder {
 
     for (let i in where) {
       conditions.push([
-        this.quote(i),
+        this.builder.quote(i),
         '=',
         {value: where[i]}
       ])
@@ -107,7 +53,7 @@ export class QueryBuilder {
         if (tokens.length > 0)
           tokens[tokens.length - 1] += ','
 
-        tokens.push(this.quote(item))
+        tokens.push(this.builder.quote(item))
       }
     }
 
@@ -133,19 +79,13 @@ export class QueryBuilder {
       'SELECT',
       this.buildSelect(options.attributes),
       'FROM',
-      this.quote(this.table.tableName),
+      this.builder.quote(this.getTableName()),
       this.buildWhere(options.where),
       this.buildOrderBy(options.order),
       this.buildRange('LIMIT', options.limit),
       this.buildRange('OFFSET', options.offset),
     ]
 
-    const flattener = new Flattener()
-    const sql = flattener.flatten(finalToken)
-
-    return {
-      sql: sql,
-      args: flattener.args
-    }
+    return this.builder.flatten(finalToken)
   }
 }

@@ -10,6 +10,12 @@
       },
       "vast": {
         "type": "colossal"
+      },
+      "sampleDate": {
+        "type": "date"
+      },
+      "data": {
+        "type": "json"
       }
     }
   }

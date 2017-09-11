@@ -184,8 +184,6 @@ function vineyard_to_sequelize(schema, keys, sequelize) {
     var tables = {};
     for (var name_2 in keys) {
         tables[name_2] = create_table(schema.trellises[name_2], schema, sequelize);
-        if (sequelize.useQueryBuilder)
-            tables[name_2].useQueryBuilder = true;
     }
     // for (let name in keys) {
     //   tables [name] = create_table(schema.trellises [name], schema, sequelize)
@@ -201,6 +199,7 @@ function usePostgres(db, databaseConfig) {
     });
     db['pgPool'] = new pg.Pool(pgConfig);
     db['useQueryBuilder'] = true;
+    db['useUpdateBuilder'] = true;
 }
 exports.usePostgres = usePostgres;
 //# sourceMappingURL=database.js.map
