@@ -139,7 +139,7 @@ export class Query_Implementation<T> implements Query<T> {
         throw Error("Query.select single value called on empty result set.")
       }
 
-      return result[0].dataValues._value
+      return result.map(item => item.dataValues._value);
     }
 
     return result.map(item => processFields(item.dataValues, this.trellis))
