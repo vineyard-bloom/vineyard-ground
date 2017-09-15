@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var query_1 = require("./query");
 var update_1 = require("./update");
-var Collection = (function () {
+var Collection = /** @class */ (function () {
     function Collection(trellis, sequelize_model) {
         this.trellis = trellis;
         this.sequelize = sequelize_model;

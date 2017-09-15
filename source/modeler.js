@@ -23,7 +23,7 @@ function initializeTrellises(schema, collections, keys, db) {
     var sequelize_models = database_1.vineyard_to_sequelize(schema, schema.trellises, db);
     sync_collections(schema, collections, schema.trellises, sequelize_models);
 }
-var Modeler = (function () {
+var Modeler = /** @class */ (function () {
     function Modeler(db, schema) {
         this.collections = {};
         this.schema = schema instanceof vineyard_schema_1.Schema
@@ -53,7 +53,7 @@ var Modeler = (function () {
     return Modeler;
 }());
 exports.Modeler = Modeler;
-var DevModeler = (function (_super) {
+var DevModeler = /** @class */ (function (_super) {
     __extends(DevModeler, _super);
     function DevModeler() {
         return _super !== null && _super.apply(this, arguments) || this;

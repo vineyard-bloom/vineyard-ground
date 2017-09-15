@@ -28,7 +28,7 @@ function processFields(result, trellis) {
     }
     return result;
 }
-var Query_Implementation = (function () {
+var Query_Implementation = /** @class */ (function () {
     function Query_Implementation(sequelize, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;
@@ -100,7 +100,7 @@ var Query_Implementation = (function () {
                     return null;
                 throw Error("Query.select single value called on empty result set.");
             }
-            return result[0].dataValues._value;
+            return result.map(function (item) { return item.dataValues._value; });
         }
         return result.map(function (item) { return processFields(item.dataValues, _this.trellis); });
     };
