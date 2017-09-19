@@ -75,7 +75,7 @@ function perform_operation(identity, seed, list, sequelize, operation) {
 function update_list(identity, seed, list, sequelize) {
     var value = seed[list.name];
     if (Array.isArray(value)) {
-        throw new Error("Not yet implemented.");
+        return Promise.all(value.map(function (item) { return perform_operation(identity, seed, list, sequelize, item); }));
     }
     else {
         return perform_operation(identity, seed, list, sequelize, value);

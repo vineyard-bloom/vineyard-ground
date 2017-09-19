@@ -90,8 +90,7 @@ function perform_operation(identity, seed, list: Reference, sequelize, operation
 function update_list(identity, seed, list: Reference, sequelize) {
   const value = seed[list.name]
   if (Array.isArray(value)) {
-    throw new Error("Not yet implemented.")
-  }
+      return Promise.all(value.map(item => perform_operation(identity, seed, list, sequelize, item)))  }
   else {
     return perform_operation(identity, seed, list, sequelize, value)
   }
