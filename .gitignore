@@ -3,3 +3,5 @@ node_modules
 npm-*
 *.js.map
 config.json
+yarn*
+test/temp

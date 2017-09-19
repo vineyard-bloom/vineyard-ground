@@ -38,7 +38,7 @@ enum Reduce_Mode {
 }
 
 function processFields(result, trellis: Trellis) {
-  if (trellis['table'].sequelize.getDialect() == 'mysql') {
+  if (trellis['oldTable'].sequelize.getDialect() == 'mysql') {
     for (let i in trellis.properties) {
       const property = trellis.properties[i]
       if (property.type.name == 'json') {
@@ -103,9 +103,9 @@ export class Query_Implementation<T> implements Query<T> {
     // where[to_lower(reference.get_other_trellis().name)] =
     //   sequelize.col(reference.get_other_trellis().primary_key.name)
 
-    return reference.other_property.trellis['table'].findAll({
+    return reference.other_property.trellis['oldTable'].findAll({
       include: {
-        model: reference.trellis['table'],
+        model: reference.trellis['oldTable'],
         through: {where: where},
         as: reference.other_property.name,
         required: true

@@ -13,10 +13,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var vineyard_schema_1 = require("vineyard-schema");
 var collection_1 = require("./collection");
 var database_1 = require("./database");
+var pluralize = require('pluralize');
 function sync_collections(schema, collections, keys, sequelize_models) {
     for (var name_1 in keys) {
         var trellis = schema.trellises[name_1];
         collections[name_1] = new collection_1.Collection(trellis, sequelize_models[name_1]);
+        trellis.table = {
+            name: pluralize(trellis.name).toLowerCase()
+        };
     }
 }
 function initializeTrellises(schema, collections, keys, db) {

@@ -1,5 +1,6 @@
 
-import {Property, Library, Trellis_Type, Type_Category} from "vineyard-schema"
+import {Library, Trellis_Type, Type_Category} from "vineyard-schema"
+import {Property} from "../types";
 
 export function getFieldType(property: Property, library: Library): any {
   const type = property.type
@@ -9,19 +10,19 @@ export function getFieldType(property: Property, library: Library): any {
       if (type === library.types.long)
         return {
           name: 'BIGINT',
-          defaultValue: 0
+          defaultValue: '0'
         }
 
       if (type === library.types.int)
         return {
           name: 'INTEGER',
-          defaultValue: 0
+          defaultValue: '0'
         }
 
       if (type === library.types.string)
         return {
           name: 'CHARACTER VARYING(255)',
-          defaultValue: ""
+          defaultValue: "''"
         }
 
       if (type === library.types.text)
@@ -35,7 +36,7 @@ export function getFieldType(property: Property, library: Library): any {
       if (type === library.types.bool)
         return {
           name: 'BOOLEAN',
-          defaultValue: false
+          defaultValue: 'false'
         }
 
       if (type === library.types.guid)
@@ -46,17 +47,17 @@ export function getFieldType(property: Property, library: Library): any {
       if (type === library.types.float)
         return {
           name: 'FLOAT',
-          defaultValue: 0
+          defaultValue: '0'
         }
 
       if (type === library.types.date)
         return {
-          name: 'DATEONLY'
+          name: 'DATE'
         }
 
       if (type === library.types.datetime)
         return {
-          name: 'DATE'
+          name: 'TIMESTAMPZ'
         }
 
       if (type === library.types.time)
@@ -67,7 +68,7 @@ export function getFieldType(property: Property, library: Library): any {
       if (type === library.types.colossal)
         return {
           name: 'NUMERIC',
-          defaultValue: 0
+          defaultValue: '0'
         }
 
       throw new Error("Unknown primitive: " + type.name + '.')
@@ -77,7 +78,7 @@ export function getFieldType(property: Property, library: Library): any {
 
     case Type_Category.trellis:
       if (library.types[type.name]) {
-        return get_field((type as Trellis_Type).trellis.primary_key, library)
+        return getFieldType((type as Trellis_Type).trellis.primary_key, library)
       }
 
       throw new Error("Unknown trellis reference: " + type.name + '.')

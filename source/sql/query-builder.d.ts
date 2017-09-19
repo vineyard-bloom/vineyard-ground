@@ -1,4 +1,4 @@
-import { Trellis } from "vineyard-schema";
+import { Trellis } from "../types";
 import { TrellisSqlBuilder } from "./sql-building";
 export interface QueryOptions {
     where?: any;

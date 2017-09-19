@@ -1,4 +1,4 @@
-import {Trellis} from "vineyard-schema"
+import {Trellis} from "../types"
 import {delimit, Flattener, TrellisSqlBuilder, Token} from "./sql-building";
 
 function getFieldName(f) {

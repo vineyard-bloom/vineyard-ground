@@ -10,7 +10,7 @@ var Reduce_Mode;
     Reduce_Mode[Reduce_Mode["single_value"] = 2] = "single_value";
 })(Reduce_Mode || (Reduce_Mode = {}));
 function processFields(result, trellis) {
-    if (trellis['table'].sequelize.getDialect() == 'mysql') {
+    if (trellis['oldTable'].sequelize.getDialect() == 'mysql') {
         for (var i in trellis.properties) {
             var property = trellis.properties[i];
             if (property.type.name == 'json') {
@@ -58,9 +58,9 @@ var Query_Implementation = (function () {
         where[utility_1.to_lower(reference.trellis.name)] = identity;
         // where[to_lower(reference.get_other_trellis().name)] =
         //   sequelize.col(reference.get_other_trellis().primary_key.name)
-        return reference.other_property.trellis['table'].findAll({
+        return reference.other_property.trellis['oldTable'].findAll({
             include: {
-                model: reference.trellis['table'],
+                model: reference.trellis['oldTable'],
                 through: { where: where },
                 as: reference.other_property.name,
                 required: true

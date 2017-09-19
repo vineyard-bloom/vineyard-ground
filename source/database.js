@@ -85,12 +85,12 @@ function create_field(property, library, dialect) {
     return field;
 }
 function get_cross_table_name(trellises) {
-    return trellises.map(function (t) { return t['table'].getTableName(); }).sort().join('_');
+    return trellises.map(function (t) { return t['oldTable'].getTableName(); }).sort().join('_');
 }
 function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
     var table_trellises = [list.trellis, list.other_property.trellis];
     var cross_table_name = get_cross_table_name(table_trellises);
-    var relationship = trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
+    var relationship = trellis['oldTable'].belongsToMany(list.get_other_trellis()['oldTable'], {
         as: list.name,
         otherKey: list.other_property.trellis.name.toLowerCase(),
         foreignKey: list.trellis.name.toLowerCase(),
@@ -103,8 +103,8 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
     if (property.type.get_category() == vineyard_schema_1.Type_Category.trellis) {
         var reference = property;
         if (!reference.other_property) {
-            var other_table = reference.get_other_trellis()['table'];
-            other_table.hasMany(trellis['table'], {
+            var other_table = reference.get_other_trellis()['oldTable'];
+            other_table.hasMany(trellis['oldTable'], {
                 foreignKey: reference.name,
                 constraints: true
             });
@@ -116,7 +116,7 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
             initialize_many_to_many(list, trellis, schema, tables, sequelize);
         }
         else {
-            trellis['table'].hasMany(list.get_other_trellis()['table'], {
+            trellis['oldTable'].hasMany(list.get_other_trellis()['oldTable'], {
                 as: list.name,
                 foreignKey: list.other_property.name,
                 constraints: true
@@ -173,12 +173,12 @@ function create_table(trellis, schema, sequelize) {
         if (autoFields.indexOf('modified') == -1)
             modified = false;
     }
-    var table = trellis['table'] = sequelize.define(trellis.name.toLowerCase(), fields, {
+    var oldTable = trellis['oldTable'] = sequelize.define(trellis.name.toLowerCase(), fields, {
         underscored: true,
         createdAt: created,
         updatedAt: modified,
     });
-    return table;
+    return oldTable;
 }
 function vineyard_to_sequelize(schema, keys, sequelize) {
     var tables = {};

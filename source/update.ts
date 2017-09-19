@@ -26,7 +26,7 @@ function prepare_property(property: Property, value) {
   if (property.is_reference()) {
     return prepare_reference(property as Reference, value)
   }
-  else if (property.type.name == 'json' && property.trellis['table'].sequelize.getDialect() == 'mysql') {
+  else if (property.type.name == 'json' && property.trellis['oldTable'].sequelize.getDialect() == 'mysql') {
     return JSON.stringify(value)
   }
   else {
@@ -90,7 +90,7 @@ function perform_operation(identity, seed, list: Reference, sequelize, operation
 function update_list(identity, seed, list: Reference, sequelize) {
   const value = seed[list.name]
   if (Array.isArray(value)) {
-    throw new Error("Not yet implemented.")
+    return Promise.all(value.map(item => perform_operation(identity, seed, list, sequelize, item)))
   }
   else {
     return perform_operation(identity, seed, list, sequelize, value)

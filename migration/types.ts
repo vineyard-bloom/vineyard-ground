@@ -1,5 +1,4 @@
-import {Trellis} from "vineyard-schema"
-import {Property} from "vineyard-schema";
+import {Property, Trellis} from "../source/types";
 
 export enum ChangeType {
   createTable,
