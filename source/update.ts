@@ -26,9 +26,6 @@ function prepare_property(property: Property, value) {
   if (property.is_reference()) {
     return prepare_reference(property as Reference, value)
   }
-  else if (property.type.name == 'json' && property.trellis['oldTable'].sequelize.getDialect() == 'mysql') {
-    return JSON.stringify(value)
-  }
   else {
     if ((value === null || value === undefined) && property.is_nullable)
       return null

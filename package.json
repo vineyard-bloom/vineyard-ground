@@ -11,7 +11,8 @@
   "author": "Christopher W. Johnson",
   "license": "MIT",
   "dependencies": {
-    "pg": "^7.3.0",
+    "bignumber.js": "^4.0.4",
+    "pg": "^6.1.5",
     "pluralize": "^7.0.0",
     "sequelize": "^3.30.4",
     "uuid": "^3.0.1",
@@ -23,8 +24,8 @@
     "@types/node": "^7.0.5",
     "@types/sequelize": "^3.4.43",
     "mocha": "^3.2.0",
-    "source-map-support": "^0.4.14",
-    "shelljs": "^0.7.8"
+    "shelljs": "^0.7.8",
+    "source-map-support": "^0.4.14"
   },
   "peerDependencies": {
     "bignumber.js": "4.0.2"
