@@ -3,3 +3,4 @@ node_modules
 npm-*
 *.js.map
 config.json
+test/temp

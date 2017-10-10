@@ -1,6 +1,4 @@
-/// <reference types="sequelize" />
 import { ICollection } from "./collection";
-import * as sequelize from 'sequelize';
 import { Collection_Trellis } from './types';
 export interface Query<T> {
     then(any: any): Promise<any>;
@@ -44,6 +42,6 @@ export declare class Query_Implementation<T> implements Query<T> {
     sort(args: string[]): Query<T>;
     expand<T2>(path: string): Query<T2>;
 }
-export declare function Path(path: any): sequelize.col;
-export declare function Sum(path: any): sequelize.fn;
-export declare function Count(path: any): sequelize.fn;
+export declare function Path(path: any): any;
+export declare function Sum(path: any): any;
+export declare function Count(path: any): any;

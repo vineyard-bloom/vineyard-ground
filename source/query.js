@@ -28,7 +28,7 @@ function processFields(result, trellis) {
     }
     return result;
 }
-var Query_Implementation = /** @class */ (function () {
+var Query_Implementation = (function () {
     function Query_Implementation(sequelize, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;
