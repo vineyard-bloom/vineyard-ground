@@ -1,6 +1,6 @@
-import {Property, Type_Category, Reference, Trellis_Type, Trellis, Library, Schema} from "vineyard-schema"
-import * as Sequelize from 'sequelize'
-import {Table_Trellis} from "./types";
+import {Type_Category, Trellis_Type, Library} from "vineyard-schema"
+const Sequelize = require('sequelize')
+import {Table_Trellis, Trellis, Property, Schema, Table} from "./types";
 
 const node_uuid = require('uuid')
 
@@ -82,7 +82,8 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
     case Type_Category.trellis:
       if (library.types[type.name]) {
-        return get_field((type as Trellis_Type).trellis.primary_key, library, dialect)
+        const field: any = (type as Trellis_Type).trellis.primary_key
+        return get_field(field, library, dialect)
       }
 
       throw new Error("Unknown trellis reference: " + type.name + '.')
@@ -109,14 +110,14 @@ function create_field(property: Property, library: Library, dialect: string): an
 }
 
 function get_cross_table_name(trellises: Trellis []) {
-  return trellises.map(t => t['table'].getTableName()).sort().join('_')
+  return trellises.map(t => t.table.getTableName()).sort().join('_')
 }
 
-function initialize_many_to_many(list: Reference, trellis: Trellis, schema: Schema, tables, sequelize) {
+function initialize_many_to_many(list: Property, trellis: Trellis, schema: Schema, tables: any, sequelize: any) {
   const table_trellises = [list.trellis, list.other_property.trellis]
   const cross_table_name = get_cross_table_name(table_trellises)
 
-  const relationship = trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
+  const relationship = trellis.table.belongsToMany(list.get_other_trellis()['table'], {
     as: list.name,
     otherKey: list.other_property.trellis.name.toLowerCase(),
     foreignKey: list.trellis.name.toLowerCase(),
@@ -124,12 +125,12 @@ function initialize_many_to_many(list: Reference, trellis: Trellis, schema: Sche
     through: cross_table_name
   })
 
-  list['cross_table'] = relationship.through.model
+  list.cross_table = relationship.through.model
 }
 
-function initialize_relationship(property: Property, trellis: Trellis, schema: Schema, tables, sequelize) {
+function initialize_relationship(property: Property, trellis: Trellis, schema: Schema, tables: any, sequelize: any) {
   if (property.type.get_category() == Type_Category.trellis) {
-    const reference = property as Reference
+    const reference = property as Property
     if (!reference.other_property) {
       const other_table = reference.get_other_trellis()['table']
       other_table.hasMany(trellis['table'], {
@@ -139,7 +140,7 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
     }
   }
   else if (property.type.get_category() == Type_Category.list) {
-    const list = property as Reference
+    const list = property as Property
     if (list.other_property.type.get_category() == Type_Category.list) {
       initialize_many_to_many(list, trellis, schema, tables, sequelize)
     }
@@ -153,7 +154,7 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
   }
 }
 
-function initialize_relationships(schema: Schema, tables, sequelize) {
+function initialize_relationships(schema: Schema, tables: any, sequelize: any) {
   for (let name in schema.trellises) {
     const trellis = schema.trellises [name]
     for (let i in trellis.properties) {
@@ -163,8 +164,8 @@ function initialize_relationships(schema: Schema, tables, sequelize) {
   }
 }
 
-function create_table(trellis: Trellis, schema: Schema, sequelize) {
-  const fields = {}
+function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
+  const fields: {[T: string]: Property} = {}
 
   // Create the primary key field first for DB UX
   for (let i = 0; i < trellis.primary_keys.length; ++i) {
@@ -196,8 +197,8 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
     }
   }
 
-  let created:string | boolean = 'created'
-  let modified:string | boolean = 'modified'
+  let created: string | boolean = 'created'
+  let modified: string | boolean = 'modified'
 
   if (trellis.additional && Array.isArray(trellis.additional.autoFields)) {
     const autoFields = trellis.additional.autoFields
@@ -219,8 +220,8 @@ function create_table(trellis: Trellis, schema: Schema, sequelize) {
   return table
 }
 
-export function vineyard_to_sequelize(schema: Schema, keys, sequelize) {
-  const tables = {}
+export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any) {
+  const tables: {[key: string]: Table} = {}
 
   for (let name in keys) {
     tables [name] = create_table(schema.trellises [name], schema, sequelize)

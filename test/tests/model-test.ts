@@ -3,13 +3,13 @@ import {DevModeler} from "../../source/modeler";
 require('source-map-support').install()
 import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
-import * as Sequelize from 'sequelize'
+const Sequelize = require('sequelize')
 import {Modeler, Add, Remove} from '../../source'
 
 const config = require('../config/config.json')
-let mainWorld,
-  dangerousTag,
-  flyingTag
+let mainWorld: any,
+  dangerousTag: any,
+  flyingTag: any
 
 describe('Game', function () {
   this.timeout(5000)
@@ -22,27 +22,27 @@ describe('Game', function () {
       .then(() => model.Tag.create({
           name: "flying"
         })
-          .then(tag => flyingTag = tag)
+          .then((tag: any) => flyingTag = tag)
           .then(() => model.World.create({}))
-          .then(world => mainWorld = world)
+          .then((world: any) => mainWorld = world)
           .then(() => model.Creature.create({
             name: "ogre",
             world: mainWorld,
             health: 5
           }))
-          .then(ogre => model.Tag.create({
+          .then((ogre: any) => model.Tag.create({
               name: "dangerous"
             })
-              .then(tag => dangerousTag = tag)
+              .then((tag: any) => dangerousTag = tag)
               .then(() => model.Creature.update(ogre, {
                   health: 10,
                   tags: Add(dangerousTag)
                 })
-                  .then(creature => {
+                  .then((creature: any) => {
                     assert.equal(creature.health, 10)
                     return model.Creature.first().expand('tags')
                   })
-                  .then(creature => {
+                  .then((creature: any) => {
                     assert(Array.isArray(creature.tags))
                     assert.equal(1, creature.tags.length)
                     assert.equal('dangerous', creature.tags[0].name)
@@ -55,7 +55,7 @@ describe('Game', function () {
           )
       )
       .then(() => model.Creature.first().expand('tags'))
-      .then(creature => {
+      .then((creature: any) => {
         assert(Array.isArray(creature.tags))
         assert.equal(0, creature.tags.length)
       })
@@ -66,7 +66,7 @@ describe('Game', function () {
         tags: Add(flyingTag)
       }))
       .then(() => model.World.first().expand('creatures'))
-      .then(world => {
+      .then((world: any) => {
         assert(Array.isArray(world.creatures))
         assert.equal(2, world.creatures.length)
       })
@@ -95,7 +95,7 @@ describe('Arbitrary', function () {
         })
       )
       .then(() => model.Odd.all())
-      .then(results => {
+      .then((results: any) => {
         console.log('result', results)
         assert(new BigNumber(results[0].vast).equals(results[1].vast))
       })

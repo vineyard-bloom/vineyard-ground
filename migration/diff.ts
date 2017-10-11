@@ -1,8 +1,9 @@
-import * as shell from 'shelljs'
-import {Property, Schema, Trellis, Trellis_Map} from "vineyard-schema"
+const shell = require('shelljs')
 import {Change, ChangeType} from "./types";
+import {Property, Trellis, Trellis_Map} from "../source/types";
+import {Schema} from "vineyard-schema/source/scheming";
 
-function shellCommand(command) {
+function shellCommand(command: string) {
   console.log('shell', command)
   if (process.platform === 'win32') {
     return shell.exec('powershell "' + command + '"')
@@ -13,7 +14,7 @@ function shellCommand(command) {
 }
 
 function getJson(commit: string, path: string) {
-  const json = shellCommand('git show ' + commit + ':' + path)
+  const json = shellCommand('git show ' + commit + ':' + path) as string
   return JSON.parse(json)
 }
 
@@ -26,7 +27,7 @@ interface Bundle {
 type Property_Map = { [name: string]: Property }
 
 function findChangedProperties(firstProperties: Property_Map, secondProperties: Property_Map): Change [] {
-  let result = []
+  let result: Change[] = []
   for (let name in firstProperties) {
     if (!secondProperties[name]) {
       result.push({
@@ -62,7 +63,7 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
 }
 
 function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [] {
-  let result = []
+  let result: Change[] = []
   for (let name in first) {
     if (!second[name]) {
       result.push({
@@ -88,7 +89,7 @@ function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [
 export function get_diff(path: string, firstCommit: string, secondCommit: string) {
   const firstJson = getJson(firstCommit, path)
   const secondJson = getJson(secondCommit, path)
-  const first = new Schema(firstJson).trellises
-  const second = new Schema(secondJson).trellises
+  const first:any = new Schema(firstJson).trellises
+  const second:any = new Schema(secondJson).trellises
   return findChangedTrellises(first, second)
 }

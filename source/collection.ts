@@ -7,28 +7,28 @@ export interface ICollection {
 }
 
 export class Collection<T> implements ICollection {
-  private sequelize
+  private sequelize: any
   private trellis: Collection_Trellis<T>
 
-  constructor(trellis: Collection_Trellis<T>, sequelize_model) {
+  constructor(trellis: Collection_Trellis<T>, sequelize_model: any) {
     this.trellis = trellis
     this.sequelize = sequelize_model
     trellis.collection = this
   }
 
-  create(seed): Promise<T> {
+  create(seed: any): Promise<T> {
     return create(seed, this.trellis, this.sequelize)
   }
 
-  create_or_update(seed): Promise<T> {
+  create_or_update(seed: any): Promise<T> {
     return create_or_update(seed, this.trellis, this.sequelize)
   }
 
-  update(seed, changes?): Promise<T> {
+  update(seed: any, changes?: any): Promise<T> {
     return update(seed, this.trellis, this.sequelize, changes)
   }
 
-  remove(seed): Promise<T> {
+  remove(seed: any): Promise<T> {
     return this.sequelize.destroy({
       where: {
         [this.trellis.primary_keys[0].name]: this.trellis.get_identity(seed)
@@ -40,19 +40,19 @@ export class Collection<T> implements ICollection {
     return new Query_Implementation<T>(this.sequelize, this.trellis)
   }
 
-  filter(options): Query<T> {
+  filter(options: any): Query<T> {
     return this.all().filter(options)
   }
 
-  first(options?): Query<T> {
+  first(options?: any): Query<T> {
     return this.all().first(options)
   }
 
-  first_or_null(options?): Query<T> {
+  first_or_null(options?: any): Query<T> {
     return this.all().first_or_null(options)
   }
 
-  firstOrNull(options?): Query<T> {
+  firstOrNull(options?: any): Query<T> {
     return this.all().first_or_null(options)
   }
 
@@ -60,10 +60,10 @@ export class Collection<T> implements ICollection {
     return this.sequelize
   }
 
-  get(identity) {
+  get(identity: any) {
     identity = this.trellis.get_identity(identity)
-    const filter = {}
-    filter[this.trellis.primary_key.name] = identity
+    const filter: { [key: string]: any } = {}
+    filter[this.trellis.primary_keys[0].name] = identity
 
     return this.filter(filter).first()
   }

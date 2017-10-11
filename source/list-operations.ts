@@ -6,10 +6,10 @@ export enum Operation_Type {
 
 export interface Operation {
   type: Operation_Type
-  item?
+  item?: any
 }
 
-export function Add(item): Operation {
+export function Add(item: any): Operation {
   return {
     type: Operation_Type.add,
     item: item
@@ -22,7 +22,7 @@ export function Clear(): Operation {
   }
 }
 
-export function Remove(item): Operation {
+export function Remove(item: any): Operation {
   return {
     type: Operation_Type.remove,
     item: item

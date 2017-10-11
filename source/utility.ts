@@ -1,4 +1,4 @@
-export function to_lower_snake_case(text) {
+export function to_lower_snake_case(text: string) {
   if (text.length == 1)
     return text
 
@@ -6,6 +6,6 @@ export function to_lower_snake_case(text) {
   return result
 }
 
-export function to_lower(text) {
+export function to_lower(text: string) {
   return text[0].toLowerCase() + text.substr(1)
 }

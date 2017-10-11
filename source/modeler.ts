@@ -4,24 +4,24 @@ import {vineyard_to_sequelize} from "./database";
 
 export type Collection_Map = { [name: string]: ICollection }
 
-function sync_collections(schema: Schema, collections: Collection_Map, keys, sequelize_models) {
+function sync_collections(schema: Schema, collections: Collection_Map, keys: any, sequelize_models: any) {
   for (let name in keys) {
     const trellis = schema.trellises [name] as any
     collections [name] = new Collection(trellis, sequelize_models [name])
   }
 }
 
-function initializeTrellises(schema: Schema, collections: Collection_Map, keys, db) {
-  const sequelize_models = vineyard_to_sequelize(schema, schema.trellises, db)
+function initializeTrellises(schema: Schema, collections: Collection_Map, keys: any, db: any) {
+  const sequelize_models = vineyard_to_sequelize(schema as any, schema.trellises, db)
   sync_collections(schema, collections, schema.trellises, sequelize_models)
 }
 
 export class Modeler {
   private schema: Schema
-  protected db
+  protected db: any
   collections: Collection_Map = {}
 
-  constructor(db, schema: Schema | any) {
+  constructor(db: any, schema: Schema | any) {
     this.schema = schema instanceof Schema
       ? schema
       : new Schema(schema)
@@ -32,16 +32,16 @@ export class Modeler {
     initializeTrellises(this.schema, this.collections, this.schema.trellises, this.db)
   }
 
-  query(sql, replacements?) {
+  query(sql: string, replacements?: any) {
     return this.db.query(sql, {
       replacements: replacements
     })
-      .then(result => result [0])
+      .then((result: any[]) => result [0])
   }
 
-  querySingle(sql, replacements?) {
+  querySingle(sql: string, replacements?: any) {
     return this.query(sql, replacements)
-      .then(result => result [0])
+      .then((result: any []) => result [0])
   }
 
   addDefinitions(definitions: any) {

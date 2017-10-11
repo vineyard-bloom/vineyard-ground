@@ -1,4 +1,3 @@
-
 import {Library, Trellis_Type, Type_Category} from "vineyard-schema"
 import {Property} from "../types";
 
@@ -78,7 +77,8 @@ export function getFieldType(property: Property, library: Library): any {
 
     case Type_Category.trellis:
       if (library.types[type.name]) {
-        return getFieldType((type as Trellis_Type).trellis.primary_key, library)
+        const field: any = (type as Trellis_Type).trellis.primary_key
+        return getFieldType(field, library)
       }
 
       throw new Error("Unknown trellis reference: " + type.name + '.')

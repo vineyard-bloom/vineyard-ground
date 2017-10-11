@@ -33,9 +33,9 @@ export function smartJoin(items: string[]) {
 }
 
 export class Flattener {
-  args = []
+  args: any = []
 
-  flatten(token: Token) {
+  flatten(token: Token): any {
     if (typeof token == 'string')
       return token
 
@@ -61,14 +61,14 @@ export class SqlBuilder {
     return '"' + text + '"'
   }
 
-  sanitize(value) {
+  sanitize(value: any) {
     if (typeof value == 'string')
       return "'" + value + "'"
 
     return value
   }
 
-  flatten(token) {
+  flatten(token: any) {
     const flattener = new Flattener()
     const sql = flattener.flatten(token)
 
@@ -91,7 +91,7 @@ export class SqlBuilder {
 
 export class TrellisSqlBuilder {
   protected trellis: Trellis
-  protected table
+  protected table: any
   protected builder: SqlBuilder = new SqlBuilder()
 
   constructor(trellis: Trellis) {

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var shell = require("shelljs");
-var vineyard_schema_1 = require("vineyard-schema");
 var types_1 = require("./types");
 function shellCommand(command) {
     console.log('shell', command);
@@ -77,8 +76,8 @@ function findChangedTrellises(first, second) {
 function get_diff(path, firstCommit, secondCommit) {
     var firstJson = getJson(firstCommit, path);
     var secondJson = getJson(secondCommit, path);
-    var first = new vineyard_schema_1.Schema(firstJson).trellises;
-    var second = new vineyard_schema_1.Schema(secondJson).trellises;
+    var first = new Schema(firstJson).trellises;
+    var second = new Schema(secondJson).trellises;
     return findChangedTrellises(first, second);
 }
 exports.get_diff = get_diff;

@@ -6,7 +6,7 @@ export declare type Token = string | any[] | Arg;
 export declare function delimit(tokens: Token[], delimiter: string): Token;
 export declare function smartJoin(items: string[]): string;
 export declare class Flattener {
-    args: any[];
+    args: never[];
     flatten(token: Token): any;
 }
 export declare class SqlBuilder {
@@ -14,7 +14,7 @@ export declare class SqlBuilder {
     sanitize(value: any): any;
     flatten(token: any): {
         sql: any;
-        args: any[];
+        args: never[];
     };
     getPath(property: Property): string;
     getCrossTableName(property: Property): string;

@@ -1,11 +1,11 @@
 import {Trellis} from "../types"
 import {delimit, Flattener, TrellisSqlBuilder, Token} from "./sql-building";
 
-function getFieldName(f) {
+function getFieldName(f: any) {
   return f.field.name
 }
 
-function getValue(f) {
+function getValue(f: any) {
   return f.value
 }
 
@@ -15,11 +15,11 @@ export class UpdateBuilder extends TrellisSqlBuilder {
     super(trellis)
   }
 
-  private prepareFieldsAndValues(seed) {
+  private prepareFieldsAndValues(seed: any) {
     return []
   }
 
-  formatAssignment(assignment) {
+  formatAssignment(assignment: any) {
     return [
       'SET',
       this.builder.quote(assignment.field.name),
@@ -32,7 +32,7 @@ export class UpdateBuilder extends TrellisSqlBuilder {
     return assignments.map(a => this.formatAssignment(a))
   }
 
-  buildConditions(seed) {
+  buildConditions(seed: any) {
     return this.trellis.primary_keys.map(k => {
       const value = seed[k.name]
       if (!value)
@@ -46,7 +46,7 @@ export class UpdateBuilder extends TrellisSqlBuilder {
     })
   }
 
-  buildCreate(seed) {
+  buildCreate(seed: any) {
     const assignments = this.prepareFieldsAndValues(seed)
     const fields = delimit(assignments.map(getFieldName), ', ')
     const values = delimit(assignments.map(getValue), ', ')
@@ -58,7 +58,7 @@ export class UpdateBuilder extends TrellisSqlBuilder {
       '(', values, ')']
   }
 
-  buildUpdate(seed) {
+  buildUpdate(seed: any) {
     const assignments = this.prepareFieldsAndValues(seed)
     const assignmentClause = delimit(this.formatAssignments(assignments), ', ')
     const conditionClause = delimit(this.buildConditions(seed), 'AND')

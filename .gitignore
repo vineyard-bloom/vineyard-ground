@@ -4,3 +4,4 @@ npm-*
 *.js.map
 config.json
 test/temp
+yarn*

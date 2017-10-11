@@ -20,7 +20,7 @@ export class QueryBuilder extends TrellisSqlBuilder {
     super(trellis)
   }
 
-  private buildWhere(where): Token {
+  private buildWhere(where: any): Token {
     if (!where)
       return ''
 
@@ -37,7 +37,7 @@ export class QueryBuilder extends TrellisSqlBuilder {
     return ['WHERE', delimit(conditions, 'AND')]
   }
 
-  private buildOrderBy(order): Token {
+  private buildOrderBy(order: any): Token {
     if (!order)
       return ''
 
@@ -60,7 +60,7 @@ export class QueryBuilder extends TrellisSqlBuilder {
     return ['ORDER BY', tokens]
   }
 
-  private buildRange(command, value): Token {
+  private buildRange(command: string, value: any): Token {
     if (!value)
       return ''
 
@@ -70,7 +70,7 @@ export class QueryBuilder extends TrellisSqlBuilder {
     return [command, value.toString()]
   }
 
-  private buildSelect(attributes) {
+  private buildSelect(attributes: any) {
     return '*'
   }
 

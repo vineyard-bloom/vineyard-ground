@@ -11,19 +11,17 @@
   "author": "Christopher W. Johnson",
   "license": "MIT",
   "dependencies": {
+    "bignumber.js": "4.0.2",
     "sequelize": "^3.30.4",
     "uuid": "^3.0.1",
     "vineyard-schema": "vineyard-bloom/vineyard-schema"
   },
   "devDependencies": {
-    "@types/sequelize": "^3.4.43",
     "@types/es6-promise": "0.0.32",
     "@types/mocha": "^2.2.40",
     "@types/node": "^7.0.5",
     "mocha": "^3.2.0",
+    "shelljs": "^0.7.8",
     "source-map-support": "^0.4.14"
-  },
-  "peerDependencies": {
-    "bignumber.js": "4.0.2"
   }
 }

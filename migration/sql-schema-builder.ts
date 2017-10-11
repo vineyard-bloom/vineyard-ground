@@ -23,7 +23,7 @@ export class SqlSchemaBuilder {
     return property.type.name == 'int' || property.type.name == 'long'
   }
 
-  getDefaultValue(type, sequence: string = null) {
+  getDefaultValue(type:any, sequence: string | null = null) {
     if (sequence)
       return "DEFAULT nextval('" + sequence + "')"
 
@@ -137,7 +137,8 @@ export class SqlSchemaBuilder {
 
   private createForeignKey(trellis: Trellis) {
     const name = trellis.name[0].toLowerCase() + trellis.name.substr(1)
-    return new vineyardSchema.StandardProperty(name, trellis.primary_keys[0].type, null)
+    throw new Error("Not implemented.")
+    // return new vineyardSchema.StandardProperty(name, trellis.primary_keys[0].type, null)
   }
 
   private createCrossTable(property: Property) {
@@ -146,30 +147,31 @@ export class SqlSchemaBuilder {
     const first = this.createForeignKey(property.trellis)
     const second = this.createForeignKey(property.get_other_trellis())
 
-    const trellis: Trellis = {
-      table: {
-        name: name,
-        isCross: true,
-      },
-      name: name,
-      properties: {
-        [first.name]: first,
-        [second.name]: second,
-      },
-      primary_keys: [first, second],
-      additional: null
-    }
-
-    first.trellis = trellis
-    second.trellis = trellis
-
-    return this.buildChange({
-      type: ChangeType.createTable,
-      trellis: trellis
-    }, null)
+    throw new Error("Not implemented.")
+    // const trellis: Trellis = {
+    //   table: {
+    //     name: name,
+    //     isCross: true,
+    //   },
+    //   name: name,
+    //   properties: {
+    //     [first.name]: first,
+    //     [second.name]: second,
+    //   },
+    //   primary_keys: [first, second],
+    //   additional: null
+    // }
+    //
+    // first.trellis = trellis
+    // second.trellis = trellis
+    //
+    // return this.buildChange({
+    //   type: ChangeType.createTable,
+    //   trellis: trellis
+    // }, null)
   }
 
-  private createCrossTables(properties) {
+  private createCrossTables(properties:any) {
     const result = []
     for (let name in properties) {
       result.push(this.createCrossTable(properties[name]))
@@ -178,22 +180,24 @@ export class SqlSchemaBuilder {
   }
 
   private processChange(change: Change, context: Context) {
-    switch (change.type) {
-      case ChangeType.createTable:
-        return this.createTable(change.trellis, context)
+    throw new Error("Not implemented.")
 
-      case ChangeType.changeFieldNullable:
-        return this.changeFieldNullable(change.property)
-
-      case ChangeType.changeFieldType:
-        return this.changeFieldType(change.property)
-
-      case ChangeType.deleteField:
-        return this.deleteField(change.property)
-
-      case ChangeType.deleteTable:
-        return this.deleteTable(change.property)
-    }
+    // switch (change.type) {
+    //   case ChangeType.createTable:
+    //     return this.createTable(change.trellis, context)
+    //
+    //   case ChangeType.changeFieldNullable:
+    //     return this.changeFieldNullable(change.property)
+    //
+    //   case ChangeType.changeFieldType:
+    //     return this.changeFieldType(change.property)
+    //
+    //   case ChangeType.deleteField:
+    //     return this.deleteField(change.property)
+    //
+    //   case ChangeType.deleteTable:
+    //     return this.deleteTable(change.property)
+    // }
   }
 
   private buildChange(change: Change, context: Context) {
