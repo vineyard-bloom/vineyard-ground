@@ -7,28 +7,30 @@ import {to_lower} from "./utility";
 
 // let BigNumber = null
 
-export interface Query<T> {
-  then(any: any): Promise<any>
+export type ThenableCallback<N, O> = (result: O) => N
+export interface Query<T, O> {
+  exec(): Promise<O>
 
-  exec(): Promise<any>
+  expand<T2, O2>(path: string): Query<T2, O2>
 
-  expand<T2>(path: string): Query<T2>
+  filter(options: any): Query<T, T[]>
 
-  filter(options: any): Query<T>
+  first(options?: any): Query<T, T | undefined>
 
-  first(options?: any): Query<T>
+  first_or_null(options?: any): Query<T, T | undefined>
 
-  first_or_null(options?: any): Query<T>
+  firstOrNull(options?: any): Query<T, T | undefined>
 
-  firstOrNull(options?: any): Query<T>
+  join<T2, O2>(collection: ICollection): Query<T2, O2>
 
-  join<N>(collection: ICollection): Query<N>
+  range(start?: number, length?: number): Query<T, O>
 
-  select<N>(options: any): Query<N>
+  select<T2, O2>(options: any): Query<T2, O2>
 
-  range(start?: number, length?: number): Query<T>
+  sort(args: string[]): Query<T, O>
 
-  sort(args: string[]): Query<T>
+  then<N>(callback: ThenableCallback<N, O>): Promise<N>
+  then<N>(callback: ThenableCallback<Promise<N>, O>): Promise<N>
 }
 
 enum Reduce_Mode {
@@ -68,12 +70,12 @@ interface QueryOptions {
   order?: string []
 }
 
-export class Query_Implementation<T> implements Query<T> {
+export class Query_Implementation<T, O> implements Query<T, O> {
   private sequelize: any
   private trellis: Collection_Trellis<T>
   private options: QueryOptions = {}
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
-  private expansions:any  = {}
+  private expansions: any = {}
   private allow_null: boolean = true
 
   private set_reduce_mode(value: Reduce_Mode) {
@@ -175,7 +177,7 @@ export class Query_Implementation<T> implements Query<T> {
     this.trellis = trellis
   }
 
-  exec(): Promise<any> {
+  exec(): Promise<O> {
     return this.sequelize.findAll(this.options)
       .then((result: any) => this.has_expansions()
         ? this.process_result_with_expansions(result)
@@ -187,12 +189,15 @@ export class Query_Implementation<T> implements Query<T> {
       })
   }
 
-  then(callback: any): Promise<any> {
-    return this.exec()
-      .then(callback)
+  expand<T2, O2>(path: string): Query<T2, O2> {
+    if (!this.trellis.properties[path])
+      throw new Error("No such property: " + this.trellis.name + '.' + path + '.')
+
+    this.expansions[path] = null
+    return this as any
   }
 
-  filter(options: any): Query<T> {
+  filter(options: any): Query<T, T[]> {
     for (var i in options) {
       const option = options [i]
       if (option && option[this.trellis.primary_keys[0].name]) {
@@ -200,16 +205,45 @@ export class Query_Implementation<T> implements Query<T> {
       }
     }
     this.options.where = options
-    return this
+    return this as any
   }
 
-  join(collection: ICollection): Query<T> {
+  first(options?: any): Query<T, T | undefined> {
+    this.set_reduce_mode(Reduce_Mode.first)
+    return options
+      ? this.filter(options) as any
+      : this as any
+  }
+
+  first_or_null(options?: any): Query<T, T | undefined> {
+    return this.firstOrNull(options)
+  }
+
+  firstOrNull(options?: any): Query<T, T | undefined> {
+    this.set_reduce_mode(Reduce_Mode.first)
+    this.allow_null = true
+    return options
+      ? this.filter(options) as any
+      : this as any
+  }
+
+  join<T2, O2>(collection: ICollection): Query<T2, O2> {
     this.options.include = this.options.include || []
     this.options.include.push(collection.get_sequelize())
+    return this as any
+  }
+
+  range(start?: number, length?: number): Query<T, O> {
+    if (start)
+      this.options.offset = start
+
+    if (length)
+      this.options.limit = length
+
     return this
   }
 
-  select<N>(options: any): Query<N> {
+  select<T2, O2>(options: any): Query<T2, O2> {
     if (typeof options === 'string')
       options = [options]
 
@@ -221,49 +255,17 @@ export class Query_Implementation<T> implements Query<T> {
       this.set_reduce_mode(Reduce_Mode.single_value)
     }
     this.options.attributes = options
-    return this
+    return this as any
   }
 
-  first<N>(options?: any): Query<N> {
-    this.set_reduce_mode(Reduce_Mode.first)
-    return options
-      ? this.filter(options)
-      : this
-  }
-
-  first_or_null<N>(options?: any): Query<N> {
-    return this.firstOrNull(options)
-  }
-
-  firstOrNull<N>(options?: any): Query<N> {
-    this.set_reduce_mode(Reduce_Mode.first)
-    this.allow_null = true
-    return options
-      ? this.filter(options)
-      : this
-  }
-
-  range(start?: number, length?: number): Query<T> {
-    if (start)
-      this.options.offset = start
-
-    if (length)
-      this.options.limit = length
-
-    return this
-  }
-
-  sort(args: string[]): Query<T> {
+  sort(args: string[]): Query<T, O> {
     this.options.order = args
     return this
   }
 
-  expand<T2>(path: string): Query<T2> {
-    if (!this.trellis.properties[path])
-      throw new Error("No such property: " + this.trellis.name + '.' + path + '.')
-
-    this.expansions[path] = null
-    return this
+  then<N>(callback: ThenableCallback<N, O>): Promise<N> {
+    return this.exec()
+      .then(callback)
   }
 }
 

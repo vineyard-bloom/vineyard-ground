@@ -36,23 +36,23 @@ export class Collection<T> implements ICollection {
     })
   }
 
-  all(): Query<T> {
-    return new Query_Implementation<T>(this.sequelize, this.trellis)
+  all(): Query<T, T[]> {
+    return new Query_Implementation<T, T[]>(this.sequelize, this.trellis)
   }
 
-  filter(options: any): Query<T> {
+  filter(options: any): Query<T, T[]> {
     return this.all().filter(options)
   }
 
-  first(options?: any): Query<T> {
+  first(options?: any): Query<T, T | undefined> {
     return this.all().first(options)
   }
 
-  first_or_null(options?: any): Query<T> {
+  first_or_null(options?: any): Query<T, T | undefined> {
     return this.all().first_or_null(options)
   }
 
-  firstOrNull(options?: any): Query<T> {
+  firstOrNull(options?: any): Query<T, T | undefined> {
     return this.all().first_or_null(options)
   }
 
