@@ -4,8 +4,8 @@ var types_1 = require("./types");
 var sql_schema_builder_1 = require("./sql-schema-builder");
 function generate(schema) {
     var changes = [];
-    for (var name_1 in schema.trellises) {
-        var trellis = schema.trellises[name_1];
+    for (var name in schema.trellises) {
+        var trellis = schema.trellises[name];
         changes.push({
             type: types_1.ChangeType.createTable,
             trellis: trellis

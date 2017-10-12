@@ -1,9 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var types_1 = require("./types");
 var sql_building_1 = require("../source/sql/sql-building");
 var field_types_1 = require("../source/sql/field-types");
-var vineyardSchema = require("vineyard-schema");
 var indent = '  ';
 var SqlSchemaBuilder = (function () {
     function SqlSchemaBuilder(schema) {
@@ -47,8 +45,8 @@ var SqlSchemaBuilder = (function () {
             var result = this.createProperty(property, this.isAutoIncrement(property));
             tokens.push(this.builder.flatten(result).sql);
         }
-        for (var name_1 in trellis.properties) {
-            var property = trellis.properties[name_1];
+        for (var name in trellis.properties) {
+            var property = trellis.properties[name];
             if (trellis.primary_keys.indexOf(property) > -1)
                 continue;
             var result = this.createProperty(property);
@@ -74,8 +72,8 @@ var SqlSchemaBuilder = (function () {
                 }
             }
         }
-        for (var name_2 in trellis.properties) {
-            var property = trellis.properties[name_2];
+        for (var name in trellis.properties) {
+            var property = trellis.properties[name];
             if (property.is_list() && property.other_property.is_list()) {
                 var crossTableName = this.builder.getCrossTableName(property);
                 context.crossTables[crossTableName] = property.trellis.name < property.other_property.trellis.name
@@ -103,53 +101,61 @@ var SqlSchemaBuilder = (function () {
     };
     SqlSchemaBuilder.prototype.createForeignKey = function (trellis) {
         var name = trellis.name[0].toLowerCase() + trellis.name.substr(1);
-        return new vineyardSchema.StandardProperty(name, trellis.primary_keys[0].type, null);
+        throw new Error("Not implemented.");
+        // return new vineyardSchema.StandardProperty(name, trellis.primary_keys[0].type, null)
     };
     SqlSchemaBuilder.prototype.createCrossTable = function (property) {
         var name = this.builder.getCrossTableName(property);
         var first = this.createForeignKey(property.trellis);
         var second = this.createForeignKey(property.get_other_trellis());
-        var trellis = {
-            table: {
-                name: name,
-                isCross: true,
-            },
-            name: name,
-            properties: (_a = {},
-                _a[first.name] = first,
-                _a[second.name] = second,
-                _a),
-            primary_keys: [first, second],
-            additional: null
-        };
-        first.trellis = trellis;
-        second.trellis = trellis;
-        return this.buildChange({
-            type: types_1.ChangeType.createTable,
-            trellis: trellis
-        }, null);
-        var _a;
+        throw new Error("Not implemented.");
+        // const trellis: Trellis = {
+        //   table: {
+        //     name: name,
+        //     isCross: true,
+        //   },
+        //   name: name,
+        //   properties: {
+        //     [first.name]: first,
+        //     [second.name]: second,
+        //   },
+        //   primary_keys: [first, second],
+        //   additional: null
+        // }
+        //
+        // first.trellis = trellis
+        // second.trellis = trellis
+        //
+        // return this.buildChange({
+        //   type: ChangeType.createTable,
+        //   trellis: trellis
+        // }, null)
     };
     SqlSchemaBuilder.prototype.createCrossTables = function (properties) {
         var result = [];
-        for (var name_3 in properties) {
-            result.push(this.createCrossTable(properties[name_3]));
+        for (var name in properties) {
+            result.push(this.createCrossTable(properties[name]));
         }
         return result;
     };
     SqlSchemaBuilder.prototype.processChange = function (change, context) {
-        switch (change.type) {
-            case types_1.ChangeType.createTable:
-                return this.createTable(change.trellis, context);
-            case types_1.ChangeType.changeFieldNullable:
-                return this.changeFieldNullable(change.property);
-            case types_1.ChangeType.changeFieldType:
-                return this.changeFieldType(change.property);
-            case types_1.ChangeType.deleteField:
-                return this.deleteField(change.property);
-            case types_1.ChangeType.deleteTable:
-                return this.deleteTable(change.property);
-        }
+        throw new Error("Not implemented.");
+        // switch (change.type) {
+        //   case ChangeType.createTable:
+        //     return this.createTable(change.trellis, context)
+        //
+        //   case ChangeType.changeFieldNullable:
+        //     return this.changeFieldNullable(change.property)
+        //
+        //   case ChangeType.changeFieldType:
+        //     return this.changeFieldType(change.property)
+        //
+        //   case ChangeType.deleteField:
+        //     return this.deleteField(change.property)
+        //
+        //   case ChangeType.deleteTable:
+        //     return this.deleteTable(change.property)
+        // }
     };
     SqlSchemaBuilder.prototype.buildChange = function (change, context) {
         var token = this.processChange(change, context);

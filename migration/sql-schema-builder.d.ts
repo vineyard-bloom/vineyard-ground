@@ -5,7 +5,7 @@ export declare class SqlSchemaBuilder {
     private builder;
     constructor(schema: Schema);
     private isAutoIncrement(property);
-    getDefaultValue(type: any, sequence?: string): string;
+    getDefaultValue(type: any, sequence?: string | null): string;
     getSequenceName(property: Property): string;
     createProperty(property: Property, autoIncrement?: boolean): any[] | "";
     private renderPropertyCreations(trellis);

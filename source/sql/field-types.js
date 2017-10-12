@@ -57,12 +57,18 @@ function getFieldType(property, library) {
                     name: 'NUMERIC',
                     defaultValue: '0'
                 };
+            if (type === library.types.bignumber)
+                return {
+                    name: 'NUMERIC',
+                    defaultValue: '0'
+                };
             throw new Error("Unknown primitive: " + type.name + '.');
         case vineyard_schema_1.Type_Category.list:
             return null;
         case vineyard_schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
-                return getFieldType(type.trellis.primary_key, library);
+                var field = type.trellis.primary_key;
+                return getFieldType(field, library);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');
         default:

@@ -12,3 +12,8 @@ export interface Change {
     trellis?: Trellis;
     property?: Property;
 }
+export interface TableChange {
+    type: ChangeType.createTable | ChangeType.deleteTable;
+    trellis: Trellis;
+    property?: undefined;
+}

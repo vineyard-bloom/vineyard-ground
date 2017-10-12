@@ -1,7 +1,7 @@
 import {generate} from "../../migration";
 
 require('source-map-support').install()
-import {QueryBuilder} from "../../source/sql/query-builder";
+import {QueryGenerator} from "../../source/sql/query-generator";
 import * as assert from 'assert'
 import {DevModeler} from "../../source/modeler";
 import {Schema} from "vineyard-schema"
@@ -17,16 +17,16 @@ describe('sql-builder-test', function () {
   this.timeout(5000)
 
   it('selection', function () {
-    const builder = new QueryBuilder(modeler.collections.Creature.getTrellis())
-    const bundle = builder.build({where: {name: "ogre"}})
+    const builder = new QueryGenerator(modeler.collections.Creature.getTrellis())
+    const bundle = builder.generate({where: {name: "ogre"}})
     assert.equal(bundle.sql, `SELECT * FROM "creatures" WHERE "name" = $1`)
     assert.equal(bundle.args.length, 1)
     assert.equal(bundle.args[0], 'ogre')
   })
 
   it('advanced', function () {
-    const builder = new QueryBuilder(modeler.collections.Creature.getTrellis())
-    const bundle = builder.build({
+    const builder = new QueryGenerator(modeler.collections.Creature.getTrellis())
+    const bundle = builder.generate({
       order: ['name', 'health', 'desc'],
       limit: 5,
     })

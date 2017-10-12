@@ -1,4 +1,4 @@
-import {Query, Query_Implementation} from './query'
+import {QueryBuilder, Query_Implementation} from './query'
 import {CollectionTrellis, DatabaseClient, LegacyClient, TableClient, Trellis} from './types'
 import {create, create_or_update, update} from './update'
 
@@ -47,15 +47,15 @@ export class Collection<T> implements ICollection {
     })
   }
 
-  all(): Query<T, T[]> {
+  all(): QueryBuilder<T, T[]> {
     return new Query_Implementation<T, T[]>(this.table, this.client, this.trellis)
   }
 
-  filter(options: any): Query<T, T[]> {
+  filter(options: any): QueryBuilder<T, T[]> {
     return this.all().filter(options)
   }
 
-  first(options?: any): Query<T, T | undefined> {
+  first(options?: any): QueryBuilder<T, T | undefined> {
     return this.all().first(options)
   }
 

@@ -30,6 +30,9 @@ function prepare_property(property, value) {
             if (property.type.name === 'colossal') {
                 return value.toString();
             }
+            if (property.type.name === 'bignumber') {
+                return value.toString();
+            }
             if (['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
                 throw new Error(property.get_path() + ' cannot be an object');
         }
@@ -37,16 +40,16 @@ function prepare_property(property, value) {
     }
 }
 function prepare_seed(seed, trellis) {
-    var new_seed = {};
+    var newSeed = {};
     for (var i in seed) {
         var property = trellis.properties[i];
         if (!property)
             throw new Error("Invalid property: " + trellis.name + "." + i + '.');
         if (!property.is_list()) {
-            new_seed[i] = prepare_property(property, seed[i]);
+            newSeed[i] = prepare_property(property, seed[i]);
         }
     }
-    return new_seed;
+    return newSeed;
 }
 function perform_operation(identity, seed, list, sequelize, operation) {
     switch (operation.type) {
@@ -73,20 +76,20 @@ function perform_operation(identity, seed, list, sequelize, operation) {
             throw new Error("Not implemented.");
     }
 }
-function update_list(identity, seed, list, sequelize) {
+function update_list(identity, seed, list, table) {
     var value = seed[list.name];
     if (Array.isArray(value)) {
-        return Promise.all(value.map(function (item) { return perform_operation(identity, seed, list, sequelize, item); }));
+        return Promise.all(value.map(function (item) { return perform_operation(identity, seed, list, table, item); }));
     }
     else {
-        return perform_operation(identity, seed, list, sequelize, value);
+        return perform_operation(identity, seed, list, table, value);
     }
 }
-function update_lists(identity, seed, trellis, sequelize) {
+function update_lists(identity, seed, trellis, table) {
     var promise = Promise.resolve();
     var _loop_1 = function (list) {
         if (seed[list.name])
-            promise = promise.then(function () { return update_list(identity, seed, list, sequelize); });
+            promise = promise.then(function () { return update_list(identity, seed, list, table); });
     };
     for (var _i = 0, _a = trellis.get_lists(); _i < _a.length; _i++) {
         var list = _a[_i];
@@ -94,29 +97,31 @@ function update_lists(identity, seed, trellis, sequelize) {
     }
     return promise;
 }
-function post_process(result, identity, seed, trellis, sequelize) {
-    return update_lists(identity, seed, trellis, sequelize)
+function post_process(result, identity, seed, trellis, table) {
+    return update_lists(identity, seed, trellis, table)
         .then(function () { return result.dataValues; });
 }
-function create(seed, trellis, sequelize) {
-    var new_seed = prepare_seed(seed, trellis);
-    return sequelize.create(new_seed)
-        .then(function (result) { return post_process(result, trellis.get_identity(result.dataValues), seed, trellis, sequelize); });
+function create(seed, trellis, table) {
+    var newSeed = prepare_seed(seed, trellis);
+    // return sequelize.create(newSeed)
+    return table.create(newSeed)
+        .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, table); });
 }
 exports.create = create;
-function create_or_update(seed, trellis, sequelize) {
-    var new_seed = prepare_seed(seed, trellis);
-    return sequelize.upsert(new_seed)
-        .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, sequelize); });
+function create_or_update(seed, trellis, table) {
+    var newSeed = prepare_seed(seed, trellis);
+    // return sequelize.upsert(newSeed)
+    return table.upsert(newSeed)
+        .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, table); });
 }
 exports.create_or_update = create_or_update;
 function update(seed, trellis, sequelize, changes) {
     var primary_key = trellis.primary_keys[0].name;
     var identity = trellis.get_identity(seed);
-    var new_seed = prepare_seed(changes || seed, trellis);
+    var newSeed = prepare_seed(changes || seed, trellis);
     var filter = {};
     filter[primary_key] = identity;
-    return sequelize.update(new_seed, {
+    return sequelize.update(newSeed, {
         where: filter,
         returning: true
     })

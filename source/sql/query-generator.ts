@@ -1,5 +1,5 @@
 import {Trellis} from "../types"
-import {delimit, Flattener, TrellisSqlBuilder, Token} from "./sql-building";
+import {delimit, Flattener, TrellisSqlGenerator, Token} from "./sql-building";
 
 export interface QueryOptions {
   where?: any
@@ -14,7 +14,7 @@ export interface QueryBundle {
   args: any[]
 }
 
-export class QueryBuilder extends TrellisSqlBuilder {
+export class QueryGenerator extends TrellisSqlGenerator {
 
   constructor(trellis: Trellis) {
     super(trellis)
@@ -74,7 +74,7 @@ export class QueryBuilder extends TrellisSqlBuilder {
     return '*'
   }
 
-  build(options: QueryOptions = {}): QueryBundle {
+  generate(options: QueryOptions = {}): QueryBundle {
     const finalToken = [
       'SELECT',
       this.buildSelect(options.attributes),

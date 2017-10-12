@@ -11,12 +11,12 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var sql_building_1 = require("./sql-building");
-var QueryBuilder = (function (_super) {
-    __extends(QueryBuilder, _super);
-    function QueryBuilder(trellis) {
+var QueryGenerator = (function (_super) {
+    __extends(QueryGenerator, _super);
+    function QueryGenerator(trellis) {
         return _super.call(this, trellis) || this;
     }
-    QueryBuilder.prototype.buildWhere = function (where) {
+    QueryGenerator.prototype.buildWhere = function (where) {
         if (!where)
             return '';
         var conditions = [];
@@ -29,7 +29,7 @@ var QueryBuilder = (function (_super) {
         }
         return ['WHERE', sql_building_1.delimit(conditions, 'AND')];
     };
-    QueryBuilder.prototype.buildOrderBy = function (order) {
+    QueryGenerator.prototype.buildOrderBy = function (order) {
         if (!order)
             return '';
         var tokens = [];
@@ -49,17 +49,17 @@ var QueryBuilder = (function (_super) {
         }
         return ['ORDER BY', tokens];
     };
-    QueryBuilder.prototype.buildRange = function (command, value) {
+    QueryGenerator.prototype.buildRange = function (command, value) {
         if (!value)
             return '';
         if (typeof value != 'number')
             throw new Error("Range values must be numbers.");
         return [command, value.toString()];
     };
-    QueryBuilder.prototype.buildSelect = function (attributes) {
+    QueryGenerator.prototype.buildSelect = function (attributes) {
         return '*';
     };
-    QueryBuilder.prototype.build = function (options) {
+    QueryGenerator.prototype.generate = function (options) {
         if (options === void 0) { options = {}; }
         var finalToken = [
             'SELECT',
@@ -73,7 +73,7 @@ var QueryBuilder = (function (_super) {
         ];
         return this.builder.flatten(finalToken);
     };
-    return QueryBuilder;
-}(sql_building_1.TrellisSqlBuilder));
-exports.QueryBuilder = QueryBuilder;
-//# sourceMappingURL=query-builder.js.map
+    return QueryGenerator;
+}(sql_building_1.TrellisSqlGenerator));
+exports.QueryGenerator = QueryGenerator;
+//# sourceMappingURL=query-generator.js.map

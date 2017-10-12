@@ -1,5 +1,5 @@
 import { Trellis } from "../types";
-import { TrellisSqlBuilder } from "./sql-building";
+import { TrellisSqlGenerator } from "./sql-building";
 export interface QueryOptions {
     where?: any;
     order?: string[];
@@ -11,11 +11,11 @@ export interface QueryBundle {
     sql: string;
     args: any[];
 }
-export declare class QueryBuilder extends TrellisSqlBuilder {
+export declare class QueryGenerator extends TrellisSqlGenerator {
     constructor(trellis: Trellis);
     private buildWhere(where);
     private buildOrderBy(order);
     private buildRange(command, value);
     private buildSelect(attributes);
-    build(options?: QueryOptions): QueryBundle;
+    generate(options?: QueryOptions): QueryBundle;
 }

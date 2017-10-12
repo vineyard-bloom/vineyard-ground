@@ -1,9 +1,7 @@
-import {DevModeler} from "../../source/modeler";
-
 require('source-map-support').install()
+import {DevModeler} from "../../source/modeler";
 import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
-
 const Sequelize = require('sequelize')
 import {Modeler, Add, Remove} from '../../source'
 import {PostgresClient} from "../../source/clients/postgres-client";
@@ -91,6 +89,7 @@ describe('Arbitrary', function () {
           unknown: "mist",
           vast: "1000000000000000000000000000021",
           sampleDate: new Date("June 15, 2016"),
+          veryBig: new BigNumber("1023.1334"),
           data: {
             frogs: [
               {name: "Froggy"},
@@ -104,6 +103,7 @@ describe('Arbitrary', function () {
           unknown: "mist2",
           vast: new BigNumber("1000000000000000000000000000021"),
           sampleDate: new Date("August 3, 2002"),
+          veryBig: "819715.15157",
           data: {
             "nothing": null
           }
@@ -115,6 +115,10 @@ describe('Arbitrary', function () {
         assert(new BigNumber(results[0].vast).equals(results[1].vast))
         assert(results[0].sampleDate instanceof Date)
         assert.equal(results[0].data.frogs.length, 2)
+        assert(results[0].veryBig instanceof BigNumber)
+        assert(results[1].veryBig instanceof BigNumber)
+        assert(results[0].veryBig.equals("1023.1334"))
+        assert(results[1].veryBig.equals("819715.15157"))
       })
   })
 })

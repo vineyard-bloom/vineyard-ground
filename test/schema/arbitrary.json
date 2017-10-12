@@ -11,6 +11,9 @@
       "vast": {
         "type": "colossal"
       },
+      "veryBig": {
+        "type": "bignumber"
+      },
       "sampleDate": {
         "type": "date"
       },

@@ -4,28 +4,30 @@ const sequelize = require('sequelize')
 
 import {CollectionTrellis, DatabaseClient, TableClient, Property, Trellis} from './types'
 import {to_lower} from "./utility";
-import {QueryBuilder} from "./sql/query-builder";
+import {QueryGenerator} from "./sql/query-generator";
+
+const BigNumber = require("bignumber.js")
 
 // let BigNumber = null
 
 export type ThenableCallback<N, O> = (result: O) => N | Promise<N>
 
-export interface Query<T, O> {
+export interface QueryBuilder<T, O> {
   exec(): Promise<O>
 
-  expand<T2, O2>(path: string): Query<T2, O2>
+  expand<T2, O2>(path: string): QueryBuilder<T2, O2>
 
-  filter(options: any): Query<T, T[]>
+  filter(options: any): QueryBuilder<T, T[]>
 
-  first(options?: any): Query<T, T | undefined>
+  first(options?: any): QueryBuilder<T, T | undefined>
 
-  join<T2, O2>(collection: ICollection): Query<T2, O2>
+  join<T2, O2>(collection: ICollection): QueryBuilder<T2, O2>
 
-  range(start?: number, length?: number): Query<T, O>
+  range(start?: number, length?: number): QueryBuilder<T, O>
 
-  select<T2, O2>(options: any): Query<T2, O2>
+  select<T2, O2>(options: any): QueryBuilder<T2, O2>
 
-  sort(args: string[]): Query<T, O>
+  sort(args: string[]): QueryBuilder<T, O>
 
   then<N>(callback: ThenableCallback<N, O>): Promise<N>
 }
@@ -51,9 +53,9 @@ function processFields(result: any, trellis: Trellis) {
     if (property.type.name == 'long') {
       result[i] = parseInt(result[i])
     }
-    // else if (property.type.name == 'colossal') {
-    //   result[i] = new BigNumber(result[i])
-    // }
+    else if (property.type.name == 'bignumber') {
+      result[i] = new BigNumber(result[i])
+    }
   }
   return result
 }
@@ -71,7 +73,7 @@ function getData(row: any) {
   return row.dataValues || row
 }
 
-export class Query_Implementation<T, O> implements Query<T, O> {
+export class Query_Implementation<T, O> implements QueryBuilder<T, O> {
   private table: TableClient<T>
   private client: DatabaseClient
   private trellis: CollectionTrellis<T>
@@ -186,19 +188,19 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this.get_expansions().length > 0
   }
 
-  private queryWithQueryBuilder() {
+  private queryWithQueryGenerator() {
     const legacyClient = this.client.getLegacyClient()
     if (legacyClient)
       return legacyClient.findAll(this.table, this.options)
 
-    const builder = new QueryBuilder(this.trellis)
-    this.bundle = builder.build(this.options)
+    const generator = new QueryGenerator(this.trellis)
+    this.bundle = generator.generate(this.options)
     return this.client.query<T>(this.bundle.sql, this.bundle.args)
       .then(result => result.rows)
   }
 
   exec(): Promise<O> {
-    return this.queryWithQueryBuilder()
+    return this.queryWithQueryGenerator()
       .then((result: any) => this.has_expansions()
         ? this.process_result_with_expansions(result)
         : this.process_result(result)
@@ -212,7 +214,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
       })
   }
 
-  expand<T2, O2>(path: string): Query<T2, O2> {
+  expand<T2, O2>(path: string): QueryBuilder<T2, O2> {
     if (!this.trellis.properties[path])
       throw new Error("No such property: " + this.trellis.name + '.' + path + '.')
 
@@ -220,7 +222,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this as any
   }
 
-  filter(options: any): Query<T, T[]> {
+  filter(options: any): QueryBuilder<T, T[]> {
     for (var i in options) {
       const option = options [i]
       if (option && option[this.trellis.primary_keys[0].name]) {
@@ -231,21 +233,21 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this as any
   }
 
-  first(options?: any): Query<T, T | undefined> {
+  first(options?: any): QueryBuilder<T, T | undefined> {
     this.set_reduce_mode(Reduce_Mode.first)
     return options
       ? this.filter(options) as any
       : this as any
   }
 
-  join<T2, O2>(collection: ICollection): Query<T2, O2> {
+  join<T2, O2>(collection: ICollection): QueryBuilder<T2, O2> {
     this.options.include = this.options.include || []
     // this.options.include.push(collection.get_sequelize())
     throw new Error("Not implemented.")
     // return this as any
   }
 
-  range(start?: number, length?: number): Query<T, O> {
+  range(start?: number, length?: number): QueryBuilder<T, O> {
     if (start)
       this.options.offset = start
 
@@ -255,7 +257,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this
   }
 
-  select<T2, O2>(options: any): Query<T2, O2> {
+  select<T2, O2>(options: any): QueryBuilder<T2, O2> {
     if (typeof options === 'string')
       options = [options]
 
@@ -270,7 +272,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this as any
   }
 
-  sort(args: string[]): Query<T, O> {
+  sort(args: string[]): QueryBuilder<T, O> {
     this.options.order = args
     return this
   }

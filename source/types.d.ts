@@ -1,13 +1,10 @@
 import * as vineyardSchema from 'vineyard-schema';
 import { Collection } from "./collection";
-export interface Table_Trellis extends Trellis {
-    table: any;
+export interface Table {
+    name: string;
+    isCross?: boolean;
 }
-export interface Collection_Trellis<T> extends Trellis {
-    table: any;
-    collection: Collection<T>;
-}
-export interface SequelizeTable {
+export interface SequelizeTable extends Table {
     sequelize: any;
     getTableName(): string;
     belongsToMany(table: Table, options: any): any;
@@ -15,10 +12,6 @@ export interface SequelizeTable {
     create(fields: any): any;
     destroy(fields: any): any;
     findAll(options: any): any;
-}
-export interface Table extends SequelizeTable {
-    name: string;
-    isCross?: boolean;
 }
 export interface Property {
     name: string;
@@ -28,13 +21,14 @@ export interface Property {
     "default": any;
     is_unique: boolean;
     other_property: Property;
-    cross_table?: Table;
+    cross_table?: SequelizeTable;
     is_reference(): boolean;
     is_list(): boolean;
     get_other_trellis(): Trellis;
     get_path(): string;
 }
 export interface Trellis {
+    oldTable: SequelizeTable;
     table: Table;
     name: string;
     properties: {
@@ -46,6 +40,14 @@ export interface Trellis {
     get_identity(input: any): any;
     get_lists(): any;
 }
+export interface Table_Trellis extends Trellis {
+    oldTable: SequelizeTable;
+}
+export interface CollectionTrellis<T> extends Trellis {
+    oldTable: SequelizeTable;
+    collection: Collection<T>;
+}
+export declare type Collection_Trellis<T> = CollectionTrellis<T>;
 export declare type TrellisMap = {
     [name: string]: Trellis;
 };
@@ -56,3 +58,34 @@ export interface Schema {
 export declare type Trellis_Map = {
     [name: string]: Trellis;
 };
+export interface QueryResult<T> {
+    rows: T[];
+}
+export interface LegacyClient {
+    findAll(table: ITableClient, options: any): any;
+}
+export interface DatabaseClient {
+    getLegacyClient(): LegacyClient | undefined;
+    query<T>(sql: string, args?: {
+        [key: string]: any;
+    }): PromiseLike<QueryResult<T>>;
+}
+export interface ITableClient {
+}
+export interface RemoveOptions {
+    where: any;
+}
+export interface TableClient<T> extends ITableClient {
+    create(newSeed: T): Promise<T>;
+    upsert(newSeed: T): Promise<T>;
+    remove(options: RemoveOptions): Promise<any>;
+}
+export interface DatabaseConfig {
+    host: string;
+    username: string;
+    password: string;
+    database: string;
+}
+export interface GeneralDatabaseConfig extends DatabaseConfig {
+    dialect: string;
+}

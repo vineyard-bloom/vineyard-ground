@@ -75,16 +75,16 @@ var SqlBuilder = (function () {
     return SqlBuilder;
 }());
 exports.SqlBuilder = SqlBuilder;
-var TrellisSqlBuilder = (function () {
-    function TrellisSqlBuilder(trellis) {
+var TrellisSqlGenerator = (function () {
+    function TrellisSqlGenerator(trellis) {
         this.builder = new SqlBuilder();
         this.trellis = trellis;
         this.table = trellis.table;
     }
-    TrellisSqlBuilder.prototype.getTableName = function () {
+    TrellisSqlGenerator.prototype.getTableName = function () {
         return this.table.name;
     };
-    return TrellisSqlBuilder;
+    return TrellisSqlGenerator;
 }());
-exports.TrellisSqlBuilder = TrellisSqlBuilder;
+exports.TrellisSqlGenerator = TrellisSqlGenerator;
 //# sourceMappingURL=sql-building.js.map

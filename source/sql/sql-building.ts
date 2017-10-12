@@ -89,7 +89,7 @@ export class SqlBuilder {
   }
 }
 
-export class TrellisSqlBuilder {
+export class TrellisSqlGenerator {
   protected trellis: Trellis
   protected table: any
   protected builder: SqlBuilder = new SqlBuilder()

@@ -1,5 +1,5 @@
 import {Trellis} from "../types"
-import {delimit, Flattener, TrellisSqlBuilder, Token} from "./sql-building";
+import {delimit, Flattener, TrellisSqlGenerator, Token} from "./sql-building";
 
 function getFieldName(f: any) {
   return f.field.name
@@ -9,7 +9,7 @@ function getValue(f: any) {
   return f.value
 }
 
-export class UpdateBuilder extends TrellisSqlBuilder {
+export class UpdateBuilder extends TrellisSqlGenerator {
 
   constructor(trellis: Trellis) {
     super(trellis)

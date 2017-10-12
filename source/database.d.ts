@@ -1,4 +1,3 @@
-import { Schema, Table } from "./types";
-export declare function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any): {
-    [key: string]: Table;
-};
+import { Schema } from "./types";
+import { SequelizeModelMap } from "./clients/sequelize-client";
+export declare function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any): SequelizeModelMap;

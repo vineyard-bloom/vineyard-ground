@@ -2,11 +2,11 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var migration_1 = require("../../migration");
 require('source-map-support').install();
-var query_builder_1 = require("../../source/sql/query-builder");
+var query_generator_1 = require("../../source/sql/query-generator");
 var assert = require("assert");
 var modeler_1 = require("../../source/modeler");
 var vineyard_schema_1 = require("vineyard-schema");
-var Sequelize = require("sequelize");
+var Sequelize = require('sequelize');
 var diff_1 = require("../utility/diff");
 var config = require('../config/config.json');
 var db = new Sequelize(config.database);
@@ -15,15 +15,15 @@ var modeler = new modeler_1.DevModeler(db, schema);
 describe('sql-builder-test', function () {
     this.timeout(5000);
     it('selection', function () {
-        var builder = new query_builder_1.QueryBuilder(modeler.collections.Creature['trellis']);
-        var bundle = builder.build({ where: { name: "ogre" } });
+        var builder = new query_generator_1.QueryGenerator(modeler.collections.Creature.getTrellis());
+        var bundle = builder.generate({ where: { name: "ogre" } });
         assert.equal(bundle.sql, "SELECT * FROM \"creatures\" WHERE \"name\" = $1");
         assert.equal(bundle.args.length, 1);
         assert.equal(bundle.args[0], 'ogre');
     });
     it('advanced', function () {
-        var builder = new query_builder_1.QueryBuilder(modeler.collections.Creature['trellis']);
-        var bundle = builder.build({
+        var builder = new query_generator_1.QueryGenerator(modeler.collections.Creature.getTrellis());
+        var bundle = builder.generate({
             order: ['name', 'health', 'desc'],
             limit: 5,
         });

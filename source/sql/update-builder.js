@@ -71,6 +71,6 @@ var UpdateBuilder = (function (_super) {
         ];
     };
     return UpdateBuilder;
-}(sql_building_1.TrellisSqlBuilder));
+}(sql_building_1.TrellisSqlGenerator));
 exports.UpdateBuilder = UpdateBuilder;
 //# sourceMappingURL=update-builder.js.map

@@ -1,26 +1,27 @@
 import { ICollection } from "./collection";
-import { Collection_Trellis } from './types';
-export declare type ThenableCallback<N, O> = (result: O) => N;
-export interface Query<T, O> {
+import { CollectionTrellis, DatabaseClient, TableClient } from './types';
+export declare type ThenableCallback<N, O> = (result: O) => N | Promise<N>;
+export interface QueryBuilder<T, O> {
     exec(): Promise<O>;
-    expand<T2, O2>(path: string): Query<T2, O2>;
-    filter(options: any): Query<T, T[]>;
-    first(options?: any): Query<T, T | undefined>;
-    firstOrNull(options?: any): Query<T, T | undefined>;
-    join<T2, O2>(collection: ICollection): Query<T2, O2>;
-    range(start?: number, length?: number): Query<T, O>;
-    select<T2, O2>(options: any): Query<T2, O2>;
-    sort(args: string[]): Query<T, O>;
+    expand<T2, O2>(path: string): QueryBuilder<T2, O2>;
+    filter(options: any): QueryBuilder<T, T[]>;
+    first(options?: any): QueryBuilder<T, T | undefined>;
+    join<T2, O2>(collection: ICollection): QueryBuilder<T2, O2>;
+    range(start?: number, length?: number): QueryBuilder<T, O>;
+    select<T2, O2>(options: any): QueryBuilder<T2, O2>;
+    sort(args: string[]): QueryBuilder<T, O>;
     then<N>(callback: ThenableCallback<N, O>): Promise<N>;
-    then<N>(callback: ThenableCallback<Promise<N>, O>): Promise<N>;
 }
-export declare class Query_Implementation<T, O> implements Query<T, O> {
-    private sequelize;
+export declare class Query_Implementation<T, O> implements QueryBuilder<T, O> {
+    private table;
+    private client;
     private trellis;
     private options;
     private reduce_mode;
     private expansions;
     private allow_null;
+    private bundle;
+    constructor(table: TableClient<T>, client: DatabaseClient, trellis: CollectionTrellis<T>);
     private set_reduce_mode(value);
     private get_other_collection(path);
     private expand_cross_table(reference, identity);
@@ -30,16 +31,15 @@ export declare class Query_Implementation<T, O> implements Query<T, O> {
     private process_result_with_expansions(result);
     private get_expansions();
     private has_expansions();
-    constructor(sequelize: any, trellis: Collection_Trellis<T>);
+    private queryWithQueryGenerator();
     exec(): Promise<O>;
-    expand<T2, O2>(path: string): Query<T2, O2>;
-    filter(options: any): Query<T, T[]>;
-    first(options?: any): Query<T, T | undefined>;
-    firstOrNull(options?: any): Query<T, T | undefined>;
-    join<T2, O2>(collection: ICollection): Query<T2, O2>;
-    range(start?: number, length?: number): Query<T, O>;
-    select<T2, O2>(options: any): Query<T2, O2>;
-    sort(args: string[]): Query<T, O>;
+    expand<T2, O2>(path: string): QueryBuilder<T2, O2>;
+    filter(options: any): QueryBuilder<T, T[]>;
+    first(options?: any): QueryBuilder<T, T | undefined>;
+    join<T2, O2>(collection: ICollection): QueryBuilder<T2, O2>;
+    range(start?: number, length?: number): QueryBuilder<T, O>;
+    select<T2, O2>(options: any): QueryBuilder<T2, O2>;
+    sort(args: string[]): QueryBuilder<T, O>;
     then<N>(callback: ThenableCallback<N, O>): Promise<N>;
 }
 export declare function Path(path: string): any;

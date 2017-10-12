@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var shell = require("shelljs");
+var shell = require('shelljs');
 var assert = require("assert");
 var fs = require('fs');
 var path = require('path');

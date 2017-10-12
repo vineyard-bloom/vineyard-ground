@@ -1,21 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var modeler_1 = require("../../source/modeler");
 require('source-map-support').install();
+var modeler_1 = require("../../source/modeler");
 var assert = require("assert");
 var vineyard_schema_1 = require("vineyard-schema");
-var Sequelize = require("sequelize");
+var Sequelize = require('sequelize');
 var source_1 = require("../../source");
-var database_1 = require("../../source/database");
+var postgres_client_1 = require("../../source/clients/postgres-client");
 var config = require('../config/config.json');
 var mainWorld, dangerousTag, flyingTag;
 var db = new Sequelize(config.database);
-database_1.usePostgres(db, config.database);
 describe('Game', function () {
     this.timeout(5000);
     it('sync_database', function () {
         var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
-        var modeler = new modeler_1.DevModeler(db, schema);
+        var modeler = new modeler_1.DevModeler(db, schema, new postgres_client_1.PostgresClient(config.database));
         var model = modeler.collections;
         return modeler.regenerate()
             .then(function () { return model.Tag.create({
@@ -71,7 +70,7 @@ describe('Arbitrary', function () {
     this.timeout(4000);
     it('sync_database', function () {
         var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
-        var modeler = new modeler_1.DevModeler(db, schema);
+        var modeler = new modeler_1.DevModeler(db, schema, new postgres_client_1.PostgresClient(config.database));
         var model = modeler.collections;
         var BigNumber = require('bignumber.js');
         return modeler.regenerate()
@@ -80,6 +79,7 @@ describe('Arbitrary', function () {
             unknown: "mist",
             vast: "1000000000000000000000000000021",
             sampleDate: new Date("June 15, 2016"),
+            veryBig: new BigNumber("1023.1334"),
             data: {
                 frogs: [
                     { name: "Froggy" },
@@ -92,6 +92,7 @@ describe('Arbitrary', function () {
             unknown: "mist2",
             vast: new BigNumber("1000000000000000000000000000021"),
             sampleDate: new Date("August 3, 2002"),
+            veryBig: "819715.15157",
             data: {
                 "nothing": null
             }
@@ -102,6 +103,10 @@ describe('Arbitrary', function () {
             assert(new BigNumber(results[0].vast).equals(results[1].vast));
             assert(results[0].sampleDate instanceof Date);
             assert.equal(results[0].data.frogs.length, 2);
+            assert(results[0].veryBig instanceof BigNumber);
+            assert(results[1].veryBig instanceof BigNumber);
+            assert(results[0].veryBig.equals("1023.1334"));
+            assert(results[1].veryBig.equals("819715.15157"));
         });
     });
 });

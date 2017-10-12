@@ -8,4 +8,5 @@ __export(require("./modeler"));
 __export(require("./collection"));
 __export(require("./query"));
 __export(require("./list-operations"));
+__export(require("./clients/postgres-client"));
 //# sourceMappingURL=index.js.map

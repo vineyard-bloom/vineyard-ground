@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize = require('sequelize');
 var utility_1 = require("./utility");
+var query_generator_1 = require("./sql/query-generator");
+var BigNumber = require("bignumber.js");
 var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
@@ -9,7 +11,7 @@ var Reduce_Mode;
     Reduce_Mode[Reduce_Mode["single_value"] = 2] = "single_value";
 })(Reduce_Mode || (Reduce_Mode = {}));
 function processFields(result, trellis) {
-    if (trellis.table.sequelize.getDialect() == 'mysql') {
+    if (trellis.oldTable.sequelize.getDialect() == 'mysql') {
         for (var i in trellis.properties) {
             var property = trellis.properties[i];
             if (property.type.name == 'json') {
@@ -22,20 +24,28 @@ function processFields(result, trellis) {
         if (property.type.name == 'long') {
             result[i] = parseInt(result[i]);
         }
-        // else if (property.type.name == 'colossal') {
-        //   result[i] = new BigNumber(result[i])
-        // }
+        else if (property.type.name == 'bignumber') {
+            result[i] = new BigNumber(result[i]);
+        }
     }
     return result;
 }
+function getData(row) {
+    return row.dataValues || row;
+}
 var Query_Implementation = (function () {
-    function Query_Implementation(sequelize, trellis) {
+    function Query_Implementation(table, client, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;
         this.expansions = {};
         this.allow_null = true;
-        this.sequelize = sequelize;
+        this.table = table;
         this.trellis = trellis;
+        this.client = client;
+        // Monkey patch for soft backwards compatibility
+        var self = this;
+        self.firstOrNull = this.first;
+        self.first_or_null = this.first;
     }
     Query_Implementation.prototype.set_reduce_mode = function (value) {
         if (this.reduce_mode == value)
@@ -54,15 +64,15 @@ var Query_Implementation = (function () {
         where[utility_1.to_lower(reference.trellis.name)] = identity;
         // where[to_lower(reference.get_other_trellis().name)] =
         //   sequelize.col(reference.get_other_trellis().primary_key.name)
-        return reference.other_property.trellis.table.findAll({
+        return reference.other_property.trellis.oldTable.findAll({
             include: {
-                model: reference.trellis['table'],
+                model: reference.trellis.oldTable,
                 through: { where: where },
                 as: reference.other_property.name,
                 required: true
             }
         })
-            .then(function (result) { return result.map(function (r) { return processFields(r.dataValues, reference.other_property.trellis); }); });
+            .then(function (result) { return result.map(function (r) { return processFields(getData(r), reference.other_property.trellis); }); });
     };
     Query_Implementation.prototype.perform_expansion = function (path, data) {
         var property = this.trellis.properties[path];
@@ -79,8 +89,8 @@ var Query_Implementation = (function () {
     Query_Implementation.prototype.handle_expansions = function (results) {
         var _this = this;
         var promises = results.map(function (result) { return Promise.all(_this.get_expansions()
-            .map(function (path) { return _this.perform_expansion(path, result.dataValues)
-            .then(function (child) { return result.dataValues[path] = child; }); })); });
+            .map(function (path) { return _this.perform_expansion(path, getData(result))
+            .then(function (child) { return getData(result)[path] = child; }); })); });
         return Promise.all(promises)
             .then(function () { return results; }); // Not needed but a nice touch.
     };
@@ -92,7 +102,7 @@ var Query_Implementation = (function () {
                     return null;
                 throw Error("Query.first called on empty result set.");
             }
-            return processFields(result[0].dataValues, this.trellis);
+            return processFields(getData(result[0]), this.trellis);
         }
         else if (this.reduce_mode == Reduce_Mode.single_value) {
             if (result.length == 0) {
@@ -100,9 +110,9 @@ var Query_Implementation = (function () {
                     return null;
                 throw Error("Query.select single value called on empty result set.");
             }
-            return result.map(function (item) { return item.dataValues._value; });
+            return getData(result[0])._value;
         }
-        return result.map(function (item) { return processFields(item.dataValues, _this.trellis); });
+        return result.map(function (item) { return processFields(getData(item), _this.trellis); });
     };
     Query_Implementation.prototype.process_result_with_expansions = function (result) {
         var _this = this;
@@ -115,14 +125,26 @@ var Query_Implementation = (function () {
     Query_Implementation.prototype.has_expansions = function () {
         return this.get_expansions().length > 0;
     };
+    Query_Implementation.prototype.queryWithQueryGenerator = function () {
+        var legacyClient = this.client.getLegacyClient();
+        if (legacyClient)
+            return legacyClient.findAll(this.table, this.options);
+        var generator = new query_generator_1.QueryGenerator(this.trellis);
+        this.bundle = generator.generate(this.options);
+        return this.client.query(this.bundle.sql, this.bundle.args)
+            .then(function (result) { return result.rows; });
+    };
     Query_Implementation.prototype.exec = function () {
         var _this = this;
-        return this.sequelize.findAll(this.options)
+        return this.queryWithQueryGenerator()
             .then(function (result) { return _this.has_expansions()
             ? _this.process_result_with_expansions(result)
             : _this.process_result(result); })
             .catch(function (error) {
-            console.error(_this.options);
+            if (_this.bundle)
+                console.error(_this.bundle);
+            else
+                console.error(_this.options);
             throw error;
         });
     };
@@ -148,17 +170,11 @@ var Query_Implementation = (function () {
             ? this.filter(options)
             : this;
     };
-    Query_Implementation.prototype.firstOrNull = function (options) {
-        this.set_reduce_mode(Reduce_Mode.first);
-        this.allow_null = true;
-        return options
-            ? this.filter(options)
-            : this;
-    };
     Query_Implementation.prototype.join = function (collection) {
         this.options.include = this.options.include || [];
-        this.options.include.push(collection.get_sequelize());
-        return this;
+        // this.options.include.push(collection.get_sequelize())
+        throw new Error("Not implemented.");
+        // return this as any
     };
     Query_Implementation.prototype.range = function (start, length) {
         if (start)
