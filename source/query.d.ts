@@ -1,19 +1,20 @@
 import { ICollection } from "./collection";
 import { Collection_Trellis } from './types';
-export interface Query<T> {
-    then(any: any): Promise<any>;
-    exec(): Promise<any>;
-    expand<T2>(path: string): Query<T2>;
-    filter(options: any): Query<T>;
-    first(options?: any): Query<T>;
-    first_or_null(options?: any): Query<T>;
-    firstOrNull(options?: any): Query<T>;
-    join<N>(collection: ICollection): Query<N>;
-    select<N>(options: any): Query<N>;
-    range(start?: number, length?: number): Query<T>;
-    sort(args: string[]): Query<T>;
+export declare type ThenableCallback<N, O> = (result: O) => N;
+export interface Query<T, O> {
+    exec(): Promise<O>;
+    expand<T2, O2>(path: string): Query<T2, O2>;
+    filter(options: any): Query<T, T[]>;
+    first(options?: any): Query<T, T | undefined>;
+    firstOrNull(options?: any): Query<T, T | undefined>;
+    join<T2, O2>(collection: ICollection): Query<T2, O2>;
+    range(start?: number, length?: number): Query<T, O>;
+    select<T2, O2>(options: any): Query<T2, O2>;
+    sort(args: string[]): Query<T, O>;
+    then<N>(callback: ThenableCallback<N, O>): Promise<N>;
+    then<N>(callback: ThenableCallback<Promise<N>, O>): Promise<N>;
 }
-export declare class Query_Implementation<T> implements Query<T> {
+export declare class Query_Implementation<T, O> implements Query<T, O> {
     private sequelize;
     private trellis;
     private options;
@@ -30,18 +31,17 @@ export declare class Query_Implementation<T> implements Query<T> {
     private get_expansions();
     private has_expansions();
     constructor(sequelize: any, trellis: Collection_Trellis<T>);
-    exec(): Promise<any>;
-    then(callback: any): Promise<any>;
-    filter(options: any): Query<T>;
-    join(collection: ICollection): Query<T>;
-    select<N>(options: any): Query<N>;
-    first<N>(options?: any): Query<N>;
-    first_or_null<N>(options?: any): Query<N>;
-    firstOrNull<N>(options?: any): Query<N>;
-    range(start?: number, length?: number): Query<T>;
-    sort(args: string[]): Query<T>;
-    expand<T2>(path: string): Query<T2>;
+    exec(): Promise<O>;
+    expand<T2, O2>(path: string): Query<T2, O2>;
+    filter(options: any): Query<T, T[]>;
+    first(options?: any): Query<T, T | undefined>;
+    firstOrNull(options?: any): Query<T, T | undefined>;
+    join<T2, O2>(collection: ICollection): Query<T2, O2>;
+    range(start?: number, length?: number): Query<T, O>;
+    select<T2, O2>(options: any): Query<T2, O2>;
+    sort(args: string[]): Query<T, O>;
+    then<N>(callback: ThenableCallback<N, O>): Promise<N>;
 }
-export declare function Path(path: any): any;
-export declare function Sum(path: any): any;
-export declare function Count(path: any): any;
+export declare function Path(path: string): any;
+export declare function Sum(path: string): any;
+export declare function Count(path: string): any;

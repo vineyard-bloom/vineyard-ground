@@ -11,11 +11,11 @@ export declare class Collection<T> implements ICollection {
     create_or_update(seed: any): Promise<T>;
     update(seed: any, changes?: any): Promise<T>;
     remove(seed: any): Promise<T>;
-    all(): Query<T>;
-    filter(options: any): Query<T>;
-    first(options?: any): Query<T>;
-    first_or_null(options?: any): Query<T>;
-    firstOrNull(options?: any): Query<T>;
+    all(): Query<T, T[]>;
+    filter(options: any): Query<T, T[]>;
+    first(options?: any): Query<T, T | undefined>;
+    first_or_null(options?: any): Query<T, T | undefined>;
+    firstOrNull(options?: any): Query<T, T | undefined>;
     get_sequelize(): any;
-    get(identity: any): Query<T>;
+    get(identity: any): Query<T, T | undefined>;
 }

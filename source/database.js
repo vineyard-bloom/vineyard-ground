@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var vineyard_schema_1 = require("vineyard-schema");
-var Sequelize = require("sequelize");
+var Sequelize = require('sequelize');
 var node_uuid = require('uuid');
 function get_field(property, library, dialect) {
     var type = property.type;
@@ -66,7 +66,8 @@ function get_field(property, library, dialect) {
             return null;
         case vineyard_schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
-                return get_field(type.trellis.primary_key, library, dialect);
+                var field = type.trellis.primary_key;
+                return get_field(field, library, dialect);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');
         default:
@@ -85,19 +86,19 @@ function create_field(property, library, dialect) {
     return field;
 }
 function get_cross_table_name(trellises) {
-    return trellises.map(function (t) { return t['table'].getTableName(); }).sort().join('_');
+    return trellises.map(function (t) { return t.table.getTableName(); }).sort().join('_');
 }
 function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
     var table_trellises = [list.trellis, list.other_property.trellis];
     var cross_table_name = get_cross_table_name(table_trellises);
-    var relationship = trellis['table'].belongsToMany(list.get_other_trellis()['table'], {
+    var relationship = trellis.table.belongsToMany(list.get_other_trellis()['table'], {
         as: list.name,
         otherKey: list.other_property.trellis.name.toLowerCase(),
         foreignKey: list.trellis.name.toLowerCase(),
         constraints: false,
         through: cross_table_name
     });
-    list['cross_table'] = relationship.through.model;
+    list.cross_table = relationship.through.model;
 }
 function initialize_relationship(property, trellis, schema, tables, sequelize) {
     if (property.type.get_category() == vineyard_schema_1.Type_Category.trellis) {
@@ -125,8 +126,8 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
     }
 }
 function initialize_relationships(schema, tables, sequelize) {
-    for (var name_1 in schema.trellises) {
-        var trellis = schema.trellises[name_1];
+    for (var name in schema.trellises) {
+        var trellis = schema.trellises[name];
         for (var i in trellis.properties) {
             var property = trellis.properties[i];
             initialize_relationship(property, trellis, schema, tables, sequelize);
@@ -182,8 +183,8 @@ function create_table(trellis, schema, sequelize) {
 }
 function vineyard_to_sequelize(schema, keys, sequelize) {
     var tables = {};
-    for (var name_2 in keys) {
-        tables[name_2] = create_table(schema.trellises[name_2], schema, sequelize);
+    for (var name in keys) {
+        tables[name] = create_table(schema.trellises[name], schema, sequelize);
     }
     initialize_relationships(schema, tables, sequelize);
     return tables;

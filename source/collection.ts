@@ -14,6 +14,11 @@ export class Collection<T> implements ICollection {
     this.trellis = trellis
     this.sequelize = sequelize_model
     trellis.collection = this
+
+    // Monkey patch for soft backwards compatibility
+    const self = this as any
+    self.firstOrNull = this.first
+    self.first_or_null = this.first
   }
 
   create(seed: any): Promise<T> {
@@ -46,14 +51,6 @@ export class Collection<T> implements ICollection {
 
   first(options?: any): Query<T, T | undefined> {
     return this.all().first(options)
-  }
-
-  first_or_null(options?: any): Query<T, T | undefined> {
-    return this.all().first_or_null(options)
-  }
-
-  firstOrNull(options?: any): Query<T, T | undefined> {
-    return this.all().first_or_null(options)
   }
 
   get_sequelize() {

@@ -46,7 +46,7 @@ var Collection = (function () {
     Collection.prototype.get = function (identity) {
         identity = this.trellis.get_identity(identity);
         var filter = {};
-        filter[this.trellis.primary_key.name] = identity;
+        filter[this.trellis.primary_keys[0].name] = identity;
         return this.filter(filter).first();
     };
     return Collection;

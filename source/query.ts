@@ -5,9 +5,7 @@ const sequelize = require('sequelize')
 import {Collection_Trellis, Property, Trellis} from './types'
 import {to_lower} from "./utility";
 
-// let BigNumber = null
-
-export type ThenableCallback<N, O> = (result: O) => N
+export type ThenableCallback<N, O> = (result: O) => N | Promise<N>
 export interface Query<T, O> {
   exec(): Promise<O>
 
@@ -16,10 +14,6 @@ export interface Query<T, O> {
   filter(options: any): Query<T, T[]>
 
   first(options?: any): Query<T, T | undefined>
-
-  first_or_null(options?: any): Query<T, T | undefined>
-
-  firstOrNull(options?: any): Query<T, T | undefined>
 
   join<T2, O2>(collection: ICollection): Query<T2, O2>
 
@@ -30,7 +24,6 @@ export interface Query<T, O> {
   sort(args: string[]): Query<T, O>
 
   then<N>(callback: ThenableCallback<N, O>): Promise<N>
-  then<N>(callback: ThenableCallback<Promise<N>, O>): Promise<N>
 }
 
 enum Reduce_Mode {
@@ -175,6 +168,11 @@ export class Query_Implementation<T, O> implements Query<T, O> {
   constructor(sequelize: any, trellis: Collection_Trellis<T>) {
     this.sequelize = sequelize
     this.trellis = trellis
+
+    // Monkey patch for soft backwards compatibility
+    const self = this as any
+    self.firstOrNull = this.first
+    self.first_or_null = this.first
   }
 
   exec(): Promise<O> {
@@ -210,18 +208,6 @@ export class Query_Implementation<T, O> implements Query<T, O> {
 
   first(options?: any): Query<T, T | undefined> {
     this.set_reduce_mode(Reduce_Mode.first)
-    return options
-      ? this.filter(options) as any
-      : this as any
-  }
-
-  first_or_null(options?: any): Query<T, T | undefined> {
-    return this.firstOrNull(options)
-  }
-
-  firstOrNull(options?: any): Query<T, T | undefined> {
-    this.set_reduce_mode(Reduce_Mode.first)
-    this.allow_null = true
     return options
       ? this.filter(options) as any
       : this as any

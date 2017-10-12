@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var list_operations_1 = require("./list-operations");
 var utility_1 = require("./utility");
 function prepare_reference(reference, value) {
-    var other_primary_key = reference.get_other_trellis().primary_key.name;
+    var other_primary_key = reference.get_other_trellis().primary_keys[0].name;
     if (typeof value === 'object') {
         if (!value) {
             if (reference.is_nullable)
@@ -57,13 +57,17 @@ function perform_operation(identity, seed, list, sequelize, operation) {
             var fields = {};
             fields[utility_1.to_lower(list.trellis.name)] = identity;
             fields[utility_1.to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item);
-            return list['cross_table'].create(fields);
+            if (!list.cross_table)
+                throw Error("List is missing cross table.");
+            return list.cross_table.create(fields);
         }
         case list_operations_1.Operation_Type.remove: {
             var fields = {};
             fields[utility_1.to_lower(list.trellis.name)] = identity;
             fields[utility_1.to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item);
-            return list['cross_table'].destroy({
+            if (!list.cross_table)
+                throw Error("List is missing cross table.");
+            return list.cross_table.destroy({
                 where: fields,
                 force: true
             });
@@ -110,7 +114,7 @@ function create_or_update(seed, trellis, sequelize) {
 }
 exports.create_or_update = create_or_update;
 function update(seed, trellis, sequelize, changes) {
-    var primary_key = trellis.primary_key.name;
+    var primary_key = trellis.primary_keys[0].name;
     var identity = trellis.get_identity(seed);
     var new_seed = prepare_seed(changes || seed, trellis);
     var filter = {};

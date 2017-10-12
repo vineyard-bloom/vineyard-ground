@@ -14,9 +14,9 @@ var vineyard_schema_1 = require("vineyard-schema");
 var collection_1 = require("./collection");
 var database_1 = require("./database");
 function sync_collections(schema, collections, keys, sequelize_models) {
-    for (var name_1 in keys) {
-        var trellis = schema.trellises[name_1];
-        collections[name_1] = new collection_1.Collection(trellis, sequelize_models[name_1]);
+    for (var name in keys) {
+        var trellis = schema.trellises[name];
+        collections[name] = new collection_1.Collection(trellis, sequelize_models[name]);
     }
 }
 function initializeTrellises(schema, collections, keys, db) {

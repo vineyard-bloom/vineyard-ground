@@ -7,7 +7,16 @@ export interface Collection_Trellis<T> extends Trellis {
     table: any;
     collection: Collection<T>;
 }
-export interface Table {
+export interface SequelizeTable {
+    sequelize: any;
+    getTableName(): string;
+    belongsToMany(table: Table, options: any): any;
+    hasMany(table: Table, options: any): void;
+    create(fields: any): any;
+    destroy(fields: any): any;
+    findAll(options: any): any;
+}
+export interface Table extends SequelizeTable {
     name: string;
     isCross?: boolean;
 }
@@ -19,9 +28,11 @@ export interface Property {
     "default": any;
     is_unique: boolean;
     other_property: Property;
+    cross_table?: Table;
     is_reference(): boolean;
     is_list(): boolean;
     get_other_trellis(): Trellis;
+    get_path(): string;
 }
 export interface Trellis {
     table: Table;
@@ -31,6 +42,9 @@ export interface Trellis {
     };
     primary_keys: Property[];
     additional: any;
+    collection: any;
+    get_identity(input: any): any;
+    get_lists(): any;
 }
 export declare type TrellisMap = {
     [name: string]: Trellis;
