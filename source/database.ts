@@ -1,6 +1,8 @@
 import {Type_Category, Trellis_Type, Library} from "vineyard-schema"
+
 const Sequelize = require('sequelize')
 import {Table_Trellis, Trellis, Property, Schema, Table} from "./types";
+import {SequelizeModel, SequelizeModelMap} from "./clients/sequelize-client";
 
 const node_uuid = require('uuid')
 
@@ -70,6 +72,12 @@ function get_field(property: Property, library: Library, dialect: string): any {
         }
 
       if (type === library.types.colossal)
+        return {
+          type: Sequelize.NUMERIC,
+          defaultValue: 0
+        }
+
+      if (type === library.types.bignumber)
         return {
           type: Sequelize.NUMERIC,
           defaultValue: 0
@@ -165,7 +173,7 @@ function initialize_relationships(schema: Schema, tables: any, sequelize: any) {
 }
 
 function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
-  const fields: {[T: string]: Property} = {}
+  const fields: { [T: string]: Property } = {}
 
   // Create the primary key field first for DB UX
   for (let i = 0; i < trellis.primary_keys.length; ++i) {
@@ -220,8 +228,8 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
   return oldTable
 }
 
-export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any) {
-  const tables: {[key: string]: Table} = {}
+export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any): SequelizeModelMap {
+  const tables: { [key: string]: SequelizeModel } = {}
 
   for (let name in keys) {
     tables [name] = create_table(schema.trellises [name], schema, sequelize)
@@ -230,14 +238,4 @@ export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any)
   initialize_relationships(schema, tables, sequelize)
 
   return tables
-}
-
-export function usePostgres(db: any, databaseConfig: any) {
-  const pg = require('pg')
-  const pgConfig = Object.assign(databaseConfig, {
-    user: databaseConfig.username
-  })
-  db['pgPool'] = new pg.Pool(pgConfig)
-  db['useQueryBuilder'] = true
-  db['useUpdateBuilder'] = true
 }

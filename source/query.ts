@@ -2,13 +2,14 @@ import {ICollection} from "./collection"
 
 const sequelize = require('sequelize')
 
-import {CollectionTrellis, Property, Trellis} from './types'
+import {CollectionTrellis, DatabaseClient, TableClient, Property, Trellis} from './types'
 import {to_lower} from "./utility";
 import {QueryBuilder} from "./sql/query-builder";
 
 // let BigNumber = null
 
 export type ThenableCallback<N, O> = (result: O) => N | Promise<N>
+
 export interface Query<T, O> {
   exec(): Promise<O>
 
@@ -71,13 +72,25 @@ function getData(row: any) {
 }
 
 export class Query_Implementation<T, O> implements Query<T, O> {
-  private sequelize: any
+  private table: TableClient<T>
+  private client: DatabaseClient
   private trellis: CollectionTrellis<T>
   private options: QueryOptions = {}
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
   private expansions: any = {}
   private allow_null: boolean = true
   private bundle: any
+
+  constructor(table: TableClient<T>, client: DatabaseClient, trellis: CollectionTrellis<T>) {
+    this.table = table
+    this.trellis = trellis
+    this.client = client
+
+    // Monkey patch for soft backwards compatibility
+    const self = this as any
+    self.firstOrNull = this.first
+    self.first_or_null = this.first
+  }
 
   private set_reduce_mode(value: Reduce_Mode) {
     if (this.reduce_mode == value)
@@ -173,29 +186,19 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this.get_expansions().length > 0
   }
 
-  constructor(sequelize: any, trellis: CollectionTrellis<T>) {
-    this.sequelize = sequelize
-    this.trellis = trellis
-
-    // Monkey patch for soft backwards compatibility
-    const self = this as any
-    self.firstOrNull = this.first
-    self.first_or_null = this.first
-  }
-
   private queryWithQueryBuilder() {
+    const legacyClient = this.client.getLegacyClient()
+    if (legacyClient)
+      return legacyClient.findAll(this.table, this.options)
+
     const builder = new QueryBuilder(this.trellis)
     this.bundle = builder.build(this.options)
-    return this.sequelize.sequelize.pgPool.query(this.bundle.sql, this.bundle.args)
-      .then((result: any) => result.rows)
+    return this.client.query<T>(this.bundle.sql, this.bundle.args)
+      .then(result => result.rows)
   }
 
   exec(): Promise<O> {
-    const find = this.sequelize.sequelize.useQueryBuilder
-      ? this.queryWithQueryBuilder()
-      : this.sequelize.findAll(this.options)
-
-    return find
+    return this.queryWithQueryBuilder()
       .then((result: any) => this.has_expansions()
         ? this.process_result_with_expansions(result)
         : this.process_result(result)
@@ -237,8 +240,9 @@ export class Query_Implementation<T, O> implements Query<T, O> {
 
   join<T2, O2>(collection: ICollection): Query<T2, O2> {
     this.options.include = this.options.include || []
-    this.options.include.push(collection.get_sequelize())
-    return this as any
+    // this.options.include.push(collection.get_sequelize())
+    throw new Error("Not implemented.")
+    // return this as any
   }
 
   range(start?: number, length?: number): Query<T, O> {

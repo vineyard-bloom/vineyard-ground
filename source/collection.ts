@@ -1,19 +1,20 @@
 import {Query, Query_Implementation} from './query'
-import {CollectionTrellis, Trellis} from './types'
+import {CollectionTrellis, DatabaseClient, LegacyClient, TableClient, Trellis} from './types'
 import {create, create_or_update, update} from './update'
 
 export interface ICollection {
-  get_sequelize(): any
   getTrellis(): Trellis
 }
 
 export class Collection<T> implements ICollection {
-  private sequelize: any
+  private table: TableClient<T>
+  private client: DatabaseClient
   private trellis: CollectionTrellis<T>
 
-  constructor(trellis: CollectionTrellis<T>, sequelize_model: any) {
+  constructor(trellis: CollectionTrellis<T>, table: TableClient<T>, client: DatabaseClient) {
     this.trellis = trellis
-    this.sequelize = sequelize_model
+    this.table = table
+    this.client = client
     trellis.collection = this
 
     // Monkey patch for soft backwards compatibility
@@ -27,19 +28,19 @@ export class Collection<T> implements ICollection {
   }
 
   create(seed: any): Promise<T> {
-    return create(seed, this.trellis, this.sequelize)
+    return create(seed, this.trellis, this.table)
   }
 
   create_or_update(seed: any): Promise<T> {
-    return create_or_update(seed, this.trellis, this.sequelize)
+    return create_or_update(seed, this.trellis, this.table)
   }
 
   update(seed: any, changes?: any): Promise<T> {
-    return update(seed, this.trellis, this.sequelize, changes)
+    return update(seed, this.trellis, this.table, changes)
   }
 
   remove(seed: any): Promise<T> {
-    return this.sequelize.destroy({
+    return this.table.remove({
       where: {
         [this.trellis.primary_keys[0].name]: this.trellis.get_identity(seed)
       }
@@ -47,7 +48,7 @@ export class Collection<T> implements ICollection {
   }
 
   all(): Query<T, T[]> {
-    return new Query_Implementation<T, T[]>(this.sequelize, this.trellis)
+    return new Query_Implementation<T, T[]>(this.table, this.client, this.trellis)
   }
 
   filter(options: any): Query<T, T[]> {
@@ -56,10 +57,6 @@ export class Collection<T> implements ICollection {
 
   first(options?: any): Query<T, T | undefined> {
     return this.all().first(options)
-  }
-
-  get_sequelize() {
-    return this.sequelize
   }
 
   get(identity: any) {

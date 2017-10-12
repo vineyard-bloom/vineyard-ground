@@ -1,39 +1,43 @@
 import {Schema} from 'vineyard-schema'
 import {Collection, ICollection} from "./collection";
 import {vineyard_to_sequelize} from "./database";
+import {SequelizeClient, SequelizeModelMap} from "./clients/sequelize-client";
+import {DatabaseClient} from "./types";
+
 const pluralize = require('pluralize')
 
 export type Collection_Map = { [name: string]: ICollection }
 
-function sync_collections(schema: Schema, collections: Collection_Map, keys: any, sequelize_models: any) {
+function sync_collections(schema: Schema, collections: Collection_Map, keys: any, sequelize_models: SequelizeModelMap,
+                          client: DatabaseClient) {
   for (let name in keys) {
     const trellis = schema.trellises [name] as any
-    collections [name] = new Collection(trellis, sequelize_models [name])
+    collections [name] = new Collection(trellis, sequelize_models [name], client)
     trellis.table = {
-      name:pluralize(trellis.name).toLowerCase()
+      name: pluralize(trellis.name).toLowerCase()
     }
   }
 }
 
-function initializeTrellises(schema: Schema, collections: Collection_Map, keys: any, db: any) {
+function initializeTrellises(schema: Schema, collections: Collection_Map, keys: any, db: any, client: DatabaseClient) {
   const sequelize_models = vineyard_to_sequelize(schema as any, schema.trellises, db)
-  sync_collections(schema, collections, schema.trellises, sequelize_models)
+  sync_collections(schema, collections, schema.trellises, sequelize_models, client)
 }
 
 export class Modeler {
   private schema: Schema
   protected db: any
   collections: Collection_Map = {}
+  private client: DatabaseClient
 
-  constructor(db: any, schema: Schema | any) {
+  constructor(db: any, schema: Schema | any, client: DatabaseClient = new SequelizeClient(db)) {
     this.schema = schema instanceof Schema
       ? schema
       : new Schema(schema)
 
     this.db = db
-    // const sequelize_models = vineyard_to_sequelize(this.schema, this.schema.trellises, db)
-    // sync_collections(this.schema, this.collections, this.schema.trellises, sequelize_models)
-    initializeTrellises(this.schema, this.collections, this.schema.trellises, this.db)
+    this.client = client
+    initializeTrellises(this.schema, this.collections, this.schema.trellises, this.db, this.client)
   }
 
   query(sql: string, replacements?: any) {
@@ -52,7 +56,7 @@ export class Modeler {
     this.schema.define(definitions)
     // const sequelize_models = vineyard_to_sequelize(this.schema, definitions, this.db)
     // sync_collections(this.schema, this.collections, definitions, sequelize_models)
-    initializeTrellises(this.schema, this.collections, definitions, this.db)
+    initializeTrellises(this.schema, this.collections, definitions, this.db, this.client)
   }
 }
 

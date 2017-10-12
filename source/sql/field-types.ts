@@ -71,6 +71,12 @@ export function getFieldType(property: Property, library: Library): any {
           defaultValue: '0'
         }
 
+      if (type === library.types.bignumber)
+        return {
+          name: 'NUMERIC',
+          defaultValue: '0'
+        }
+
       throw new Error("Unknown primitive: " + type.name + '.')
 
     case Type_Category.list:

@@ -3,9 +3,10 @@ import {DevModeler} from "../../source/modeler";
 require('source-map-support').install()
 import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
+
 const Sequelize = require('sequelize')
 import {Modeler, Add, Remove} from '../../source'
-import {usePostgres} from "../../source/database";
+import {PostgresClient} from "../../source/clients/postgres-client";
 
 const config = require('../config/config.json')
 let mainWorld: any,
@@ -13,13 +14,12 @@ let mainWorld: any,
   flyingTag: any
 
 const db = new Sequelize(config.database)
-usePostgres(db, config.database)
 
 describe('Game', function () {
   this.timeout(5000)
   it('sync_database', function () {
     const schema = new Schema(require('../schema/game.json'))
-    const modeler = new DevModeler(db, schema)
+    const modeler = new DevModeler(db, schema, new PostgresClient(config.database))
     const model: any = modeler.collections
 
     return modeler.regenerate()
@@ -81,7 +81,7 @@ describe('Arbitrary', function () {
   this.timeout(4000)
   it('sync_database', function () {
     const schema = new Schema(require('../schema/arbitrary.json'))
-    const modeler = new DevModeler(db, schema)
+    const modeler = new DevModeler(db, schema, new PostgresClient(config.database))
     const model: any = modeler.collections
 
     const BigNumber = require('bignumber.js')

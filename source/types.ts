@@ -74,3 +74,45 @@ export interface Schema {
 }
 
 export type Trellis_Map = { [name: string]: Trellis }
+
+export interface QueryResult<T> {
+  rows: T[]
+}
+
+export interface LegacyClient {
+  findAll(table: ITableClient, options: any): any
+}
+
+export interface DatabaseClient {
+  getLegacyClient(): LegacyClient | undefined
+
+  query<T>(sql: string, args?: { [key: string]: any }): PromiseLike<QueryResult<T>>
+}
+
+export interface ITableClient {
+  // getClient(): DatabaseClient
+
+}
+
+export interface RemoveOptions {
+  where: any
+}
+
+export interface TableClient<T> extends ITableClient {
+  create(newSeed: T): Promise<T>
+
+  upsert(newSeed: T): Promise<T>
+
+  remove(options: RemoveOptions): Promise<any>
+}
+
+export interface DatabaseConfig {
+  host: string
+  username: string
+  password: string
+  database: string
+}
+
+export interface GeneralDatabaseConfig extends DatabaseConfig {
+    dialect: string
+}

@@ -1,6 +1,6 @@
 import {Operation, Operation_Type} from './list-operations'
 import {to_lower} from "./utility"
-import {Property, Trellis} from "./types";
+import {Property, TableClient, Trellis} from "./types";
 
 function prepare_reference(reference: Property, value: any) {
   const other_primary_key = reference.get_other_trellis().primary_keys[0].name
@@ -44,7 +44,7 @@ function prepare_property(property: Property, value: any) {
 }
 
 function prepare_seed(seed: any, trellis: Trellis) {
-  const new_seed: any = {}
+  const newSeed: any = {}
 
   for (let i in seed) {
     const property = trellis.properties[i]
@@ -52,11 +52,11 @@ function prepare_seed(seed: any, trellis: Trellis) {
       throw new Error("Invalid property: " + trellis.name + "." + i + '.')
 
     if (!property.is_list()) {
-      new_seed [i] = prepare_property(property, seed[i])
+      newSeed [i] = prepare_property(property, seed[i])
     }
   }
 
-  return new_seed
+  return newSeed
 }
 
 function perform_operation(identity: any, seed: any, list: Property, sequelize: any, operation: Operation) {
@@ -90,54 +90,56 @@ function perform_operation(identity: any, seed: any, list: Property, sequelize: 
   }
 }
 
-function update_list(identity: any, seed: any, list: Property, sequelize: any) {
+function update_list<T>(identity: any, seed: any, list: Property, table: TableClient<T>) {
   const value = seed[list.name]
   if (Array.isArray(value)) {
-    return Promise.all(value.map(item => perform_operation(identity, seed, list, sequelize, item)))
+    return Promise.all(value.map(item => perform_operation(identity, seed, list, table, item)))
   }
   else {
-    return perform_operation(identity, seed, list, sequelize, value)
+    return perform_operation(identity, seed, list, table, value)
   }
 }
 
-function update_lists(identity: any, seed: any, trellis: Trellis, sequelize: any) {
+function update_lists<T>(identity: any, seed: any, trellis: Trellis, table: TableClient<T>) {
   let promise = Promise.resolve()
   for (let list of trellis.get_lists()) {
     if (seed[list.name])
-      promise = promise.then(() => update_list(identity, seed, list, sequelize))
+      promise = promise.then(() => update_list(identity, seed, list, table))
   }
 
   return promise
 }
 
-function post_process(result: any, identity: any, seed: any, trellis: Trellis, sequelize: any) {
-  return update_lists(identity, seed, trellis, sequelize)
+function post_process<T>(result: any, identity: any, seed: any, trellis: Trellis, table: TableClient<T>): Promise<T> {
+  return update_lists(identity, seed, trellis, table)
     .then(() => result.dataValues)
 }
 
-export function create<T>(seed: any, trellis: Trellis, sequelize: any): Promise<T> {
-  const new_seed = prepare_seed(seed, trellis)
+export function create<T>(seed: any, trellis: Trellis, table: TableClient<T>): Promise<T> {
+  const newSeed = prepare_seed(seed, trellis)
 
-  return sequelize.create(new_seed)
-    .then((result: any) => post_process(result, trellis.get_identity(result.dataValues), seed, trellis, sequelize))
+  // return sequelize.create(newSeed)
+  return table.create(newSeed)
+    .then(result => post_process(result, trellis.get_identity(result), seed, trellis, table))
 }
 
-export function create_or_update<T>(seed: any, trellis: Trellis, sequelize: any): Promise<T> {
-  const new_seed = prepare_seed(seed, trellis)
+export function create_or_update<T>(seed: any, trellis: Trellis, table: TableClient<T>): Promise<T> {
+  const newSeed = prepare_seed(seed, trellis)
 
-  return sequelize.upsert(new_seed)
-    .then((result: any) => post_process(result, trellis.get_identity(result), seed, trellis, sequelize))
+  // return sequelize.upsert(newSeed)
+  return table.upsert(newSeed)
+    .then(result => post_process(result, trellis.get_identity(result), seed, trellis, table))
 }
 
 export function update<T>(seed: any, trellis: Trellis, sequelize: any, changes?: any): Promise<T> {
   const primary_key = trellis.primary_keys[0].name
   const identity = trellis.get_identity(seed)
-  const new_seed = prepare_seed(changes || seed, trellis)
+  const newSeed = prepare_seed(changes || seed, trellis)
 
   const filter: any = {}
   filter[primary_key] = identity
 
-  return sequelize.update(new_seed, {
+  return sequelize.update(newSeed, {
     where: filter,
     returning: true
   })
