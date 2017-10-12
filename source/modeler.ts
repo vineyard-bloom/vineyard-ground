@@ -1,6 +1,7 @@
 import {Schema} from 'vineyard-schema'
 import {Collection, ICollection} from "./collection";
 import {vineyard_to_sequelize} from "./database";
+const pluralize = require('pluralize')
 
 export type Collection_Map = { [name: string]: ICollection }
 
@@ -8,6 +9,9 @@ function sync_collections(schema: Schema, collections: Collection_Map, keys: any
   for (let name in keys) {
     const trellis = schema.trellises [name] as any
     collections [name] = new Collection(trellis, sequelize_models [name])
+    trellis.table = {
+      name:pluralize(trellis.name).toLowerCase()
+    }
   }
 }
 

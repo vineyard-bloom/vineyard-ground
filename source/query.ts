@@ -4,6 +4,9 @@ const sequelize = require('sequelize')
 
 import {Collection_Trellis, Property, Trellis} from './types'
 import {to_lower} from "./utility";
+import {QueryBuilder} from "./sql/query-builder";
+
+// let BigNumber = null
 
 export type ThenableCallback<N, O> = (result: O) => N | Promise<N>
 export interface Query<T, O> {
@@ -33,7 +36,7 @@ enum Reduce_Mode {
 }
 
 function processFields(result: any, trellis: Trellis) {
-  if (trellis.table.sequelize.getDialect() == 'mysql') {
+  if (trellis.oldTable.sequelize.getDialect() == 'mysql') {
     for (let i in trellis.properties) {
       const property = trellis.properties[i]
       if (property.type.name == 'json') {
@@ -63,6 +66,10 @@ interface QueryOptions {
   order?: string []
 }
 
+function getData(row) {
+  return row.dataValues || row
+}
+
 export class Query_Implementation<T, O> implements Query<T, O> {
   private sequelize: any
   private trellis: Collection_Trellis<T>
@@ -70,6 +77,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
   private expansions: any = {}
   private allow_null: boolean = true
+  private bundle: any
 
   private set_reduce_mode(value: Reduce_Mode) {
     if (this.reduce_mode == value)
@@ -93,15 +101,15 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     // where[to_lower(reference.get_other_trellis().name)] =
     //   sequelize.col(reference.get_other_trellis().primary_key.name)
 
-    return reference.other_property.trellis.table.findAll({
+    return reference.other_property.trellis.oldTable.findAll({
       include: {
-        model: reference.trellis['table'],
+        model: reference.trellis.oldTable,
         through: {where: where},
         as: reference.other_property.name,
         required: true
       }
     })
-      .then((result: any) => result.map((r: any) => processFields(r.dataValues, reference.other_property.trellis)))
+      .then((result: any) => result.map((r: any) => processFields(getData(r), reference.other_property.trellis)))
   }
 
   private perform_expansion(path: string, data: any) {
@@ -118,8 +126,8 @@ export class Query_Implementation<T, O> implements Query<T, O> {
 
   private handle_expansions(results: any) {
     let promises = results.map((result: any) => Promise.all(this.get_expansions()
-      .map(path => this.perform_expansion(path, result.dataValues)
-        .then((child: any) => result.dataValues[path] = child)
+      .map(path => this.perform_expansion(path, getData(result))
+        .then((child: any) => getData(result)[path] = child)
       )
     ))
 
@@ -136,7 +144,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
         throw Error("Query.first called on empty result set.")
       }
 
-      return processFields(result [0].dataValues, this.trellis)
+      return processFields(getData(result [0]), this.trellis)
     }
     else if (this.reduce_mode == Reduce_Mode.single_value) {
       if (result.length == 0) {
@@ -146,10 +154,10 @@ export class Query_Implementation<T, O> implements Query<T, O> {
         throw Error("Query.select single value called on empty result set.")
       }
 
-      return result.map((item: any) => item.dataValues._value);
+      return getData(result[0])._value
     }
 
-    return result.map((item: any) => processFields(item.dataValues, this.trellis))
+    return result.map((item: any) => processFields(getData(item), this.trellis))
   }
 
   private process_result_with_expansions(result: any) {
@@ -175,14 +183,28 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     self.first_or_null = this.first
   }
 
+  private queryWithQueryBuilder() {
+    const builder = new QueryBuilder(this.trellis)
+    this.bundle = builder.build(this.options)
+    return this.sequelize.sequelize.pgPool.query(this.bundle.sql, this.bundle.args)
+      .then(result => result.rows)
+  }
+
   exec(): Promise<O> {
-    return this.sequelize.findAll(this.options)
+    const find = this.sequelize.sequelize.useQueryBuilder
+      ? this.queryWithQueryBuilder()
+      : this.sequelize.findAll(this.options)
+
+    return find
       .then((result: any) => this.has_expansions()
         ? this.process_result_with_expansions(result)
         : this.process_result(result)
       )
       .catch((error: Error) => {
-        console.error(this.options)
+        if (this.bundle)
+          console.error(this.bundle)
+        else
+          console.error(this.options)
         throw error
       })
   }

@@ -110,14 +110,14 @@ function create_field(property: Property, library: Library, dialect: string): an
 }
 
 function get_cross_table_name(trellises: Trellis []) {
-  return trellises.map(t => t.table.getTableName()).sort().join('_')
+  return trellises.map(t => t.oldTable.getTableName()).sort().join('_')
 }
 
 function initialize_many_to_many(list: Property, trellis: Trellis, schema: Schema, tables: any, sequelize: any) {
   const table_trellises = [list.trellis, list.other_property.trellis]
   const cross_table_name = get_cross_table_name(table_trellises)
 
-  const relationship = trellis.table.belongsToMany(list.get_other_trellis()['table'], {
+  const relationship = trellis.oldTable.belongsToMany(list.get_other_trellis()['table'], {
     as: list.name,
     otherKey: list.other_property.trellis.name.toLowerCase(),
     foreignKey: list.trellis.name.toLowerCase(),
@@ -132,8 +132,8 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
   if (property.type.get_category() == Type_Category.trellis) {
     const reference = property as Property
     if (!reference.other_property) {
-      const other_table = reference.get_other_trellis()['table']
-      other_table.hasMany(trellis['table'], {
+      const other_table = reference.get_other_trellis().oldTable
+      other_table.hasMany(trellis.oldTable, {
         foreignKey: reference.name,
         constraints: true
       })
@@ -145,7 +145,7 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
       initialize_many_to_many(list, trellis, schema, tables, sequelize)
     }
     else {
-      trellis['table'].hasMany(list.get_other_trellis()['table'], {
+      trellis.oldTable.hasMany(list.get_other_trellis().oldTable, {
         as: list.name,
         foreignKey: list.other_property.name,
         constraints: true
@@ -210,14 +210,14 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
 
   }
 
-  const table = trellis['table'] = sequelize.define(trellis.name.toLowerCase(), fields, {
+  const oldTable = trellis.oldTable = sequelize.define(trellis.name.toLowerCase(), fields, {
     underscored: true,
     createdAt: created,
     updatedAt: modified,
     // freezeTableName: true
   })
 
-  return table
+  return oldTable
 }
 
 export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any) {
@@ -230,4 +230,14 @@ export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any)
   initialize_relationships(schema, tables, sequelize)
 
   return tables
+}
+
+export function usePostgres(db, databaseConfig) {
+  const pg = require('pg')
+  const pgConfig = Object.assign(databaseConfig, {
+    user: databaseConfig.username
+  })
+  db['pgPool'] = new pg.Pool(pgConfig)
+  db['useQueryBuilder'] = true
+  db['useUpdateBuilder'] = true
 }

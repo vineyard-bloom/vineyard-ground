@@ -5,19 +5,23 @@ import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
 const Sequelize = require('sequelize')
 import {Modeler, Add, Remove} from '../../source'
+import {usePostgres} from "../../source/database";
 
 const config = require('../config/config.json')
 let mainWorld: any,
   dangerousTag: any,
   flyingTag: any
 
+const db = new Sequelize(config.database)
+usePostgres(db, config.database)
+
 describe('Game', function () {
   this.timeout(5000)
   it('sync_database', function () {
-    const db = new Sequelize(config.database)
     const schema = new Schema(require('../schema/game.json'))
     const modeler = new DevModeler(db, schema)
     const model: any = modeler.collections
+
     return modeler.regenerate()
       .then(() => model.Tag.create({
           name: "flying"
@@ -76,28 +80,41 @@ describe('Game', function () {
 describe('Arbitrary', function () {
   this.timeout(4000)
   it('sync_database', function () {
-    const db = new Sequelize(config.database)
     const schema = new Schema(require('../schema/arbitrary.json'))
     const modeler = new DevModeler(db, schema)
     const model: any = modeler.collections
+
     const BigNumber = require('bignumber.js')
     return modeler.regenerate()
       .then(() => model.Odd.create({
           strange: 10,
           unknown: "mist",
-          vast: "1000000000000000000000000000021"
+          vast: "1000000000000000000000000000021",
+          sampleDate: new Date("June 15, 2016"),
+          data: {
+            frogs: [
+              {name: "Froggy"},
+              {name: "Pac Frog"}
+            ]
+          }
         })
       )
       .then(() => model.Odd.create({
           strange: 11,
           unknown: "mist2",
-          vast: new BigNumber("1000000000000000000000000000021")
+          vast: new BigNumber("1000000000000000000000000000021"),
+          sampleDate: new Date("August 3, 2002"),
+          data: {
+            "nothing": null
+          }
         })
       )
       .then(() => model.Odd.all())
       .then((results: any) => {
         console.log('result', results)
         assert(new BigNumber(results[0].vast).equals(results[1].vast))
+        assert(results[0].sampleDate instanceof Date)
+        assert.equal(results[0].data.frogs.length, 2)
       })
   })
 })

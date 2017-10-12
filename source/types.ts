@@ -1,12 +1,12 @@
 import * as vineyardSchema from 'vineyard-schema'
 import {Collection} from "./collection";
 
-export interface Table_Trellis extends Trellis {
-  table: any;
+export interface Table_Trellis extends vineyardSchema.Trellis {
+  oldTable: any;
 }
 
-export interface Collection_Trellis<T> extends Trellis {
-  table: any
+export interface Collection_Trellis<T> extends vineyardSchema.Trellis {
+  oldTable: any
   collection: Collection<T>
 }
 
