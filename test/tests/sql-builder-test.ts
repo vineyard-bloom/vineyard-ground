@@ -5,7 +5,7 @@ import {QueryBuilder} from "../../source/sql/query-builder";
 import * as assert from 'assert'
 import {DevModeler} from "../../source/modeler";
 import {Schema} from "vineyard-schema"
-import * as Sequelize from 'sequelize'
+const Sequelize = require('sequelize')
 import {checkDiff} from "../utility/diff";
 
 const config = require('../config/config.json')
@@ -17,7 +17,7 @@ describe('sql-builder-test', function () {
   this.timeout(5000)
 
   it('selection', function () {
-    const builder = new QueryBuilder(modeler.collections.Creature['trellis'])
+    const builder = new QueryBuilder(modeler.collections.Creature.getTrellis())
     const bundle = builder.build({where: {name: "ogre"}})
     assert.equal(bundle.sql, `SELECT * FROM "creatures" WHERE "name" = $1`)
     assert.equal(bundle.args.length, 1)
@@ -25,7 +25,7 @@ describe('sql-builder-test', function () {
   })
 
   it('advanced', function () {
-    const builder = new QueryBuilder(modeler.collections.Creature['trellis'])
+    const builder = new QueryBuilder(modeler.collections.Creature.getTrellis())
     const bundle = builder.build({
       order: ['name', 'health', 'desc'],
       limit: 5,
@@ -35,9 +35,7 @@ describe('sql-builder-test', function () {
   })
 
   it('generate', function () {
-    const sql = generate(schema)
+    const sql = generate(schema as any)
     checkDiff('test/resources/game.sql', sql, config.diffViewerPath)
   })
-
-
 })

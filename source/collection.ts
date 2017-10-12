@@ -1,16 +1,17 @@
 import {Query, Query_Implementation} from './query'
-import {Collection_Trellis} from './types'
+import {CollectionTrellis, Trellis} from './types'
 import {create, create_or_update, update} from './update'
 
 export interface ICollection {
   get_sequelize(): any
+  getTrellis(): Trellis
 }
 
 export class Collection<T> implements ICollection {
   private sequelize: any
-  private trellis: Collection_Trellis<T>
+  private trellis: CollectionTrellis<T>
 
-  constructor(trellis: Collection_Trellis<T>, sequelize_model: any) {
+  constructor(trellis: CollectionTrellis<T>, sequelize_model: any) {
     this.trellis = trellis
     this.sequelize = sequelize_model
     trellis.collection = this
@@ -19,6 +20,10 @@ export class Collection<T> implements ICollection {
     const self = this as any
     self.firstOrNull = this.first
     self.first_or_null = this.first
+  }
+
+  getTrellis(): CollectionTrellis<T> {
+    return this.trellis
   }
 
   create(seed: any): Promise<T> {

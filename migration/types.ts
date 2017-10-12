@@ -13,5 +13,10 @@ export interface Change {
   type: ChangeType
   trellis?: Trellis
   property?: Property
-  // oldProperty?: Property
+}
+
+export interface TableChange {
+  type: ChangeType.createTable | ChangeType.deleteTable
+  trellis: Trellis
+  property?: undefined
 }

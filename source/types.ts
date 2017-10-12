@@ -1,16 +1,12 @@
 import * as vineyardSchema from 'vineyard-schema'
 import {Collection} from "./collection";
 
-export interface Table_Trellis extends vineyardSchema.Trellis {
-  oldTable: any;
+export interface Table {
+  name: string
+  isCross?: boolean
 }
 
-export interface Collection_Trellis<T> extends vineyardSchema.Trellis {
-  oldTable: any
-  collection: Collection<T>
-}
-
-export interface SequelizeTable {
+export interface SequelizeTable extends Table {
   sequelize: any
 
   getTableName(): string
@@ -26,11 +22,6 @@ export interface SequelizeTable {
   findAll(options: any): any
 }
 
-export interface Table extends SequelizeTable {
-  name: string
-  isCross?: boolean
-}
-
 export interface Property {
   name: string
   type: vineyardSchema.Type
@@ -39,7 +30,7 @@ export interface Property {
   "default": any
   is_unique: boolean
   other_property: Property
-  cross_table?: Table
+  cross_table?: SequelizeTable
 
   is_reference(): boolean
 
@@ -51,6 +42,7 @@ export interface Property {
 }
 
 export interface Trellis {
+  oldTable: SequelizeTable
   table: Table
   name: string
   properties: { [name: string]: Property }
@@ -62,6 +54,17 @@ export interface Trellis {
 
   get_lists(): any
 }
+
+export interface Table_Trellis extends Trellis {
+  oldTable: SequelizeTable;
+}
+
+export interface CollectionTrellis<T> extends Trellis {
+  oldTable: SequelizeTable
+  collection: Collection<T>
+}
+
+export type Collection_Trellis<T> = CollectionTrellis<T>
 
 export type TrellisMap = { [name: string]: Trellis }
 

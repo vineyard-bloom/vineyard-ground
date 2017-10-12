@@ -232,7 +232,7 @@ export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any)
   return tables
 }
 
-export function usePostgres(db, databaseConfig) {
+export function usePostgres(db: any, databaseConfig: any) {
   const pg = require('pg')
   const pgConfig = Object.assign(databaseConfig, {
     user: databaseConfig.username

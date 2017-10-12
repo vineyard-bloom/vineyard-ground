@@ -1,4 +1,4 @@
-import * as shell from 'shelljs'
+const shell = require('shelljs')
 import * as assert from "assert";
 
 const fs = require('fs')

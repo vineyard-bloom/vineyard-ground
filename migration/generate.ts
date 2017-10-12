@@ -1,9 +1,9 @@
-import {ChangeType} from "./types";
+import {ChangeType, TableChange} from "./types";
 import {SqlSchemaBuilder} from "./sql-schema-builder";
 import {Schema} from "../source/types";
 
 export function generate(schema: Schema): string {
-  let changes = []
+  let changes:TableChange[] = []
   for (let name in schema.trellises) {
     const trellis = schema.trellises [name]
     changes.push({

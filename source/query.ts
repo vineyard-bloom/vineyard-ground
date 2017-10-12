@@ -2,7 +2,7 @@ import {ICollection} from "./collection"
 
 const sequelize = require('sequelize')
 
-import {Collection_Trellis, Property, Trellis} from './types'
+import {CollectionTrellis, Property, Trellis} from './types'
 import {to_lower} from "./utility";
 import {QueryBuilder} from "./sql/query-builder";
 
@@ -66,13 +66,13 @@ interface QueryOptions {
   order?: string []
 }
 
-function getData(row) {
+function getData(row: any) {
   return row.dataValues || row
 }
 
 export class Query_Implementation<T, O> implements Query<T, O> {
   private sequelize: any
-  private trellis: Collection_Trellis<T>
+  private trellis: CollectionTrellis<T>
   private options: QueryOptions = {}
   private reduce_mode: Reduce_Mode = Reduce_Mode.none
   private expansions: any = {}
@@ -173,7 +173,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     return this.get_expansions().length > 0
   }
 
-  constructor(sequelize: any, trellis: Collection_Trellis<T>) {
+  constructor(sequelize: any, trellis: CollectionTrellis<T>) {
     this.sequelize = sequelize
     this.trellis = trellis
 
@@ -187,7 +187,7 @@ export class Query_Implementation<T, O> implements Query<T, O> {
     const builder = new QueryBuilder(this.trellis)
     this.bundle = builder.build(this.options)
     return this.sequelize.sequelize.pgPool.query(this.bundle.sql, this.bundle.args)
-      .then(result => result.rows)
+      .then((result: any) => result.rows)
   }
 
   exec(): Promise<O> {
