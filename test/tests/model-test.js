@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require('source-map-support').install();
-var modeler_1 = require("../../source/modeler");
 var assert = require("assert");
 var vineyard_schema_1 = require("vineyard-schema");
 var Sequelize = require('sequelize');
@@ -14,7 +13,7 @@ describe('Game', function () {
     this.timeout(5000);
     it('sync_database', function () {
         var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
-        var modeler = new modeler_1.DevModeler(db, schema, new postgres_client_1.PostgresClient(config.database));
+        var modeler = new source_1.DevModeler(db, schema, new postgres_client_1.PostgresClient(config.database));
         var model = modeler.collections;
         return modeler.regenerate()
             .then(function () { return model.Tag.create({
@@ -70,7 +69,7 @@ describe('Arbitrary', function () {
     this.timeout(4000);
     it('sync_database', function () {
         var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
-        var modeler = new modeler_1.DevModeler(db, schema, new postgres_client_1.PostgresClient(config.database));
+        var modeler = new source_1.DevModeler(db, schema, new postgres_client_1.PostgresClient(config.database));
         var model = modeler.collections;
         var BigNumber = require('bignumber.js');
         return modeler.regenerate()

@@ -1,7 +1,13 @@
-import {DatabaseClient, ITableClient, LegacyClient, QueryResult, RemoveOptions, TableClient} from "../types";
+import {
+  DatabaseClient, DatabaseConfig, ITableClient, LegacyClient, LegacyDatabaseInterface, QueryResult, RemoveOptions,
+  TableClient
+} from "../types";
+
+const sequelize = require("sequelize")
 
 export interface SequelizeModel {
   create: any
+  update: any
   upsert: any
   remove: any
 }
@@ -19,13 +25,17 @@ export class SequelizeClient implements DatabaseClient {
   private sequelize: any
   private legacyClient: LegacyClient
 
-  constructor(sequelize: any) {
-    this.sequelize = sequelize
+  constructor(databaseConfig: DatabaseConfig) {
+    this.sequelize = new sequelize(databaseConfig)
     this.legacyClient = new SequelizeLegacyClient()
   }
 
   getLegacyClient(): LegacyClient | undefined {
     return this.legacyClient
+  }
+
+  getLegacyDatabaseInterface(): LegacyDatabaseInterface {
+    return this.sequelize
   }
 
   query<T>(sql: string, args?: { [p: string]: any }): PromiseLike<QueryResult<T>> {
@@ -52,6 +62,13 @@ export class SequelizeTableClient<T> implements TableClient<T> {
 
   upsert(newSeed: T): Promise<T> {
     return this.sequelizeModel.upsert(newSeed)
+  }
+
+  update(seed: any | T, filter?: Partial<T>): Promise<T> {
+    return this.sequelizeModel.update(seed, {
+      where: filter,
+      returning: true
+    })
   }
 
   remove(options: RemoveOptions): Promise<any> {

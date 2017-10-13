@@ -61,7 +61,7 @@ function prepare_seed(seed: any, trellis: Trellis) {
   return newSeed
 }
 
-function perform_operation(identity: any, seed: any, list: Property, sequelize: any, operation: Operation) {
+function perform_operation<T>(identity: any, seed: any, list: Property, table: TableClient<T>, operation: Operation) {
   switch (operation.type) {
 
     case Operation_Type.add: {
@@ -120,7 +120,6 @@ function post_process<T>(result: any, identity: any, seed: any, trellis: Trellis
 export function create<T>(seed: any, trellis: Trellis, table: TableClient<T>): Promise<T> {
   const newSeed = prepare_seed(seed, trellis)
 
-  // return sequelize.create(newSeed)
   return table.create(newSeed)
     .then(result => post_process(result, trellis.get_identity(result), seed, trellis, table))
 }
@@ -128,12 +127,11 @@ export function create<T>(seed: any, trellis: Trellis, table: TableClient<T>): P
 export function create_or_update<T>(seed: any, trellis: Trellis, table: TableClient<T>): Promise<T> {
   const newSeed = prepare_seed(seed, trellis)
 
-  // return sequelize.upsert(newSeed)
   return table.upsert(newSeed)
     .then(result => post_process(result, trellis.get_identity(result), seed, trellis, table))
 }
 
-export function update<T>(seed: any, trellis: Trellis, sequelize: any, changes?: any): Promise<T> {
+export function update<T>(seed: any, trellis: Trellis, table: TableClient<T>, changes?: any): Promise<T> {
   const primary_key = trellis.primary_keys[0].name
   const identity = trellis.get_identity(seed)
   const newSeed = prepare_seed(changes || seed, trellis)
@@ -141,10 +139,7 @@ export function update<T>(seed: any, trellis: Trellis, sequelize: any, changes?:
   const filter: any = {}
   filter[primary_key] = identity
 
-  return sequelize.update(newSeed, {
-    where: filter,
-    returning: true
-  })
-    .then((result: any) => post_process(result[1][0], identity, changes, trellis, sequelize))
+  return table.update(newSeed, filter)
+    .then((result: any) => post_process(result[1][0], identity, changes, trellis, table))
 
 }

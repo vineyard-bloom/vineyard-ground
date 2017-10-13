@@ -113,8 +113,6 @@ export class Query_Implementation<T, O> implements QueryBuilder<T, O> {
   private expand_cross_table(reference: Property, identity: any) {
     const where: any = {}
     where[to_lower(reference.trellis.name)] = identity
-    // where[to_lower(reference.get_other_trellis().name)] =
-    //   sequelize.col(reference.get_other_trellis().primary_key.name)
 
     return reference.other_property.trellis.oldTable.findAll({
       include: {

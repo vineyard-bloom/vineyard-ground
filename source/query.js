@@ -62,8 +62,6 @@ var Query_Implementation = (function () {
     Query_Implementation.prototype.expand_cross_table = function (reference, identity) {
         var where = {};
         where[utility_1.to_lower(reference.trellis.name)] = identity;
-        // where[to_lower(reference.get_other_trellis().name)] =
-        //   sequelize.col(reference.get_other_trellis().primary_key.name)
         return reference.other_property.trellis.oldTable.findAll({
             include: {
                 model: reference.trellis.oldTable,

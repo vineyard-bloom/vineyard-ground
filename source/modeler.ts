@@ -2,7 +2,7 @@ import {Schema} from 'vineyard-schema'
 import {Collection, ICollection} from "./collection";
 import {vineyard_to_sequelize} from "./database";
 import {SequelizeClient, SequelizeModelMap} from "./clients/sequelize-client";
-import {DatabaseClient} from "./types";
+import {DatabaseClient, DatabaseConfig} from "./types";
 
 const pluralize = require('pluralize')
 
@@ -30,12 +30,12 @@ export class Modeler {
   collections: Collection_Map = {}
   private client: DatabaseClient
 
-  constructor(db: any, schema: Schema | any, client: DatabaseClient = new SequelizeClient(db)) {
+  constructor(schema: Schema | any, client: DatabaseClient) {
     this.schema = schema instanceof Schema
       ? schema
       : new Schema(schema)
 
-    this.db = db
+    this.db = client.getLegacyDatabaseInterface()
     this.client = client
     initializeTrellises(this.schema, this.collections, this.schema.trellises, this.db, this.client)
   }
@@ -57,6 +57,10 @@ export class Modeler {
     // const sequelize_models = vineyard_to_sequelize(this.schema, definitions, this.db)
     // sync_collections(this.schema, this.collections, definitions, sequelize_models)
     initializeTrellises(this.schema, this.collections, definitions, this.db, this.client)
+  }
+
+  getLegacyDatabaseInterface(): any {
+    return this.db
   }
 }
 

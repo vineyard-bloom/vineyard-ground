@@ -64,8 +64,11 @@ export interface QueryResult<T> {
 export interface LegacyClient {
     findAll(table: ITableClient, options: any): any;
 }
+export interface LegacyDatabaseInterface {
+}
 export interface DatabaseClient {
     getLegacyClient(): LegacyClient | undefined;
+    getLegacyDatabaseInterface(): LegacyDatabaseInterface;
     query<T>(sql: string, args?: {
         [key: string]: any;
     }): PromiseLike<QueryResult<T>>;
@@ -76,8 +79,9 @@ export interface RemoveOptions {
     where: any;
 }
 export interface TableClient<T> extends ITableClient {
-    create(newSeed: T): Promise<T>;
-    upsert(newSeed: T): Promise<T>;
+    create(newSeed: Partial<T>): Promise<T>;
+    update(seed: Partial<T>, filter: Partial<T>): Promise<T>;
+    upsert(newSeed: Partial<T>): Promise<T>;
     remove(options: RemoveOptions): Promise<any>;
 }
 export interface DatabaseConfig {

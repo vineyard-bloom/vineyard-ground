@@ -51,7 +51,7 @@ function prepare_seed(seed, trellis) {
     }
     return newSeed;
 }
-function perform_operation(identity, seed, list, sequelize, operation) {
+function perform_operation(identity, seed, list, table, operation) {
     switch (operation.type) {
         case list_operations_1.Operation_Type.add: {
             var fields = {};
@@ -103,29 +103,24 @@ function post_process(result, identity, seed, trellis, table) {
 }
 function create(seed, trellis, table) {
     var newSeed = prepare_seed(seed, trellis);
-    // return sequelize.create(newSeed)
     return table.create(newSeed)
         .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, table); });
 }
 exports.create = create;
 function create_or_update(seed, trellis, table) {
     var newSeed = prepare_seed(seed, trellis);
-    // return sequelize.upsert(newSeed)
     return table.upsert(newSeed)
         .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, table); });
 }
 exports.create_or_update = create_or_update;
-function update(seed, trellis, sequelize, changes) {
+function update(seed, trellis, table, changes) {
     var primary_key = trellis.primary_keys[0].name;
     var identity = trellis.get_identity(seed);
     var newSeed = prepare_seed(changes || seed, trellis);
     var filter = {};
     filter[primary_key] = identity;
-    return sequelize.update(newSeed, {
-        where: filter,
-        returning: true
-    })
-        .then(function (result) { return post_process(result[1][0], identity, changes, trellis, sequelize); });
+    return table.update(newSeed, filter)
+        .then(function (result) { return post_process(result[1][0], identity, changes, trellis, table); });
 }
 exports.update = update;
 //# sourceMappingURL=update.js.map

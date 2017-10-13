@@ -1,9 +1,8 @@
 require('source-map-support').install()
-import {DevModeler} from "../../source/modeler";
 import * as assert from 'assert'
 import {Schema} from 'vineyard-schema'
 const Sequelize = require('sequelize')
-import {Modeler, Add, Remove} from '../../source'
+import {DevModeler, Add, Remove} from '../../source'
 import {PostgresClient} from "../../source/clients/postgres-client";
 
 const config = require('../config/config.json')

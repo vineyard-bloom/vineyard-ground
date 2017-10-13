@@ -9,4 +9,5 @@ __export(require("./collection"));
 __export(require("./query"));
 __export(require("./list-operations"));
 __export(require("./clients/postgres-client"));
+__export(require("./clients/sequelize-client"));
 //# sourceMappingURL=index.js.map

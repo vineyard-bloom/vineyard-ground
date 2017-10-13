@@ -1,9 +1,15 @@
-import {DatabaseClient, GeneralDatabaseConfig, LegacyClient, QueryResult} from "../types"
+import {DatabaseClient, GeneralDatabaseConfig, LegacyClient, LegacyDatabaseInterface, QueryResult} from "../types"
+import {SequelizeClient} from "./sequelize-client";
 
 export class PostgresClient implements DatabaseClient {
   private pgPool: any
 
-  constructor(databaseConfig:GeneralDatabaseConfig) {
+  // Used until PostgresClient fulfills all of the ground needs that Sequelize fulfills
+  sequelizeClient: SequelizeClient
+
+  constructor(databaseConfig: GeneralDatabaseConfig) {
+    this.sequelizeClient = new SequelizeClient(databaseConfig)
+
     const pg = require('pg')
     const pgConfig = Object.assign(databaseConfig, {
       user: databaseConfig.username
@@ -13,6 +19,10 @@ export class PostgresClient implements DatabaseClient {
 
   getLegacyClient(): LegacyClient | undefined {
     return undefined
+  }
+
+  getLegacyDatabaseInterface(): LegacyDatabaseInterface {
+    return this.sequelizeClient.getLegacyDatabaseInterface()
   }
 
   query<T>(sql: string, args?: { [p: string]: any }): PromiseLike<QueryResult<T>> {

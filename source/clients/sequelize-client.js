@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var sequelize = require("sequelize");
 var SequelizeLegacyClient = (function () {
     function SequelizeLegacyClient() {
     }
@@ -10,12 +11,15 @@ var SequelizeLegacyClient = (function () {
 }());
 exports.SequelizeLegacyClient = SequelizeLegacyClient;
 var SequelizeClient = (function () {
-    function SequelizeClient(sequelize) {
-        this.sequelize = sequelize;
+    function SequelizeClient(databaseConfig) {
+        this.sequelize = new sequelize(databaseConfig);
         this.legacyClient = new SequelizeLegacyClient();
     }
     SequelizeClient.prototype.getLegacyClient = function () {
         return this.legacyClient;
+    };
+    SequelizeClient.prototype.getLegacyDatabaseInterface = function () {
+        return this.sequelize;
     };
     SequelizeClient.prototype.query = function (sql, args) {
         return this.sequelize.query(sql, { replacements: args });
@@ -36,6 +40,12 @@ var SequelizeTableClient = (function () {
     };
     SequelizeTableClient.prototype.upsert = function (newSeed) {
         return this.sequelizeModel.upsert(newSeed);
+    };
+    SequelizeTableClient.prototype.update = function (seed, filter) {
+        return this.sequelizeModel.update(seed, {
+            where: filter,
+            returning: true
+        });
     };
     SequelizeTableClient.prototype.remove = function (options) {
         return this.sequelizeModel.destroy(options);

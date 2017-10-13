@@ -9,10 +9,11 @@ export declare class Modeler {
     protected db: any;
     collections: Collection_Map;
     private client;
-    constructor(db: any, schema: Schema | any, client?: DatabaseClient);
+    constructor(schema: Schema | any, client: DatabaseClient);
     query(sql: string, replacements?: any): any;
     querySingle(sql: string, replacements?: any): any;
     addDefinitions(definitions: any): void;
+    getLegacyDatabaseInterface(): any;
 }
 export declare class DevModeler extends Modeler {
     regenerate(): any;
