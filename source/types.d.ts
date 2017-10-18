@@ -1,5 +1,6 @@
 import * as vineyardSchema from 'vineyard-schema';
 import { Collection } from "./collection";
+import { SequelizeModel } from "./clients/sequelize-client";
 export interface Table {
     name: string;
     isCross?: boolean;
@@ -72,6 +73,7 @@ export interface DatabaseClient {
     query<T>(sql: string, args?: {
         [key: string]: any;
     }): PromiseLike<QueryResult<T>>;
+    createTableInterface(trellis: Trellis, sequelizeModel: SequelizeModel): ITableClient;
 }
 export interface ITableClient {
 }

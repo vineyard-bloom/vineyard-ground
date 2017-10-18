@@ -24,6 +24,9 @@ var SequelizeClient = (function () {
     SequelizeClient.prototype.query = function (sql, args) {
         return this.sequelize.query(sql, { replacements: args });
     };
+    SequelizeClient.prototype.createTableInterface = function (trellis, sequelizeModel) {
+        return new SequelizeTableClient(this, sequelizeModel);
+    };
     return SequelizeClient;
 }());
 exports.SequelizeClient = SequelizeClient;

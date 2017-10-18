@@ -125,7 +125,7 @@ function initialize_many_to_many(list: Property, trellis: Trellis, schema: Schem
   const table_trellises = [list.trellis, list.other_property.trellis]
   const cross_table_name = get_cross_table_name(table_trellises)
 
-  const relationship = trellis.oldTable.belongsToMany(list.get_other_trellis()['table'], {
+  const relationship = trellis.oldTable.belongsToMany(list.get_other_trellis().oldTable, {
     as: list.name,
     otherKey: list.other_property.trellis.name.toLowerCase(),
     foreignKey: list.trellis.name.toLowerCase(),

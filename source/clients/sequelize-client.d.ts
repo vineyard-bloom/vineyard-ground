@@ -1,4 +1,4 @@
-import { DatabaseClient, DatabaseConfig, ITableClient, LegacyClient, LegacyDatabaseInterface, QueryResult, RemoveOptions, TableClient } from "../types";
+import { DatabaseClient, DatabaseConfig, ITableClient, LegacyClient, LegacyDatabaseInterface, QueryResult, RemoveOptions, TableClient, Trellis } from "../types";
 export interface SequelizeModel {
     create: any;
     update: any;
@@ -20,6 +20,7 @@ export declare class SequelizeClient implements DatabaseClient {
     query<T>(sql: string, args?: {
         [p: string]: any;
     }): PromiseLike<QueryResult<T>>;
+    createTableInterface(trellis: Trellis, sequelizeModel: SequelizeModel): ITableClient;
 }
 export declare class SequelizeTableClient<T> implements TableClient<T> {
     private client;

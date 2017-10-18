@@ -19,6 +19,9 @@ var PostgresClient = (function () {
     PostgresClient.prototype.query = function (sql, args) {
         return this.pgPool.query(sql, args);
     };
+    PostgresClient.prototype.createTableInterface = function (trellis, sequelizeModel) {
+        return null;
+    };
     return PostgresClient;
 }());
 exports.PostgresClient = PostgresClient;

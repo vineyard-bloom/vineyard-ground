@@ -1,6 +1,6 @@
 import {
   DatabaseClient, DatabaseConfig, ITableClient, LegacyClient, LegacyDatabaseInterface, QueryResult, RemoveOptions,
-  TableClient
+  TableClient, Trellis
 } from "../types";
 
 const sequelize = require("sequelize")
@@ -40,6 +40,10 @@ export class SequelizeClient implements DatabaseClient {
 
   query<T>(sql: string, args?: { [p: string]: any }): PromiseLike<QueryResult<T>> {
     return this.sequelize.query(sql, {replacements: args})
+  }
+
+  createTableInterface(trellis: Trellis, sequelizeModel: SequelizeModel): ITableClient {
+    return new SequelizeTableClient(this, sequelizeModel)
   }
 }
 

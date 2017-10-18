@@ -17,7 +17,8 @@ var pluralize = require('pluralize');
 function sync_collections(schema, collections, keys, sequelize_models, client) {
     for (var name in keys) {
         var trellis = schema.trellises[name];
-        collections[name] = new collection_1.Collection(trellis, sequelize_models[name], client);
+        var table = client.createTableInterface(trellis, sequelize_models[name]);
+        collections[name] = new collection_1.Collection(trellis, table, client);
         trellis.table = {
             name: pluralize(trellis.name).toLowerCase()
         };

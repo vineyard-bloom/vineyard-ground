@@ -96,7 +96,7 @@ function get_cross_table_name(trellises) {
 function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
     var table_trellises = [list.trellis, list.other_property.trellis];
     var cross_table_name = get_cross_table_name(table_trellises);
-    var relationship = trellis.oldTable.belongsToMany(list.get_other_trellis()['table'], {
+    var relationship = trellis.oldTable.belongsToMany(list.get_other_trellis().oldTable, {
         as: list.name,
         otherKey: list.other_property.trellis.name.toLowerCase(),
         foreignKey: list.trellis.name.toLowerCase(),

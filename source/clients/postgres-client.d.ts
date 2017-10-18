@@ -1,5 +1,5 @@
-import { DatabaseClient, GeneralDatabaseConfig, LegacyClient, LegacyDatabaseInterface, QueryResult } from "../types";
-import { SequelizeClient } from "./sequelize-client";
+import { DatabaseClient, GeneralDatabaseConfig, ITableClient, LegacyClient, LegacyDatabaseInterface, QueryResult, Trellis } from "../types";
+import { SequelizeClient, SequelizeModel } from "./sequelize-client";
 export declare class PostgresClient implements DatabaseClient {
     private pgPool;
     sequelizeClient: SequelizeClient;
@@ -9,4 +9,5 @@ export declare class PostgresClient implements DatabaseClient {
     query<T>(sql: string, args?: {
         [p: string]: any;
     }): PromiseLike<QueryResult<T>>;
+    createTableInterface(trellis: Trellis, sequelizeModel: SequelizeModel): ITableClient;
 }
