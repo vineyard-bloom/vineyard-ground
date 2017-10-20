@@ -33,6 +33,6 @@ export class PostgresClient implements DatabaseClient {
   }
 
   createTableInterface(trellis: Trellis, sequelizeModel: SequelizeModel): ITableClient {
-    return null;
+    return this.sequelizeClient.createTableInterface(trellis, sequelizeModel)
   }
 }
