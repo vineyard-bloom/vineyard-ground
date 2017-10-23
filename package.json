@@ -14,9 +14,8 @@
     "bignumber.js": "^4.0.4",
     "pg": "^6.1.5",
     "pluralize": "^7.0.0",
-    "sequelize": "^3.30.4",
-    "uuid": "^3.0.1",
-    "vineyard-schema": "vineyard-bloom/vineyard-schema"
+    "sequelize": "^4.16.2",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "@types/mocha": "^2.2.40",

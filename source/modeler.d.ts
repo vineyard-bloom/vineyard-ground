@@ -1,4 +1,4 @@
-import { Schema } from 'vineyard-schema';
+import { Schema } from './schema';
 import { ICollection } from "./collection";
 import { DatabaseClient } from "./types";
 export declare type Collection_Map = {

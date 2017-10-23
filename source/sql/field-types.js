@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var vineyard_schema_1 = require("vineyard-schema");
+var schema_1 = require("../schema");
 function getFieldType(property, library) {
     var type = property.type;
     switch (type.get_category()) {
-        case vineyard_schema_1.Type_Category.primitive:
+        case schema_1.Type_Category.primitive:
             if (type === library.types.long)
                 return {
                     name: 'BIGINT',
@@ -63,9 +63,9 @@ function getFieldType(property, library) {
                     defaultValue: '0'
                 };
             throw new Error("Unknown primitive: " + type.name + '.');
-        case vineyard_schema_1.Type_Category.list:
+        case schema_1.Type_Category.list:
             return null;
-        case vineyard_schema_1.Type_Category.trellis:
+        case schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
                 var field = type.trellis.primary_key;
                 return getFieldType(field, library);

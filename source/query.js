@@ -21,11 +21,17 @@ function processFields(result, trellis) {
     }
     for (var i in trellis.properties) {
         var property = trellis.properties[i];
-        if (property.type.name == 'long') {
-            result[i] = parseInt(result[i]);
-        }
-        else if (property.type.name == 'bignumber') {
-            result[i] = new BigNumber(result[i]);
+        switch (property.type.name) {
+            case 'long':
+                result[i] = parseInt(result[i]);
+                break;
+            case 'bignumber':
+                result[i] = new BigNumber(result[i]);
+                break;
+            case 'datetime':
+            case 'date':
+                result[i] = new Date(result[i]);
+                break;
         }
     }
     return result;

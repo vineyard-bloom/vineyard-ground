@@ -1,12 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var vineyard_schema_1 = require("vineyard-schema");
+var schema_1 = require("./schema");
 var Sequelize = require('sequelize');
 var node_uuid = require('uuid');
 function get_field(property, library, dialect) {
     var type = property.type;
     switch (type.get_category()) {
-        case vineyard_schema_1.Type_Category.primitive:
+        case schema_1.Type_Category.primitive:
             if (type === library.types.long)
                 return {
                     type: Sequelize.BIGINT,
@@ -67,9 +67,9 @@ function get_field(property, library, dialect) {
                     defaultValue: 0
                 };
             throw new Error("Unknown primitive: " + type.name + '.');
-        case vineyard_schema_1.Type_Category.list:
+        case schema_1.Type_Category.list:
             return null;
-        case vineyard_schema_1.Type_Category.trellis:
+        case schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
                 var field = type.trellis.primary_key;
                 return get_field(field, library, dialect);
@@ -106,7 +106,7 @@ function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
     list.cross_table = relationship.through.model;
 }
 function initialize_relationship(property, trellis, schema, tables, sequelize) {
-    if (property.type.get_category() == vineyard_schema_1.Type_Category.trellis) {
+    if (property.type.get_category() == schema_1.Type_Category.trellis) {
         var reference = property;
         if (!reference.other_property) {
             var other_table = reference.get_other_trellis().oldTable;
@@ -116,9 +116,9 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
             });
         }
     }
-    else if (property.type.get_category() == vineyard_schema_1.Type_Category.list) {
+    else if (property.type.get_category() == schema_1.Type_Category.list) {
         var list = property;
-        if (list.other_property.type.get_category() == vineyard_schema_1.Type_Category.list) {
+        if (list.other_property.type.get_category() == schema_1.Type_Category.list) {
             initialize_many_to_many(list, trellis, schema, tables, sequelize);
         }
         else {

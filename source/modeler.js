@@ -10,7 +10,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var vineyard_schema_1 = require("vineyard-schema");
+var schema_1 = require("./schema");
 var collection_1 = require("./collection");
 var database_1 = require("./database");
 var pluralize = require('pluralize');
@@ -26,14 +26,14 @@ function sync_collections(schema, collections, keys, sequelize_models, client) {
 }
 function initializeTrellises(schema, collections, keys, db, client) {
     var sequelize_models = database_1.vineyard_to_sequelize(schema, schema.trellises, db);
-    sync_collections(schema, collections, schema.trellises, sequelize_models, client);
+    sync_collections(schema, collections, keys, sequelize_models, client);
 }
 var Modeler = (function () {
     function Modeler(schema, client) {
         this.collections = {};
-        this.schema = schema instanceof vineyard_schema_1.Schema
+        this.schema = schema instanceof schema_1.Schema
             ? schema
-            : new vineyard_schema_1.Schema(schema);
+            : new schema_1.Schema(schema);
         this.db = client.getLegacyDatabaseInterface();
         this.client = client;
         initializeTrellises(this.schema, this.collections, this.schema.trellises, this.db, this.client);

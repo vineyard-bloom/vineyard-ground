@@ -39,7 +39,7 @@ var SequelizeTableClient = (function () {
         return this.client;
     };
     SequelizeTableClient.prototype.create = function (newSeed) {
-        return this.sequelizeModel.create(newSeed.dataValues);
+        return this.sequelizeModel.create(newSeed);
     };
     SequelizeTableClient.prototype.upsert = function (newSeed) {
         return this.sequelizeModel.upsert(newSeed);

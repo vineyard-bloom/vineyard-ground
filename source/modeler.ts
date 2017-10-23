@@ -1,4 +1,4 @@
-import {Schema} from 'vineyard-schema'
+import {Schema} from './schema'
 import {Collection, ICollection} from "./collection";
 import {vineyard_to_sequelize} from "./database";
 import {SequelizeClient, SequelizeModelMap} from "./clients/sequelize-client";
@@ -22,7 +22,7 @@ function sync_collections(schema: Schema, collections: Collection_Map, keys: any
 
 function initializeTrellises(schema: Schema, collections: Collection_Map, keys: any, db: any, client: DatabaseClient) {
   const sequelize_models = vineyard_to_sequelize(schema as any, schema.trellises, db)
-  sync_collections(schema, collections, schema.trellises, sequelize_models, client)
+  sync_collections(schema, collections, keys, sequelize_models, client)
 }
 
 export class Modeler {

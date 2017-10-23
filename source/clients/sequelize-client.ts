@@ -61,7 +61,7 @@ export class SequelizeTableClient<T> implements TableClient<T> {
   }
 
   create(newSeed: T): Promise<T> {
-    return this.sequelizeModel.create((newSeed as any).dataValues)
+    return this.sequelizeModel.create(newSeed)
   }
 
   upsert(newSeed: T): Promise<T> {

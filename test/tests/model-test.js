@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 require('source-map-support').install();
 var assert = require("assert");
-var vineyard_schema_1 = require("vineyard-schema");
+var schema_1 = require("../../source/schema");
 var Sequelize = require('sequelize');
 var source_1 = require("../../source");
 var source_2 = require("../../source");
@@ -30,7 +30,7 @@ describe('Postgres Test', function () {
     });
 });
 function gameTest(client) {
-    var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
+    var schema = new schema_1.Schema(require('../schema/game.json'));
     var modeler = new source_1.DevModeler(schema, client);
     var model = modeler.collections;
     return modeler.regenerate()
@@ -83,7 +83,7 @@ function gameTest(client) {
     });
 }
 function arbitraryTest(client) {
-    var schema = new vineyard_schema_1.Schema(require('../schema/arbitrary.json'));
+    var schema = new schema_1.Schema(require('../schema/arbitrary.json'));
     var modeler = new source_1.DevModeler(schema, client);
     var model = modeler.collections;
     var BigNumber = require('bignumber.js');
@@ -93,6 +93,7 @@ function arbitraryTest(client) {
         unknown: "mist",
         vast: "1000000000000000000000000000021",
         sampleDate: new Date("June 15, 2016"),
+        sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
         veryBig: new BigNumber("1023.1334"),
         data: {
             frogs: [
@@ -106,6 +107,7 @@ function arbitraryTest(client) {
         unknown: "mist2",
         vast: new BigNumber("1000000000000000000000000000021"),
         sampleDate: new Date("August 3, 2002"),
+        sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
         veryBig: "819715.15157",
         data: {
             "nothing": null
@@ -117,6 +119,8 @@ function arbitraryTest(client) {
         assert(new BigNumber(results[0].vast).equals(results[1].vast));
         assert(results[0].sampleDate instanceof Date);
         assert.equal(results[0].data.frogs.length, 2);
+        assert(results[0].sampleDatetime instanceof Date);
+        assert.equal(results[0].sampleDatetime.toISOString(), "2017-10-23T18:24:05.026Z");
         assert(results[0].veryBig instanceof BigNumber);
         assert(results[1].veryBig instanceof BigNumber);
         assert(results[0].veryBig.equals("1023.1334"));

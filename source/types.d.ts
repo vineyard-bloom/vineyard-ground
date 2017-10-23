@@ -1,4 +1,4 @@
-import * as vineyardSchema from 'vineyard-schema';
+import * as vineyardSchema from './schema';
 import { Collection } from "./collection";
 import { SequelizeModel } from "./clients/sequelize-client";
 export interface Table {

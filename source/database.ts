@@ -1,4 +1,4 @@
-import {Type_Category, Trellis_Type, Library} from "vineyard-schema"
+import {Type_Category, Trellis_Type, Library} from "./schema"
 
 const Sequelize = require('sequelize')
 import {Table_Trellis, Trellis, Property, Schema, Table} from "./types";

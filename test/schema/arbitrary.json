@@ -17,6 +17,9 @@
       "sampleDate": {
         "type": "date"
       },
+      "sampleDatetime": {
+        "type": "datetime"
+      },
       "data": {
         "type": "json"
       }
