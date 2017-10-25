@@ -1,105 +1,95 @@
-
 require('source-map-support').install()
-import * as assert from 'assert'
+import {assert, expect} from 'chai'
 import {Schema} from '../../source/schema'
 import {DevModeler, Add, Remove, DatabaseClient, PostgresClient, SequelizeClient} from '../../source'
+import {BigNumber} from 'bignumber.js'
 
 const config = require('../config/config.json')
 let mainWorld: any,
   dangerousTag: any,
   flyingTag: any
 
+const contexts = [
+  {
+    name: 'Sequelize',
+    client: new SequelizeClient(config.database),
+  }
+]
+
+// createSuite('Sequelize', new SequelizeClient(config.database))
+// createSuite('Postgres', new PostgresClient(config.database))
+
+// for (let i = 0; i < contexts.length; ++i) {
+const {name, client} = contexts[0]
+
 describe('Sequelize Test', function () {
   this.timeout(5000)
-  const client = new SequelizeClient(config.database)
-  it('game', function () {
-    return gameTest(client)
-  })
+  describe('Game Test', function () {
+    let model: any
 
-  it('arbitrary', function () {
-    return arbitraryTest(client)
-  })
-})
+    before(async function () {
+      model = await initializeModel(client, 'game')
+    })
 
-describe('Postgres Test', function () {
-  this.timeout(5000)
-  const client = new PostgresClient(config.database)
-  it('game', function () {
-    return gameTest(client)
-  })
+    it('game', async function () {
 
-  it('arbitrary', function () {
-    return arbitraryTest(client)
-  })
-})
-
-function gameTest(client: DatabaseClient) {
-  const schema = new Schema(require('../schema/game.json'))
-  const modeler = new DevModeler(schema, client)
-  const model: any = modeler.collections
-
-  return modeler.regenerate()
-    .then(() => model.Tag.create({
+      flyingTag = await model.Tag.create({
         name: "flying"
       })
-        .then((tag: any) => flyingTag = tag)
-        .then(() => model.World.create({}))
-        .then((world: any) => mainWorld = world)
-        .then(() => model.Creature.create({
-          name: "ogre",
-          world: mainWorld,
-          health: 5
-        }))
-        .then((ogre: any) => model.Tag.create({
-            name: "dangerous"
-          })
-            .then((tag: any) => dangerousTag = tag)
-            .then(() => model.Creature.update(ogre, {
-                health: 10,
-                tags: Add(dangerousTag)
-              })
-                .then((creature: any) => {
-                  assert.equal(creature.health, 10)
-                  return model.Creature.first().expand('tags')
-                })
-                .then((creature: any) => {
-                  assert(Array.isArray(creature.tags))
-                  assert.equal(1, creature.tags.length)
-                  assert.equal('dangerous', creature.tags[0].name)
-                })
-                .then(() => model.Creature.update(ogre, {
-                    tags: Remove(dangerousTag)
-                  })
-                )
-            )
-        )
-    )
-    .then(() => model.Creature.first().expand('tags'))
-    .then((creature: any) => {
+
+      mainWorld = await model.World.create({})
+
+      const ogre = await model.Creature.create({
+        name: "ogre",
+        world: mainWorld,
+        health: 5
+      })
+
+      dangerousTag = await model.Tag.create({
+        name: "dangerous"
+      })
+
+      let creature = await model.Creature.update(ogre, {
+        health: 10,
+        tags: Add(dangerousTag)
+      })
+
+      assert.equal(creature.health, 10)
+      creature = await model.Creature.first().expand('tags')
+      assert(Array.isArray(creature.tags))
+      assert.equal(1, creature.tags.length)
+      assert.equal('dangerous', creature.tags[0].name)
+
+      await model.Creature.update(ogre, {
+        tags: Remove(dangerousTag)
+      })
+
+      creature = await model.Creature.first().expand('tags')
       assert(Array.isArray(creature.tags))
       assert.equal(0, creature.tags.length)
-    })
-    .then(() => model.Creature.create({
-      name: "hero",
-      world: mainWorld,
-      health: 4,
-      tags: Add(flyingTag)
-    }))
-    .then(() => model.World.first().expand('creatures'))
-    .then((world: any) => {
+
+      await model.Creature.create({
+        name: "hero",
+        world: mainWorld,
+        health: 4,
+        tags: Add(flyingTag)
+      })
+
+      const world = await model.World.first().expand('creatures')
       assert(Array.isArray(world.creatures))
       assert.equal(2, world.creatures.length)
     })
-}
+  })
 
-function arbitraryTest(client: DatabaseClient) {
-  const schema = new Schema(require('../schema/arbitrary.json'))
-  const modeler = new DevModeler(schema, client)
-  const model: any = modeler.collections
+  describe('Arbitrary Test', function () {
+    let model: any
 
-  const BigNumber = require('bignumber.js')
-  return modeler.regenerate()
-    .then(() => model.OddRecord.create({
+    before(async function () {
+      model = await initializeModel(client, 'arbitrary')
+    })
+
+    it('arbitrary general', async function () {
+      await model.OddRecord.create({
         strange: 10,
         unknown: "mist",
         vast: "1000000000000000000000000000021",
@@ -113,8 +103,8 @@ function arbitraryTest(client: DatabaseClient) {
           ]
         }
       })
-    )
-    .then(() => model.OddRecord.create({
+
+      await model.OddRecord.create({
         strange: 11,
         unknown: "mist2",
         vast: new BigNumber("1000000000000000000000000000021"),
@@ -125,9 +115,8 @@ function arbitraryTest(client: DatabaseClient) {
           "nothing": null
         }
       })
-    )
-    .then(() => model.OddRecord.all())
-    .then((results: any) => {
+
+      const results = await model.OddRecord.all()
       console.log('result', results)
       assert(new BigNumber(results[0].vast).equals(results[1].vast))
       assert(results[0].sampleDate instanceof Date)
@@ -138,5 +127,30 @@ function arbitraryTest(client: DatabaseClient) {
       assert(results[1].veryBig instanceof BigNumber)
       assert(results[0].veryBig.equals("1023.1334"))
       assert(results[1].veryBig.equals("819715.15157"))
+
+      const records = await model.ground.query(`SELECT * FROM odd_records`)
+      expect(records).lengthOf(2)
     })
+
+    it('Supports custom table names', async function () {
+      await model.RenamedRecord.create({
+        unknown: 16,
+      })
+
+      const record = await model.ground.querySingle(`SELECT * FROM mysteries`)
+      expect(record.unknown).equal(16)
+    })
+  })
+})
+
+// }
+
+async function initializeModel(client: DatabaseClient, schemaName: string) {
+  const schema = new Schema(require('../schema/' + schemaName + '.json'))
+  const modeler = new DevModeler(schema, client)
+  const model: any = modeler.collections
+  model.ground = modeler
+
+  await modeler.regenerate()
+  return model
 }

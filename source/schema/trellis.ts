@@ -1,4 +1,5 @@
 import {Type, Type_Category, List_Type} from './type'
+import {Property, SequelizeTable, Table, Trellis} from "../types";
 
 export class Trellis_Type extends Type {
   trellis: Trellis
@@ -17,20 +18,20 @@ export class Trellis_Type extends Type {
   }
 }
 
-export interface Property {
-  name: string
-  type: Type
-  trellis: Trellis
-  is_nullable: boolean
-  "default": any
-  is_unique: boolean
-
-  get_path(): string
-
-  is_reference(): boolean
-
-  is_list(): boolean
-}
+// export interface Property {
+//   name: string
+//   type: Type
+//   trellis: Trellis
+//   is_nullable: boolean
+//   "default": any
+//   is_unique: boolean
+//
+//   get_path(): string
+//
+//   is_reference(): boolean
+//
+//   is_list(): boolean
+// }
 
 export class StandardProperty implements Property {
   name: string
@@ -39,6 +40,7 @@ export class StandardProperty implements Property {
   is_nullable: boolean = false
   "default": any
   is_unique: boolean = false
+  other_property: Property
 
   constructor(name: string, type: Type, trellis: Trellis) {
     this.name = name
@@ -59,10 +61,16 @@ export class StandardProperty implements Property {
   is_list(): boolean {
     return this.type.get_category() == Type_Category.list
   }
+
+  get_other_trellis(): Trellis {
+    return this.type.get_category() == Type_Category.trellis
+      ? (this.type as Trellis_Type).trellis
+      : ((this.type as List_Type).child_type as Trellis_Type).trellis
+  }
+
 }
 
 export class Reference extends StandardProperty {
-  other_property: Property
 
   constructor(name: string, type: Type, trellis: Trellis, other_property?: Property) {
     super(name, type, trellis)
@@ -70,11 +78,6 @@ export class Reference extends StandardProperty {
       this.other_property = other_property
   }
 
-  get_other_trellis(): Trellis {
-    return this.type.get_category() == Type_Category.trellis
-      ? (this.type as Trellis_Type).trellis
-      : ((this.type as List_Type).child_type as Trellis_Type).trellis
-  }
 }
 
 function get_key_identity(data: any, name: string) {
@@ -89,21 +92,21 @@ function get_key_identity(data: any, name: string) {
   return data
 }
 
-export interface ITrellis {
-  name: string
-  properties: { [name: string]: Property }
-  primary_keys: Property[]
-  parent?: Trellis | null
-}
+// export interface ITrellis {
+//   name: string
+//   properties: { [name: string]: Property }
+//   primary_keys: Property[]
+//   parent?: Trellis | null
+// }
 
-export class Trellis implements ITrellis {
+export class TrellisImplementation implements Trellis {
+  oldTable: SequelizeTable
+  table: Table
   name: string
   properties: { [name: string]: Property } = {}
   primary_keys: Property[] = []
-  parent: Trellis | null = null
-
-  // Deprecated
-  primary_key: Property
+  parent?: Trellis
+  collection: any
 
   private lists: Reference[]
   additional: any = {}
@@ -148,7 +151,7 @@ export class Trellis implements ITrellis {
   }
 }
 
-export function getIdentity(trellis: ITrellis, data: any) {
+export function getIdentity(trellis: Trellis, data: any) {
   if (!data)
     throw new Error("Identity cannot be empty.")
 

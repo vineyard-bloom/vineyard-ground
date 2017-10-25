@@ -1,6 +1,6 @@
-import { Trellis } from "./trellis";
 import { Library } from './library';
 import { Type } from "./type";
+import { Trellis } from "../types";
 export declare type Trellis_Map = {
     [name: string]: Trellis;
 };

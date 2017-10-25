@@ -84,7 +84,7 @@ export function getFieldType(property: Property, library: Library): any {
 
     case Type_Category.trellis:
       if (library.types[type.name]) {
-        const field: any = (type as Trellis_Type).trellis.primary_key
+        const field: any = (type as Trellis_Type).trellis.primary_keys[0]
         return getFieldType(field, library)
       }
 

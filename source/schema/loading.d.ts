@@ -1,5 +1,5 @@
 import { Library } from './library';
-import { Trellis } from "./trellis";
+import { Trellis } from "../types";
 export interface Property_Source {
     type: string;
     trellis?: string;
@@ -7,6 +7,9 @@ export interface Property_Source {
     "default"?: any;
     defaultValue?: any;
     unique?: boolean;
+}
+export interface Table_Source {
+    name?: string;
 }
 export interface Trellis_Source {
     primary_key?: string | string[];
@@ -16,6 +19,7 @@ export interface Trellis_Source {
     };
     additional?: any;
     parent?: string;
+    table?: Table_Source;
 }
 export declare type Schema_Source = {
     [name: string]: Trellis_Source;

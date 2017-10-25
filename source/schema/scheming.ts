@@ -1,7 +1,7 @@
-import {Trellis} from "./trellis"
 import {Library} from './library'
 import {load_schema} from "./loading"
 import {Type} from "./type";
+import {Trellis} from "../types";
 
 export type Trellis_Map = {[name: string]: Trellis}
 

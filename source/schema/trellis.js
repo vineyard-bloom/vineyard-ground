@@ -27,6 +27,20 @@ var Trellis_Type = (function (_super) {
     return Trellis_Type;
 }(type_1.Type));
 exports.Trellis_Type = Trellis_Type;
+// export interface Property {
+//   name: string
+//   type: Type
+//   trellis: Trellis
+//   is_nullable: boolean
+//   "default": any
+//   is_unique: boolean
+//
+//   get_path(): string
+//
+//   is_reference(): boolean
+//
+//   is_list(): boolean
+// }
 var StandardProperty = (function () {
     function StandardProperty(name, type, trellis) {
         this.is_nullable = false;
@@ -46,6 +60,11 @@ var StandardProperty = (function () {
     StandardProperty.prototype.is_list = function () {
         return this.type.get_category() == type_1.Type_Category.list;
     };
+    StandardProperty.prototype.get_other_trellis = function () {
+        return this.type.get_category() == type_1.Type_Category.trellis
+            ? this.type.trellis
+            : this.type.child_type.trellis;
+    };
     return StandardProperty;
 }());
 exports.StandardProperty = StandardProperty;
@@ -57,11 +76,6 @@ var Reference = (function (_super) {
             _this.other_property = other_property;
         return _this;
     }
-    Reference.prototype.get_other_trellis = function () {
-        return this.type.get_category() == type_1.Type_Category.trellis
-            ? this.type.trellis
-            : this.type.child_type.trellis;
-    };
     return Reference;
 }(StandardProperty));
 exports.Reference = Reference;
@@ -74,15 +88,20 @@ function get_key_identity(data, name) {
             + name + '" is missing.');
     return data;
 }
-var Trellis = (function () {
-    function Trellis(name) {
+// export interface ITrellis {
+//   name: string
+//   properties: { [name: string]: Property }
+//   primary_keys: Property[]
+//   parent?: Trellis | null
+// }
+var TrellisImplementation = (function () {
+    function TrellisImplementation(name) {
         this.properties = {};
         this.primary_keys = [];
-        this.parent = null;
         this.additional = {};
         this.name = name;
     }
-    Trellis.prototype.get_lists = function () {
+    TrellisImplementation.prototype.get_lists = function () {
         if (this.lists)
             return this.lists;
         var result = [];
@@ -94,7 +113,7 @@ var Trellis = (function () {
         this.lists = result;
         return result;
     };
-    Trellis.prototype.get_identity = function (data) {
+    TrellisImplementation.prototype.get_identity = function (data) {
         if (!data)
             throw new Error("Identity cannot be empty.");
         if (this.primary_keys.length > 1) {
@@ -107,12 +126,12 @@ var Trellis = (function () {
         }
         return get_key_identity(data, this.primary_keys[0].name);
     };
-    Trellis.prototype.getIdentity = function (data) {
+    TrellisImplementation.prototype.getIdentity = function (data) {
         return this.get_identity(data);
     };
-    return Trellis;
+    return TrellisImplementation;
 }());
-exports.Trellis = Trellis;
+exports.TrellisImplementation = TrellisImplementation;
 function getIdentity(trellis, data) {
     if (!data)
         throw new Error("Identity cannot be empty.");

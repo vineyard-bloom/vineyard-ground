@@ -12,6 +12,7 @@ var __extends = (this && this.__extends) || (function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var type_1 = require("./type");
 var trellis_1 = require("./trellis");
+var utility_1 = require("../utility");
 var Incomplete_Type = (function (_super) {
     __extends(Incomplete_Type, _super);
     function Incomplete_Type(target_name, source) {
@@ -155,11 +156,14 @@ function initialize_primary_keys(trellis, source, loader) {
     for (var i = 0; i < primary_keys.length; ++i) {
         trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader));
     }
-    trellis.primary_key = trellis.primary_keys[0];
 }
 function load_trellis(name, source, loader) {
-    var trellis = new trellis_1.Trellis(name);
+    var trellis = new trellis_1.TrellisImplementation(name);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
+    var sourceTable = source.table || {};
+    trellis.table = {
+        name: sourceTable.name || utility_1.to_lower_snake_case(trellis.name)
+    };
     for (var name_1 in source.properties) {
         var property_source = source.properties[name_1];
         trellis.properties[name_1] = load_property(name_1, property_source, trellis, loader);

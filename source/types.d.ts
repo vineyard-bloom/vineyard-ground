@@ -38,6 +38,7 @@ export interface Trellis {
     primary_keys: Property[];
     additional: any;
     collection: any;
+    parent?: Trellis;
     get_identity(input: any): any;
     get_lists(): any;
 }

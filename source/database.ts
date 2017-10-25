@@ -91,7 +91,7 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
     case Type_Category.trellis:
       if (library.types[type.name]) {
-        const field: any = (type as Trellis_Type).trellis.primary_key
+        const field: any = (type as Trellis_Type).trellis.primary_keys[0]
         return get_field(field, library, dialect)
       }
 
@@ -219,11 +219,10 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
 
   }
 
-  const oldTable = trellis.oldTable = sequelize.define(to_lower_snake_case(trellis.name), fields, {
+  const oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
     underscored: true,
     createdAt: created,
     updatedAt: modified,
-    // freezeTableName: true
   })
 
   return oldTable

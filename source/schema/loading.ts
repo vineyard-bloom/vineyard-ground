@@ -1,17 +1,17 @@
 import {Type, Type_Category, List_Type} from './type'
 import {Library} from './library'
 import {
-  Trellis,
   Reference,
-  Property,
-  Trellis_Type, StandardProperty
+  Trellis_Type, StandardProperty, TrellisImplementation
 } from "./trellis"
+import {Property, Trellis} from "../types";
+import {to_lower_snake_case} from "../utility";
 
 class Incomplete_Type extends Type {
   target_name: string
-  source:any
+  source: any
 
-  constructor(target_name: string, source:any) {
+  constructor(target_name: string, source: any) {
     super("Incomplete: " + target_name)
     this.target_name = target_name
     this.source = source
@@ -35,12 +35,17 @@ export interface Property_Source {
   unique?: boolean
 }
 
+export interface Table_Source {
+  name?: string
+}
+
 export interface Trellis_Source {
   primary_key?: string | string[]
   primary?: string | string[] // Deprecated
   properties: { [name: string]: Property_Source }
-  additional?:any
+  additional?: any
   parent?: string
+  table?: Table_Source
 }
 
 export type Schema_Source = { [name: string]: Trellis_Source }
@@ -207,19 +212,22 @@ function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loade
   for (let i = 0; i < primary_keys.length; ++i) {
     trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader))
   }
-
-  trellis.primary_key = trellis.primary_keys[0]
 }
 
 function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
-  const trellis = new Trellis(name)
+  const trellis = new TrellisImplementation(name)
   loader.library.types[name] = new Trellis_Type(name, trellis)
+  const sourceTable = source.table || {}
+
+  trellis.table = {
+    name: sourceTable.name || to_lower_snake_case(trellis.name)
+  }
 
   for (let name in source.properties) {
     const property_source = source.properties [name]
     trellis.properties [name] = load_property(name, property_source, trellis, loader)
   }
-  
+
   if (source.additional)
     trellis.additional = source.additional
 
@@ -243,7 +251,7 @@ export function load_schema(definitions: Schema_Source, trellises: { [name: stri
       if (!trellises[definition.parent])
         throw Error("Invalid parent trellis: " + definition.parent + '.')
 
-      trellises [name].parent = trellises [definition.parent ]
+      trellises [name].parent = trellises [definition.parent]
     }
   }
 

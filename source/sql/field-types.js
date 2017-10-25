@@ -67,7 +67,7 @@ function getFieldType(property, library) {
             return null;
         case schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
-                var field = type.trellis.primary_key;
+                var field = type.trellis.primary_keys[0];
                 return getFieldType(field, library);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');
