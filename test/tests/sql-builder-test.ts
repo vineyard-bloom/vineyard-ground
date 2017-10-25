@@ -4,9 +4,9 @@ require('source-map-support').install()
 import {QueryGenerator} from "../../source/sql/query-generator";
 import * as assert from 'assert'
 import {DevModeler} from "../../source/modeler";
-import {Schema} from "vineyard-schema"
 const Sequelize = require('sequelize')
 import {checkDiff} from "../utility/diff";
+import {Schema} from "../../source/schema";
 
 const config = require('../config/config.json')
 const db = new Sequelize(config.database)

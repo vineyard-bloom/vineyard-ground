@@ -3,15 +3,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require('source-map-support').install();
 var assert = require("assert");
 var schema_1 = require("../../source/schema");
-var Sequelize = require('sequelize');
 var source_1 = require("../../source");
-var source_2 = require("../../source");
-var source_3 = require("../../source");
 var config = require('../config/config.json');
 var mainWorld, dangerousTag, flyingTag;
 describe('Sequelize Test', function () {
     this.timeout(5000);
-    var client = new source_3.SequelizeClient(config.database);
+    var client = new source_1.SequelizeClient(config.database);
     it('game', function () {
         return gameTest(client);
     });
@@ -21,7 +18,7 @@ describe('Sequelize Test', function () {
 });
 describe('Postgres Test', function () {
     this.timeout(5000);
-    var client = new source_2.PostgresClient(config.database);
+    var client = new source_1.PostgresClient(config.database);
     it('game', function () {
         return gameTest(client);
     });
@@ -88,7 +85,7 @@ function arbitraryTest(client) {
     var model = modeler.collections;
     var BigNumber = require('bignumber.js');
     return modeler.regenerate()
-        .then(function () { return model.Odd.create({
+        .then(function () { return model.OddRecord.create({
         strange: 10,
         unknown: "mist",
         vast: "1000000000000000000000000000021",
@@ -102,7 +99,7 @@ function arbitraryTest(client) {
             ]
         }
     }); })
-        .then(function () { return model.Odd.create({
+        .then(function () { return model.OddRecord.create({
         strange: 11,
         unknown: "mist2",
         vast: new BigNumber("1000000000000000000000000000021"),
@@ -113,7 +110,7 @@ function arbitraryTest(client) {
             "nothing": null
         }
     }); })
-        .then(function () { return model.Odd.all(); })
+        .then(function () { return model.OddRecord.all(); })
         .then(function (results) {
         console.log('result', results);
         assert(new BigNumber(results[0].vast).equals(results[1].vast));

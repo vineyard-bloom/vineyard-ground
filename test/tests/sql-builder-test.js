@@ -5,12 +5,12 @@ require('source-map-support').install();
 var query_generator_1 = require("../../source/sql/query-generator");
 var assert = require("assert");
 var modeler_1 = require("../../source/modeler");
-var vineyard_schema_1 = require("vineyard-schema");
 var Sequelize = require('sequelize');
 var diff_1 = require("../utility/diff");
+var schema_1 = require("../../source/schema");
 var config = require('../config/config.json');
 var db = new Sequelize(config.database);
-var schema = new vineyard_schema_1.Schema(require('../schema/game.json'));
+var schema = new schema_1.Schema(require('../schema/game.json'));
 var modeler = new modeler_1.DevModeler(db, schema);
 describe('sql-builder-test', function () {
     this.timeout(5000);

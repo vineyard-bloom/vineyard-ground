@@ -1,7 +1,7 @@
 const shell = require('shelljs')
 import {Change, ChangeType} from "./types";
 import {Property, Trellis, Trellis_Map} from "../source/types";
-import {Schema} from "vineyard-schema/source/scheming";
+import {Schema} from "../source/schema";
 
 function shellCommand(command: string) {
   console.log('shell', command)

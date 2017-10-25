@@ -1,13 +1,8 @@
-import {DatabaseClient} from "../../source/types";
 
 require('source-map-support').install()
 import * as assert from 'assert'
 import {Schema} from '../../source/schema'
-
-const Sequelize = require('sequelize')
-import {DevModeler, Add, Remove} from '../../source'
-import {PostgresClient} from "../../source";
-import {SequelizeClient} from "../../source";
+import {DevModeler, Add, Remove, DatabaseClient, PostgresClient, SequelizeClient} from '../../source'
 
 const config = require('../config/config.json')
 let mainWorld: any,
@@ -104,7 +99,7 @@ function arbitraryTest(client: DatabaseClient) {
 
   const BigNumber = require('bignumber.js')
   return modeler.regenerate()
-    .then(() => model.Odd.create({
+    .then(() => model.OddRecord.create({
         strange: 10,
         unknown: "mist",
         vast: "1000000000000000000000000000021",
@@ -119,7 +114,7 @@ function arbitraryTest(client: DatabaseClient) {
         }
       })
     )
-    .then(() => model.Odd.create({
+    .then(() => model.OddRecord.create({
         strange: 11,
         unknown: "mist2",
         vast: new BigNumber("1000000000000000000000000000021"),
@@ -131,7 +126,7 @@ function arbitraryTest(client: DatabaseClient) {
         }
       })
     )
-    .then(() => model.Odd.all())
+    .then(() => model.OddRecord.all())
     .then((results: any) => {
       console.log('result', results)
       assert(new BigNumber(results[0].vast).equals(results[1].vast))

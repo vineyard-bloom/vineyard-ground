@@ -2,7 +2,7 @@ import {Change, ChangeType} from "./types";
 import {delimit, SqlBuilder} from "../source/sql/sql-building";
 import {getFieldType} from "../source/sql/field-types";
 import {Property, Schema, Trellis} from "../source/types";
-import *  as vineyardSchema from 'vineyard-schema'
+// import *  as vineyardSchema from 'vineyard-schema'
 
 const indent = '  '
 

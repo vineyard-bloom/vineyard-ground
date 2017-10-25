@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var shell = require('shelljs');
 var types_1 = require("./types");
-var scheming_1 = require("vineyard-schema/source/scheming");
+var schema_1 = require("../source/schema");
 function shellCommand(command) {
     console.log('shell', command);
     if (process.platform === 'win32') {
@@ -77,8 +77,8 @@ function findChangedTrellises(first, second) {
 function get_diff(path, firstCommit, secondCommit) {
     var firstJson = getJson(firstCommit, path);
     var secondJson = getJson(secondCommit, path);
-    var first = new scheming_1.Schema(firstJson).trellises;
-    var second = new scheming_1.Schema(secondJson).trellises;
+    var first = new schema_1.Schema(firstJson).trellises;
+    var second = new schema_1.Schema(secondJson).trellises;
     return findChangedTrellises(first, second);
 }
 exports.get_diff = get_diff;

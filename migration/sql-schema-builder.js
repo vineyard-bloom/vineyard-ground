@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var sql_building_1 = require("../source/sql/sql-building");
 var field_types_1 = require("../source/sql/field-types");
+// import *  as vineyardSchema from 'vineyard-schema'
 var indent = '  ';
 var SqlSchemaBuilder = (function () {
     function SqlSchemaBuilder(schema) {

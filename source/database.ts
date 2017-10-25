@@ -3,6 +3,7 @@ import {Type_Category, Trellis_Type, Library} from "./schema"
 const Sequelize = require('sequelize')
 import {Table_Trellis, Trellis, Property, Schema, Table} from "./types";
 import {SequelizeModel, SequelizeModelMap} from "./clients/sequelize-client";
+import {to_lower_snake_case} from "./utility";
 
 const node_uuid = require('uuid')
 
@@ -218,7 +219,7 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
 
   }
 
-  const oldTable = trellis.oldTable = sequelize.define(trellis.name.toLowerCase(), fields, {
+  const oldTable = trellis.oldTable = sequelize.define(to_lower_snake_case(trellis.name), fields, {
     underscored: true,
     createdAt: created,
     updatedAt: modified,

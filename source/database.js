@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var schema_1 = require("./schema");
 var Sequelize = require('sequelize');
+var utility_1 = require("./utility");
 var node_uuid = require('uuid');
 function get_field(property, library, dialect) {
     var type = property.type;
@@ -179,7 +180,7 @@ function create_table(trellis, schema, sequelize) {
         if (autoFields.indexOf('modified') == -1)
             modified = false;
     }
-    var oldTable = trellis.oldTable = sequelize.define(trellis.name.toLowerCase(), fields, {
+    var oldTable = trellis.oldTable = sequelize.define(utility_1.to_lower_snake_case(trellis.name), fields, {
         underscored: true,
         createdAt: created,
         updatedAt: modified,

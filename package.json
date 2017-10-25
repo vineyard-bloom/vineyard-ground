@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "bignumber.js": "^4.0.4",
-    "pg": "^6.1.5",
+    "pg": "^7.3.0",
     "pluralize": "^7.0.0",
     "sequelize": "^4.16.2",
     "uuid": "^3.0.1"
