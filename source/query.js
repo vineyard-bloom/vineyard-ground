@@ -39,7 +39,7 @@ function processFields(result, trellis) {
 function getData(row) {
     return row.dataValues || row;
 }
-var Query_Implementation = (function () {
+var Query_Implementation = /** @class */ (function () {
     function Query_Implementation(table, client, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;

@@ -14,9 +14,6 @@ function sync_collections(schema: Schema, collections: Collection_Map, keys: any
     const trellis = schema.trellises [name] as any
     const table = client.createTableInterface(trellis, sequelize_models [name])
     collections [name] = new Collection(trellis, table as any, client)
-    trellis.table = {
-      name: pluralize(trellis.name).toLowerCase()
-    }
   }
 }
 

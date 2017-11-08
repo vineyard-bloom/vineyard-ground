@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var type_1 = require("./type");
-var Library = (function () {
+var Library = /** @class */ (function () {
     function Library() {
         var guid = new type_1.Primitive('guid');
         this.types = {
