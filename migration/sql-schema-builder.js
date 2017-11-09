@@ -4,7 +4,7 @@ var sql_building_1 = require("../source/sql/sql-building");
 var field_types_1 = require("../source/sql/field-types");
 // import *  as vineyardSchema from 'vineyard-schema'
 var indent = '  ';
-var SqlSchemaBuilder = (function () {
+var SqlSchemaBuilder = /** @class */ (function () {
     function SqlSchemaBuilder(schema) {
         this.builder = new sql_building_1.SqlBuilder();
         this.schema = schema;

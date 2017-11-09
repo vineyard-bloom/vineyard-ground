@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var sql_building_1 = require("./sql-building");
-var QueryGenerator = (function (_super) {
+var QueryGenerator = /** @class */ (function (_super) {
     __extends(QueryGenerator, _super);
     function QueryGenerator(trellis) {
         return _super.call(this, trellis) || this;

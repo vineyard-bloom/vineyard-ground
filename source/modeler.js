@@ -19,16 +19,13 @@ function sync_collections(schema, collections, keys, sequelize_models, client) {
         var trellis = schema.trellises[name];
         var table = client.createTableInterface(trellis, sequelize_models[name]);
         collections[name] = new collection_1.Collection(trellis, table, client);
-        trellis.table = {
-            name: pluralize(trellis.name).toLowerCase()
-        };
     }
 }
 function initializeTrellises(schema, collections, keys, db, client) {
     var sequelize_models = database_1.vineyard_to_sequelize(schema, schema.trellises, db);
     sync_collections(schema, collections, keys, sequelize_models, client);
 }
-var Modeler = (function () {
+var Modeler = /** @class */ (function () {
     function Modeler(schema, client) {
         this.collections = {};
         this.schema = schema instanceof schema_1.Schema
@@ -60,7 +57,7 @@ var Modeler = (function () {
     return Modeler;
 }());
 exports.Modeler = Modeler;
-var DevModeler = (function (_super) {
+var DevModeler = /** @class */ (function (_super) {
     __extends(DevModeler, _super);
     function DevModeler() {
         return _super !== null && _super.apply(this, arguments) || this;

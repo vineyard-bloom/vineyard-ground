@@ -17,7 +17,7 @@ function getFieldName(f) {
 function getValue(f) {
     return f.value;
 }
-var UpdateBuilder = (function (_super) {
+var UpdateBuilder = /** @class */ (function (_super) {
     __extends(UpdateBuilder, _super);
     function UpdateBuilder(trellis) {
         return _super.call(this, trellis) || this;
