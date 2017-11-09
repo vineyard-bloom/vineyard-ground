@@ -13,6 +13,7 @@ export interface Table_Source {
 }
 export interface Trellis_Source {
     primary_key?: string | string[];
+    primaryKeys?: string[];
     primary?: string | string[];
     properties: {
         [name: string]: Property_Source;

@@ -9,6 +9,7 @@ export declare class Collection<T> implements ICollection {
     private trellis;
     constructor(trellis: CollectionTrellis<T>, table: TableClient<T>, client: DatabaseClient);
     getTrellis(): CollectionTrellis<T>;
+    getTableClient(): TableClient<T>;
     create(seed: any): Promise<T>;
     create_or_update(seed: any): Promise<T>;
     update(seed: any, changes?: any): Promise<T>;

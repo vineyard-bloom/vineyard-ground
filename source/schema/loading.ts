@@ -41,6 +41,7 @@ export interface Table_Source {
 
 export interface Trellis_Source {
   primary_key?: string | string[]
+  primaryKeys?: string[]
   primary?: string | string[] // Deprecated
   properties: { [name: string]: Property_Source }
   additional?: any
@@ -208,9 +209,10 @@ function format_primary_keys(primary_keys: any, trellis_name: string) {
 }
 
 function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loader: Loader) {
-  const primary_keys = format_primary_keys(source.primary || source.primary_key, trellis.name)
-  for (let i = 0; i < primary_keys.length; ++i) {
-    trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader))
+  const initialPrimaryKeys = source.primaryKeys || source.primary || source.primary_key
+  const primaryKeys = format_primary_keys(initialPrimaryKeys, trellis.name)
+  for (let i = 0; i < primaryKeys.length; ++i) {
+    trellis.primary_keys.push(initialize_primary_key(primaryKeys[i], trellis, loader))
   }
 }
 

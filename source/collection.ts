@@ -27,6 +27,10 @@ export class Collection<T> implements ICollection {
     return this.trellis
   }
 
+  getTableClient() {
+    return this.table
+  }
+
   create(seed: any): Promise<T> {
     return create(seed, this.trellis, this.table)
   }

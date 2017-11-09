@@ -16,6 +16,9 @@ var Collection = (function () {
     Collection.prototype.getTrellis = function () {
         return this.trellis;
     };
+    Collection.prototype.getTableClient = function () {
+        return this.table;
+    };
     Collection.prototype.create = function (seed) {
         return update_1.create(seed, this.trellis, this.table);
     };

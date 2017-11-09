@@ -152,9 +152,10 @@ function format_primary_keys(primary_keys, trellis_name) {
     throw new Error("Invalid primary keys format for trellis " + trellis_name + '.');
 }
 function initialize_primary_keys(trellis, source, loader) {
-    var primary_keys = format_primary_keys(source.primary || source.primary_key, trellis.name);
-    for (var i = 0; i < primary_keys.length; ++i) {
-        trellis.primary_keys.push(initialize_primary_key(primary_keys[i], trellis, loader));
+    var initialPrimaryKeys = source.primaryKeys || source.primary || source.primary_key;
+    var primaryKeys = format_primary_keys(initialPrimaryKeys, trellis.name);
+    for (var i = 0; i < primaryKeys.length; ++i) {
+        trellis.primary_keys.push(initialize_primary_key(primaryKeys[i], trellis, loader));
     }
 }
 function load_trellis(name, source, loader) {
