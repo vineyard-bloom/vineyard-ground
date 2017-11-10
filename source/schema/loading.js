@@ -13,7 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var type_1 = require("./type");
 var trellis_1 = require("./trellis");
 var utility_1 = require("../utility");
-var Incomplete_Type = /** @class */ (function (_super) {
+var Incomplete_Type = (function (_super) {
     __extends(Incomplete_Type, _super);
     function Incomplete_Type(target_name, source) {
         var _this = _super.call(this, "Incomplete: " + target_name) || this;
@@ -29,7 +29,7 @@ var Incomplete_Type = /** @class */ (function (_super) {
     };
     return Incomplete_Type;
 }(type_1.Type));
-var Loader = /** @class */ (function () {
+var Loader = (function () {
     function Loader(library) {
         this.incomplete = {};
         this.library = library;

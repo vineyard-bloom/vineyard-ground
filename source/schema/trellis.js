@@ -11,7 +11,7 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var type_1 = require("./type");
-var Trellis_Type = /** @class */ (function (_super) {
+var Trellis_Type = (function (_super) {
     __extends(Trellis_Type, _super);
     function Trellis_Type(name, trellis) {
         var _this = _super.call(this, name) || this;
@@ -41,7 +41,7 @@ exports.Trellis_Type = Trellis_Type;
 //
 //   is_list(): boolean
 // }
-var StandardProperty = /** @class */ (function () {
+var StandardProperty = (function () {
     function StandardProperty(name, type, trellis) {
         this.is_nullable = false;
         this.is_unique = false;
@@ -68,7 +68,7 @@ var StandardProperty = /** @class */ (function () {
     return StandardProperty;
 }());
 exports.StandardProperty = StandardProperty;
-var Reference = /** @class */ (function (_super) {
+var Reference = (function (_super) {
     __extends(Reference, _super);
     function Reference(name, type, trellis, other_property) {
         var _this = _super.call(this, name, type, trellis) || this;
@@ -94,7 +94,7 @@ function get_key_identity(data, name) {
 //   primary_keys: Property[]
 //   parent?: Trellis | null
 // }
-var TrellisImplementation = /** @class */ (function () {
+var TrellisImplementation = (function () {
     function TrellisImplementation(name) {
         this.properties = {};
         this.primary_keys = [];

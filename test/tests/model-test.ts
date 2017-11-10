@@ -89,7 +89,7 @@ describe('Sequelize Test', function () {
     })
 
     it('arbitrary general', async function () {
-      await model.OddRecord.create({
+      const original = await model.OddRecord.create({
         strange: 10,
         unknown: "mist",
         vast: "1000000000000000000000000000021",
@@ -116,6 +116,7 @@ describe('Sequelize Test', function () {
         }
       })
 
+      assert(original.vast.isBigNumber)
       const results = await model.OddRecord.all()
       console.log('result', results)
       assert(new BigNumber(results[0].vast).equals(results[1].vast))

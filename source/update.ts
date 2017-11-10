@@ -1,5 +1,5 @@
 import {Operation, Operation_Type} from './list-operations'
-import {to_lower} from "./utility"
+import {processFields, to_lower} from "./utility"
 import {Property, TableClient, Trellis} from "./types";
 
 function prepare_reference(reference: Property, value: any) {
@@ -113,6 +113,7 @@ function update_lists<T>(identity: any, seed: any, trellis: Trellis, table: Tabl
 }
 
 function post_process<T>(result: any, identity: any, seed: any, trellis: Trellis, table: TableClient<T>): Promise<T> {
+  processFields(result.dataValues, trellis)
   return update_lists(identity, seed, trellis, table)
     .then(() => result.dataValues)
 }

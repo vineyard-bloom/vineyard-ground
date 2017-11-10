@@ -3,7 +3,7 @@ import {ICollection} from "./collection"
 const sequelize = require('sequelize')
 
 import {CollectionTrellis, DatabaseClient, TableClient, Property, Trellis} from './types'
-import {to_lower} from "./utility";
+import {processFields, to_lower} from "./utility";
 import {QueryGenerator} from "./sql/query-generator";
 
 const BigNumber = require("bignumber.js")
@@ -36,36 +36,6 @@ enum Reduce_Mode {
   none,
   first,
   single_value,
-}
-
-function processFields(result: any, trellis: Trellis) {
-  if (trellis.oldTable.sequelize.getDialect() == 'mysql') {
-    for (let i in trellis.properties) {
-      const property = trellis.properties[i]
-      if (property.type.name == 'json') {
-        result[i] = JSON.parse(result[i])
-      }
-    }
-  }
-
-  for (let i in trellis.properties) {
-    const property = trellis.properties[i]
-    switch (property.type.name) {
-      case 'long':
-        result[i] = parseInt(result[i])
-        break
-
-      case 'bignumber':
-        result[i] = new BigNumber(result[i])
-        break
-
-      case 'datetime':
-      case 'date':
-        result[i] = new Date(result[i])
-        break
-    }
-  }
-  return result
 }
 
 interface QueryOptions {

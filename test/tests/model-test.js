@@ -151,7 +151,7 @@ describe('Sequelize Test', function () {
         });
         it('arbitrary general', function () {
             return __awaiter(this, void 0, void 0, function () {
-                var results, records;
+                var original, results, records;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, model.OddRecord.create({
@@ -169,7 +169,7 @@ describe('Sequelize Test', function () {
                                 }
                             })];
                         case 1:
-                            _a.sent();
+                            original = _a.sent();
                             return [4 /*yield*/, model.OddRecord.create({
                                     strange: 11,
                                     unknown: "mist2",
@@ -183,6 +183,7 @@ describe('Sequelize Test', function () {
                                 })];
                         case 2:
                             _a.sent();
+                            chai_1.assert(original.vast.isBigNumber);
                             return [4 /*yield*/, model.OddRecord.all()];
                         case 3:
                             results = _a.sent();

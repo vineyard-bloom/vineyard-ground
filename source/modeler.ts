@@ -3,6 +3,7 @@ import {Collection, ICollection} from "./collection";
 import {vineyard_to_sequelize} from "./database";
 import {SequelizeClient, SequelizeModelMap} from "./clients/sequelize-client";
 import {DatabaseClient, DatabaseConfig} from "./types";
+import {BigNumber} from "bignumber.js"
 
 const pluralize = require('pluralize')
 
@@ -39,6 +40,13 @@ export class Modeler {
   }
 
   query(sql: string, replacements?: any) {
+    if (replacements) {
+      for (let i in replacements) {
+        const replacement = replacements[i]
+        if (replacement && replacement.isBigNumber)
+          replacements[i] = replacement.toString()
+      }
+    }
     return this.db.query(sql, {
       replacements: replacements
     })
