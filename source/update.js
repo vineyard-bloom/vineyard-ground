@@ -52,7 +52,7 @@ function prepare_seed(seed, trellis) {
     return newSeed;
 }
 function formatOperation(operation) {
-    if (operation instanceof operation) {
+    if (Object.keys(operation).length == 2 && operation.type != undefined && operation.item != undefined) {
         return operation;
     }
     return list_operations_1.Add(operation);

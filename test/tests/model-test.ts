@@ -37,6 +37,10 @@ describe('Sequelize Test', function () {
         name: "flying"
       })
 
+      const heroicTag = await model.Tag.create({
+        name: "heroic"
+      })
+
       mainWorld = await model.World.create({})
 
       const ogre = await model.Creature.create({
@@ -72,12 +76,14 @@ describe('Sequelize Test', function () {
         name: "hero",
         world: mainWorld,
         health: 4,
-        tags: Add(flyingTag)
+        tags: [Add(flyingTag), heroicTag]
       })
 
       const world = await model.World.first().expand('creatures')
       assert(Array.isArray(world.creatures))
       assert.equal(2, world.creatures.length)
+      const hero = await model.Creature.first({name: "hero"}).expand('tags')
+      assert.equal(hero.tags.length, 2)
     })
   })
 

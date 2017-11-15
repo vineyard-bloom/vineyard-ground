@@ -62,7 +62,7 @@ function prepare_seed(seed: any, trellis: Trellis) {
 }
 
 function formatOperation(operation: Operation | any): Operation {
-  if (operation instanceof operation) {
+  if (Object.keys(operation).length == 2 && operation.type != undefined && operation.item != undefined) {
     return operation
   }
 

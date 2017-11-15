@@ -70,7 +70,7 @@ describe('Sequelize Test', function () {
         });
         it('game', function () {
             return __awaiter(this, void 0, void 0, function () {
-                var ogre, creature, world;
+                var heroicTag, ogre, creature, world, hero;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, model.Tag.create({
@@ -78,30 +78,35 @@ describe('Sequelize Test', function () {
                             })];
                         case 1:
                             flyingTag = _a.sent();
-                            return [4 /*yield*/, model.World.create({})];
+                            return [4 /*yield*/, model.Tag.create({
+                                    name: "heroic"
+                                })];
                         case 2:
+                            heroicTag = _a.sent();
+                            return [4 /*yield*/, model.World.create({})];
+                        case 3:
                             mainWorld = _a.sent();
                             return [4 /*yield*/, model.Creature.create({
                                     name: "ogre",
                                     world: mainWorld,
                                     health: 5
                                 })];
-                        case 3:
+                        case 4:
                             ogre = _a.sent();
                             return [4 /*yield*/, model.Tag.create({
                                     name: "dangerous"
                                 })];
-                        case 4:
+                        case 5:
                             dangerousTag = _a.sent();
                             return [4 /*yield*/, model.Creature.update(ogre, {
                                     health: 10,
                                     tags: source_1.Add(dangerousTag)
                                 })];
-                        case 5:
+                        case 6:
                             creature = _a.sent();
                             chai_1.assert.equal(creature.health, 10);
                             return [4 /*yield*/, model.Creature.first().expand('tags')];
-                        case 6:
+                        case 7:
                             creature = _a.sent();
                             chai_1.assert(Array.isArray(creature.tags));
                             chai_1.assert.equal(1, creature.tags.length);
@@ -109,10 +114,10 @@ describe('Sequelize Test', function () {
                             return [4 /*yield*/, model.Creature.update(ogre, {
                                     tags: source_1.Remove(dangerousTag)
                                 })];
-                        case 7:
+                        case 8:
                             _a.sent();
                             return [4 /*yield*/, model.Creature.first().expand('tags')];
-                        case 8:
+                        case 9:
                             creature = _a.sent();
                             chai_1.assert(Array.isArray(creature.tags));
                             chai_1.assert.equal(0, creature.tags.length);
@@ -120,15 +125,19 @@ describe('Sequelize Test', function () {
                                     name: "hero",
                                     world: mainWorld,
                                     health: 4,
-                                    tags: source_1.Add(flyingTag)
+                                    tags: [source_1.Add(flyingTag), heroicTag]
                                 })];
-                        case 9:
+                        case 10:
                             _a.sent();
                             return [4 /*yield*/, model.World.first().expand('creatures')];
-                        case 10:
+                        case 11:
                             world = _a.sent();
                             chai_1.assert(Array.isArray(world.creatures));
                             chai_1.assert.equal(2, world.creatures.length);
+                            return [4 /*yield*/, model.Creature.first({ name: "hero" }).expand('tags')];
+                        case 12:
+                            hero = _a.sent();
+                            chai_1.assert.equal(hero.tags.length, 2);
                             return [2 /*return*/];
                     }
                 });
