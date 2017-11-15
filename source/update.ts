@@ -1,4 +1,4 @@
-import {Operation, Operation_Type} from './list-operations'
+import {Add, Operation, Operation_Type} from './list-operations'
 import {processFields, to_lower} from "./utility"
 import {Property, TableClient, Trellis} from "./types";
 
@@ -61,7 +61,17 @@ function prepare_seed(seed: any, trellis: Trellis) {
   return newSeed
 }
 
-function perform_operation<T>(identity: any, seed: any, list: Property, table: TableClient<T>, operation: Operation) {
+function formatOperation(operation: Operation | any): Operation {
+  if (operation instanceof operation) {
+    return operation
+  }
+
+  return Add(operation)
+}
+
+function perform_operation<T>(identity: any, list: Property, operationOrIdentity: Operation | any) {
+  const operation = formatOperation(operationOrIdentity)
+
   switch (operation.type) {
 
     case Operation_Type.add: {
@@ -95,10 +105,10 @@ function perform_operation<T>(identity: any, seed: any, list: Property, table: T
 function update_list<T>(identity: any, seed: any, list: Property, table: TableClient<T>) {
   const value = seed[list.name]
   if (Array.isArray(value)) {
-    return Promise.all(value.map(item => perform_operation(identity, seed, list, table, item)))
+    return Promise.all(value.map(item => perform_operation(identity, list, item)))
   }
   else {
-    return perform_operation(identity, seed, list, table, value)
+    return perform_operation(identity, list, value)
   }
 }
 
