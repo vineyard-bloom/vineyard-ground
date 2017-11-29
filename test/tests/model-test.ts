@@ -1,3 +1,5 @@
+import {to_lower_snake_case} from "../../source/utility";
+
 require('source-map-support').install()
 import {assert, expect} from 'chai'
 import {Schema} from '../../source/schema'
@@ -147,6 +149,15 @@ describe('Sequelize Test', function () {
       const record = await model.ground.querySingle(`SELECT * FROM mysteries`)
       expect(record.unknown).equal(16)
     })
+  })
+})
+
+describe('Simple unit tests', function () {
+  it('camelCase to snake_case', async function () {
+    assert.equal(to_lower_snake_case('first'), 'first')
+    assert.equal(to_lower_snake_case('firstSecond'), 'first_second')
+    assert.equal(to_lower_snake_case('firstIP'), 'first_ip')
+    assert.equal(to_lower_snake_case('FirstSecond'), 'first_second')
   })
 })
 

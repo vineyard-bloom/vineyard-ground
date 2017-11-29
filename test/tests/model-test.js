@@ -35,6 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var utility_1 = require("../../source/utility");
 require('source-map-support').install();
 var chai_1 = require("chai");
 var schema_1 = require("../../source/schema");
@@ -232,6 +233,19 @@ describe('Sequelize Test', function () {
                             return [2 /*return*/];
                     }
                 });
+            });
+        });
+    });
+});
+describe('Simple unit tests', function () {
+    it('camelCase to snake_case', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                chai_1.assert.equal(utility_1.to_lower_snake_case('first'), 'first');
+                chai_1.assert.equal(utility_1.to_lower_snake_case('firstSecond'), 'first_second');
+                chai_1.assert.equal(utility_1.to_lower_snake_case('firstIP'), 'first_ip');
+                chai_1.assert.equal(utility_1.to_lower_snake_case('FirstSecond'), 'first_second');
+                return [2 /*return*/];
             });
         });
     });
