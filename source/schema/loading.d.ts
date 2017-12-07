@@ -21,6 +21,7 @@ export interface Trellis_Source {
     additional?: any;
     parent?: string;
     table?: Table_Source;
+    softDelete?: boolean;
 }
 export declare type Schema_Source = {
     [name: string]: Trellis_Source;

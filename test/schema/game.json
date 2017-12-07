@@ -8,6 +8,7 @@
     }
   },
   "Creature": {
+    "softDelete": true,
     "properties": {
       "name": {
         "type": "string"

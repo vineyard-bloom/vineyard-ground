@@ -86,6 +86,14 @@ describe('Sequelize Test', function () {
       assert.equal(2, world.creatures.length)
       const hero = await model.Creature.first({name: "hero"}).expand('tags')
       assert.equal(hero.tags.length, 2)
+
+      await model.Creature.remove(hero)
+      const hero2 = await model.Creature.first({name: "hero"})
+      assert.isNull(hero2)
+
+      const rawHero = await model.ground.querySingle(`SELECT * FROM creatures WHERE name = 'hero'`)
+      assert.equal(rawHero.name, 'hero')
+      assert(rawHero.deleted instanceof Date)
     })
   })
 

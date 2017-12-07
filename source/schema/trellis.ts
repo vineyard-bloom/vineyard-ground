@@ -107,6 +107,7 @@ export class TrellisImplementation implements Trellis {
   primary_keys: Property[] = []
   parent?: Trellis
   collection: any
+  softDelete: boolean = false
 
   private lists: Reference[]
   additional: any = {}

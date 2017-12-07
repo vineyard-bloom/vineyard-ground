@@ -51,6 +51,7 @@ export interface Trellis {
   additional: any
   collection: any
   parent?: Trellis
+  softDelete?: boolean
 
   get_identity(input: any): any
 

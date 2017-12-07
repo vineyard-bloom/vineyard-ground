@@ -33,6 +33,7 @@ export declare class TrellisImplementation implements Trellis {
     primary_keys: Property[];
     parent?: Trellis;
     collection: any;
+    softDelete: boolean;
     private lists;
     additional: any;
     constructor(name: string);

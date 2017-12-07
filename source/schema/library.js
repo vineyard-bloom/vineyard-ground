@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const type_1 = require("./type");
-class Library {
-    constructor() {
-        const guid = new type_1.Primitive('guid');
+var type_1 = require("./type");
+var Library = (function () {
+    function Library() {
+        var guid = new type_1.Primitive('guid');
         this.types = {
             long: new type_1.Primitive('long'),
             bignumber: new type_1.Primitive('bignumber'),
@@ -21,11 +21,12 @@ class Library {
             uuid: guid,
         };
     }
-    add_type(type) {
+    Library.prototype.add_type = function (type) {
         if (this.types[type.name])
             throw new Error('Library already has a type named ' + type.name + '.');
         this.types[type.name] = type;
-    }
-}
+    };
+    return Library;
+}());
 exports.Library = Library;
 //# sourceMappingURL=library.js.map

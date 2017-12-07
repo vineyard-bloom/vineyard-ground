@@ -208,6 +208,7 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
 
   let created: string | boolean = 'created'
   let modified: string | boolean = 'modified'
+  const deleted: string | boolean = trellis.softDelete ? 'deleted' : false
 
   if (trellis.additional && Array.isArray(trellis.additional.autoFields)) {
     const autoFields = trellis.additional.autoFields
@@ -216,13 +217,14 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
 
     if (autoFields.indexOf('modified') == -1)
       modified = false
-
   }
 
   const oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
     underscored: true,
     createdAt: created,
     updatedAt: modified,
+    deletedAt: deleted,
+    paranoid: !!deleted
   })
 
   return oldTable

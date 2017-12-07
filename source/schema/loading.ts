@@ -47,6 +47,7 @@ export interface Trellis_Source {
   additional?: any
   parent?: string
   table?: Table_Source
+  softDelete?: boolean
 }
 
 export type Schema_Source = { [name: string]: Trellis_Source }
@@ -232,6 +233,9 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
 
   if (source.additional)
     trellis.additional = source.additional
+
+  if (source.softDelete)
+    trellis.softDelete = true
 
   initialize_primary_keys(trellis, source, loader)
   update_incomplete(trellis, loader)
