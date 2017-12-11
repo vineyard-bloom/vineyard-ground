@@ -157,9 +157,11 @@ function load_property(name: string, property_source: Property_Source, trellis: 
   if (property_source.unique === true)
     property.is_unique = true
 
-  property.default = property_source.defaultValue !== undefined
-    ? property_source.defaultValue
-    : property_source.default
+  property.default = property.is_nullable
+    ? null
+    : (property_source.defaultValue !== undefined
+      ? property_source.defaultValue
+      : property_source.default)
 
   return property
 }

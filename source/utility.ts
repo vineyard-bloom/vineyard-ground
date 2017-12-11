@@ -36,9 +36,13 @@ export function processFields(result: any, trellis: Trellis) {
         break
 
       case 'datetime':
-      case 'date':
-        result[i] = new Date(result[i])
+      case 'date': {
+        const value = result[i]
+        if (value && typeof value === 'string')
+          result[i] = new Date(value)
+
         break
+      }
     }
   }
   return result

@@ -183,6 +183,7 @@ describe('Sequelize Test', function () {
                                 sampleDate: new Date("June 15, 2016"),
                                 sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
                                 veryBig: new bignumber_js_1.BigNumber("1023.1334"),
+                                nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
                                 data: {
                                     frogs: [
                                         { name: "Froggy" },
@@ -219,6 +220,8 @@ describe('Sequelize Test', function () {
                             chai_1.assert(results[1].veryBig instanceof bignumber_js_1.BigNumber);
                             chai_1.assert(results[0].veryBig.equals("1023.1334"));
                             chai_1.assert(results[1].veryBig.equals("819715.15157"));
+                            chai_1.assert.equal(results[0].nullableDatetime.toString(), new Date("2017-10-23T18:24:05.026Z").toString());
+                            chai_1.assert.isNull(results[1].nullableDatetime);
                             return [4 /*yield*/, model.ground.query("SELECT * FROM odd_records")];
                         case 4:
                             records = _a.sent();

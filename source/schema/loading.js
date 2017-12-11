@@ -111,9 +111,11 @@ function load_property(name, property_source, trellis, loader) {
         property.is_nullable = true;
     if (property_source.unique === true)
         property.is_unique = true;
-    property.default = property_source.defaultValue !== undefined
-        ? property_source.defaultValue
-        : property_source.default;
+    property.default = property.is_nullable
+        ? null
+        : (property_source.defaultValue !== undefined
+            ? property_source.defaultValue
+            : property_source.default);
     return property;
 }
 function update_incomplete(trellis, loader) {

@@ -20,6 +20,10 @@
       "sampleDatetime": {
         "type": "datetime"
       },
+      "nullableDatetime": {
+        "type": "datetime",
+        "nullable": true
+      },
       "data": {
         "type": "json"
       }

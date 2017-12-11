@@ -18,6 +18,13 @@ const contexts = [
   }
 ]
 
+interface Creature {
+  name: string
+  health: number
+  world: string
+  tags: any[]
+}
+
 // createSuite('Sequelize', new SequelizeClient(config.database))
 // createSuite('Postgres', new PostgresClient(config.database))
 
@@ -55,7 +62,7 @@ describe('Sequelize Test', function () {
         name: "dangerous"
       })
 
-      let creature = await model.Creature.update(ogre, {
+      let creature: Creature = await model.Creature.update(ogre, {
         health: 10,
         tags: Add(dangerousTag)
       })
@@ -112,6 +119,7 @@ describe('Sequelize Test', function () {
         sampleDate: new Date("June 15, 2016"),
         sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
         veryBig: new BigNumber("1023.1334"),
+        nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
         data: {
           frogs: [
             {name: "Froggy"},
@@ -144,6 +152,8 @@ describe('Sequelize Test', function () {
       assert(results[1].veryBig instanceof BigNumber)
       assert(results[0].veryBig.equals("1023.1334"))
       assert(results[1].veryBig.equals("819715.15157"))
+      assert.equal(results[0].nullableDatetime.toString(), new Date("2017-10-23T18:24:05.026Z").toString())
+      assert.isNull(results[1].nullableDatetime)
 
       const records = await model.ground.query(`SELECT * FROM odd_records`)
       expect(records).lengthOf(2)

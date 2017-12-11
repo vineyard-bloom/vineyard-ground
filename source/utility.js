@@ -32,9 +32,12 @@ function processFields(result, trellis) {
                 result[i] = new bignumber_js_1.BigNumber(result[i]);
                 break;
             case 'datetime':
-            case 'date':
-                result[i] = new Date(result[i]);
+            case 'date': {
+                var value = result[i];
+                if (value && typeof value === 'string')
+                    result[i] = new Date(value);
                 break;
+            }
         }
     }
     return result;
