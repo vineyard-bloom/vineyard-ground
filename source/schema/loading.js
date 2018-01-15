@@ -13,7 +13,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var type_1 = require("./type");
 var trellis_1 = require("./trellis");
 var utility_1 = require("../utility");
-var Incomplete_Type = (function (_super) {
+var pluralize = require('pluralize');
+var Incomplete_Type = /** @class */ (function (_super) {
     __extends(Incomplete_Type, _super);
     function Incomplete_Type(target_name, source) {
         var _this = _super.call(this, "Incomplete: " + target_name) || this;
@@ -29,7 +30,7 @@ var Incomplete_Type = (function (_super) {
     };
     return Incomplete_Type;
 }(type_1.Type));
-var Loader = (function () {
+var Loader = /** @class */ (function () {
     function Loader(library) {
         this.incomplete = {};
         this.library = library;
@@ -165,7 +166,7 @@ function load_trellis(name, source, loader) {
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
     var sourceTable = source.table || {};
     trellis.table = {
-        name: sourceTable.name || utility_1.to_lower_snake_case(trellis.name)
+        name: sourceTable.name || pluralize(utility_1.to_lower_snake_case(trellis.name))
     };
     for (var name_1 in source.properties) {
         var property_source = source.properties[name_1];

@@ -7,6 +7,8 @@ import {
 import {Property, Trellis} from "../types";
 import {to_lower_snake_case} from "../utility";
 
+const pluralize = require('pluralize')
+
 class Incomplete_Type extends Type {
   target_name: string
   source: any
@@ -225,7 +227,7 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
   const sourceTable = source.table || {}
 
   trellis.table = {
-    name: sourceTable.name || to_lower_snake_case(trellis.name)
+    name: sourceTable.name || pluralize(to_lower_snake_case(trellis.name))
   }
 
   for (let name in source.properties) {

@@ -18,14 +18,14 @@ var Type_Category;
     Type_Category[Type_Category["list"] = 3] = "list";
     Type_Category[Type_Category["trellis"] = 4] = "trellis";
 })(Type_Category = exports.Type_Category || (exports.Type_Category = {}));
-var Type = (function () {
+var Type = /** @class */ (function () {
     function Type(name) {
         this.name = name;
     }
     return Type;
 }());
 exports.Type = Type;
-var Primitive = (function (_super) {
+var Primitive = /** @class */ (function (_super) {
     __extends(Primitive, _super);
     function Primitive(name) {
         return _super.call(this, name) || this;
@@ -39,7 +39,7 @@ var Primitive = (function (_super) {
     return Primitive;
 }(Type));
 exports.Primitive = Primitive;
-var Decimal = (function (_super) {
+var Decimal = /** @class */ (function (_super) {
     __extends(Decimal, _super);
     function Decimal(name, precision) {
         var _this = _super.call(this, name) || this;
@@ -49,7 +49,7 @@ var Decimal = (function (_super) {
     return Decimal;
 }(Primitive));
 exports.Decimal = Decimal;
-var List_Type = (function (_super) {
+var List_Type = /** @class */ (function (_super) {
     __extends(List_Type, _super);
     function List_Type(name, child_type) {
         var _this = _super.call(this, name) || this;

@@ -5,8 +5,6 @@ import {SequelizeClient, SequelizeModelMap} from "./clients/sequelize-client";
 import {DatabaseClient, DatabaseConfig} from "./types";
 import {BigNumber} from "bignumber.js"
 
-const pluralize = require('pluralize')
-
 export type Collection_Map = { [name: string]: ICollection }
 
 function sync_collections(schema: Schema, collections: Collection_Map, keys: any, sequelize_models: SequelizeModelMap,

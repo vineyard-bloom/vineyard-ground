@@ -13,7 +13,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var schema_1 = require("./schema");
 var collection_1 = require("./collection");
 var database_1 = require("./database");
-var pluralize = require('pluralize');
 function sync_collections(schema, collections, keys, sequelize_models, client) {
     for (var name in keys) {
         var trellis = schema.trellises[name];
@@ -25,7 +24,7 @@ function initializeTrellises(schema, collections, keys, db, client) {
     var sequelize_models = database_1.vineyard_to_sequelize(schema, schema.trellises, db);
     sync_collections(schema, collections, keys, sequelize_models, client);
 }
-var Modeler = (function () {
+var Modeler = /** @class */ (function () {
     function Modeler(schema, client) {
         this.collections = {};
         this.schema = schema instanceof schema_1.Schema
@@ -64,7 +63,7 @@ var Modeler = (function () {
     return Modeler;
 }());
 exports.Modeler = Modeler;
-var DevModeler = (function (_super) {
+var DevModeler = /** @class */ (function (_super) {
     __extends(DevModeler, _super);
     function DevModeler() {
         return _super !== null && _super.apply(this, arguments) || this;
