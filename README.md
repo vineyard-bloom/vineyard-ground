@@ -10,9 +10,9 @@ SQL ORM for Node.js.  Ground wraps aspects of [Sequelize](https://github.com/seq
 * Chainable query API.
 * Automatic identity resolution.  (Functions requiring an entity identifier can be passed either an object or scalar identity value.)
 
-## [Documentation](docs/index.md)
+## [Documentation](doc/index.md)
 
-* [Schema](docs/schema.md)
-* [Collections](docs/collections.md)
-* [Queries](docs/queries.md)
+* [Schema](doc/schema.md)
+* [Collections](doc/collection.md)
+* [Queries](doc/query.md)
 
