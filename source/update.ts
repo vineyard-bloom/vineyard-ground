@@ -37,7 +37,7 @@ function prepare_property(property: Property, value: any) {
       if (property.type.name === 'bignumber') {
         return value.toString()
       }
-      if (['json', 'jsonb', 'date', 'datetime', 'time'].indexOf(property.type.name) == -1)
+      if (['json', 'jsonb', 'date', 'datetime', 'time', 'blob'].indexOf(property.type.name) == -1)
         throw new Error(property.get_path() + ' cannot be an object')
     }
 
