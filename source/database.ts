@@ -84,6 +84,11 @@ function get_field(property: Property, library: Library, dialect: string): any {
           defaultValue: 0
         }
 
+      if (type === library.types.blob)
+        return {
+          type: Sequelize.BLOB
+        }
+
       throw new Error("Unknown primitive: " + type.name + '.')
 
     case Type_Category.list:
