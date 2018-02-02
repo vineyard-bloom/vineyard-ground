@@ -10,4 +10,5 @@ __export(require("./query"));
 __export(require("./list-operations"));
 __export(require("./clients/postgres-client"));
 __export(require("./clients/sequelize-client"));
+__export(require("./schema/loading"));
 //# sourceMappingURL=index.js.map

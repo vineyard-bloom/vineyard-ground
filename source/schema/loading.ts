@@ -1,8 +1,8 @@
 import { List_Type, Type, Type_Category } from './type'
 import { Library } from './library'
 import { Reference, StandardProperty, Trellis_Type, TrellisImplementation } from "./trellis"
-import { Property, Trellis } from "../types";
-import { to_lower_snake_case } from "../utility";
+import { Property, Trellis } from "../types"
+import { to_lower_snake_case } from "../utility"
 
 const pluralize = require('pluralize')
 

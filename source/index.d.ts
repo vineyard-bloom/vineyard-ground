@@ -6,3 +6,4 @@ export * from './list-operations';
 export * from './types';
 export * from './clients/postgres-client';
 export * from './clients/sequelize-client';
+export * from './schema/loading';
