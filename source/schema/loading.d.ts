@@ -1,5 +1,6 @@
 import { Library } from './library';
 import { Trellis } from "../types";
+export declare function setSnakeCaseTables(value: boolean): void;
 export interface Property_Source {
     type: string;
     trellis?: string;

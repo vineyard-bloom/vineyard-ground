@@ -1,13 +1,16 @@
-import {Type, Type_Category, List_Type} from './type'
-import {Library} from './library'
-import {
-  Reference,
-  Trellis_Type, StandardProperty, TrellisImplementation
-} from "./trellis"
-import {Property, Trellis} from "../types";
-import {to_lower_snake_case} from "../utility";
+import { List_Type, Type, Type_Category } from './type'
+import { Library } from './library'
+import { Reference, StandardProperty, Trellis_Type, TrellisImplementation } from "./trellis"
+import { Property, Trellis } from "../types";
+import { to_lower_snake_case } from "../utility";
 
 const pluralize = require('pluralize')
+
+let snakeCaseTables: boolean = true
+
+export function setSnakeCaseTables(value: boolean) {
+  snakeCaseTables = value
+}
 
 class Incomplete_Type extends Type {
   target_name: string
@@ -227,7 +230,7 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
   const sourceTable = source.table || {}
 
   trellis.table = {
-    name: sourceTable.name || pluralize(to_lower_snake_case(trellis.name))
+    name: sourceTable.name || pluralize(snakeCaseTables ? to_lower_snake_case(trellis.name) : trellis.name.toLowerCase())
   }
 
   for (let name in source.properties) {
