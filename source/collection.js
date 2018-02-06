@@ -1,55 +1,57 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const query_1 = require("./query");
-const update_1 = require("./update");
-class Collection {
-    constructor(trellis, table, client) {
+var query_1 = require("./query");
+var update_1 = require("./update");
+var Collection = /** @class */ (function () {
+    function Collection(trellis, table, client) {
         this.trellis = trellis;
         this.table = table;
         this.client = client;
         trellis.collection = this;
         // Monkey patch for soft backwards compatibility
-        const self = this;
+        var self = this;
         self.firstOrNull = this.first;
         self.first_or_null = this.first;
     }
-    getTrellis() {
+    Collection.prototype.getTrellis = function () {
         return this.trellis;
-    }
-    getTableClient() {
+    };
+    Collection.prototype.getTableClient = function () {
         return this.table;
-    }
-    create(seed) {
+    };
+    Collection.prototype.create = function (seed) {
         return update_1.create(seed, this.trellis, this.table);
-    }
-    create_or_update(seed) {
+    };
+    Collection.prototype.create_or_update = function (seed) {
         return update_1.create_or_update(seed, this.trellis, this.table);
-    }
-    update(seed, changes) {
+    };
+    Collection.prototype.update = function (seed, changes) {
         return update_1.update(seed, this.trellis, this.table, changes);
-    }
-    remove(seed) {
+    };
+    Collection.prototype.remove = function (seed) {
         return this.table.remove({
-            where: {
-                [this.trellis.primary_keys[0].name]: this.trellis.get_identity(seed)
-            }
+            where: (_a = {},
+                _a[this.trellis.primary_keys[0].name] = this.trellis.get_identity(seed),
+                _a)
         });
-    }
-    all() {
+        var _a;
+    };
+    Collection.prototype.all = function () {
         return new query_1.Query_Implementation(this.table, this.client, this.trellis);
-    }
-    filter(options) {
+    };
+    Collection.prototype.filter = function (options) {
         return this.all().filter(options);
-    }
-    first(options) {
+    };
+    Collection.prototype.first = function (options) {
         return this.all().first(options);
-    }
-    get(identity) {
+    };
+    Collection.prototype.get = function (identity) {
         identity = this.trellis.get_identity(identity);
-        const filter = {};
+        var filter = {};
         filter[this.trellis.primary_keys[0].name] = identity;
         return this.filter(filter).first();
-    }
-}
+    };
+    return Collection;
+}());
 exports.Collection = Collection;
 //# sourceMappingURL=collection.js.map

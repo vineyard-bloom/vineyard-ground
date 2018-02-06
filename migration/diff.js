@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const shell = require('shelljs');
-const types_1 = require("./types");
-const schema_1 = require("../source/schema");
+var shell = require('shelljs');
+var types_1 = require("./types");
+var schema_1 = require("../source/schema");
 function shellCommand(command) {
     console.log('shell', command);
     if (process.platform === 'win32') {
@@ -13,12 +13,12 @@ function shellCommand(command) {
     }
 }
 function getJson(commit, path) {
-    const json = shellCommand('git show ' + commit + ':' + path);
+    var json = shellCommand('git show ' + commit + ':' + path);
     return JSON.parse(json);
 }
 function findChangedProperties(firstProperties, secondProperties) {
-    let result = [];
-    for (let name in firstProperties) {
+    var result = [];
+    for (var name in firstProperties) {
         if (!secondProperties[name]) {
             result.push({
                 type: types_1.ChangeType.deleteField,
@@ -26,9 +26,9 @@ function findChangedProperties(firstProperties, secondProperties) {
             });
         }
     }
-    for (let name in secondProperties) {
-        const first = firstProperties[name];
-        const second = secondProperties[name];
+    for (var name in secondProperties) {
+        var first = firstProperties[name];
+        var second = secondProperties[name];
         if (!first) {
             result.push({
                 type: types_1.ChangeType.createField,
@@ -52,8 +52,8 @@ function findChangedProperties(firstProperties, secondProperties) {
     return result;
 }
 function findChangedTrellises(first, second) {
-    let result = [];
-    for (let name in first) {
+    var result = [];
+    for (var name in first) {
         if (!second[name]) {
             result.push({
                 type: types_1.ChangeType.deleteTable,
@@ -61,7 +61,7 @@ function findChangedTrellises(first, second) {
             });
         }
     }
-    for (let name in second) {
+    for (var name in second) {
         if (!first[name]) {
             result.push({
                 type: types_1.ChangeType.createTable,
@@ -75,10 +75,10 @@ function findChangedTrellises(first, second) {
     return result;
 }
 function get_diff(path, firstCommit, secondCommit) {
-    const firstJson = getJson(firstCommit, path);
-    const secondJson = getJson(secondCommit, path);
-    const first = new schema_1.Schema(firstJson).trellises;
-    const second = new schema_1.Schema(secondJson).trellises;
+    var firstJson = getJson(firstCommit, path);
+    var secondJson = getJson(secondCommit, path);
+    var first = new schema_1.Schema(firstJson).trellises;
+    var second = new schema_1.Schema(secondJson).trellises;
     return findChangedTrellises(first, second);
 }
 exports.get_diff = get_diff;
