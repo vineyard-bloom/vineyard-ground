@@ -117,6 +117,8 @@ function load_property(name, property_source, trellis, loader) {
         property.is_nullable = true;
     if (property_source.unique === true)
         property.is_unique = true;
+    if (typeof property_source.autoIncrement === 'boolean')
+        property.autoIncrement = property_source.autoIncrement;
     property.default = property.is_nullable
         ? null
         : (property_source.defaultValue !== undefined

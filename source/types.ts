@@ -32,6 +32,7 @@ export interface Property {
   is_unique: boolean
   other_property: Property
   cross_table?: SequelizeTable
+  autoIncrement?: boolean
 
   is_reference(): boolean
 

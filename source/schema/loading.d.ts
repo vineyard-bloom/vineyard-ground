@@ -8,6 +8,7 @@ export interface Property_Source {
     "default"?: any;
     defaultValue?: any;
     unique?: boolean;
+    autoIncrement?: boolean;
 }
 export interface Table_Source {
     name?: string;

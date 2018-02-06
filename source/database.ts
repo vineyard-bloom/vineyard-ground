@@ -190,7 +190,9 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
     }
     else if (property.type === schema.library.types.int ||
       property.type === schema.library.types.long) {
-      primary_key.autoIncrement = true
+      if (property.autoIncrement !== false)
+        primary_key.autoIncrement = true
+
       delete primary_key.defaultValue
     }
   }

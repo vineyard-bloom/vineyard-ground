@@ -82,7 +82,7 @@ export class Reference extends StandardProperty {
 
 function get_key_identity(data: any, name: string) {
   const id = data[name]
-  if (id)
+  if (id || id === 0)
     return id
 
   if (typeof data === 'object')

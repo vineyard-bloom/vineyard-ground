@@ -81,7 +81,7 @@ var Reference = /** @class */ (function (_super) {
 exports.Reference = Reference;
 function get_key_identity(data, name) {
     var id = data[name];
-    if (id)
+    if (id || id === 0)
         return id;
     if (typeof data === 'object')
         throw new Error('Cannot retrieve identity from object because primary key "'
