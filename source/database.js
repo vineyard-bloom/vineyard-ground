@@ -66,6 +66,16 @@ function get_field(property, library, dialect) {
                     type: Sequelize.NUMERIC,
                     defaultValue: 0
                 };
+            if (type === library.types.char)
+                return {
+                    type: Sequelize.CHAR,
+                    defaultValue: ""
+                };
+            if (type === library.types.short)
+                return {
+                    type: Sequelize.SMALLINT,
+                    defaultValue: 0
+                };
             throw new Error("Unknown primitive: " + type.name + '.');
         case schema_1.Type_Category.list:
             return null;
@@ -83,6 +93,8 @@ function create_field(property, library, dialect) {
     var field = get_field(property, library, dialect);
     if (!field)
         return null;
+    if (property.length)
+        field.type = field.type(property.length);
     field.allowNull = property.is_nullable;
     if (property.default !== undefined)
         field.defaultValue = property.default;

@@ -9,6 +9,7 @@ export interface Property_Source {
     defaultValue?: any;
     unique?: boolean;
     autoIncrement?: boolean;
+    length?: number;
 }
 export interface Table_Source {
     name?: string;

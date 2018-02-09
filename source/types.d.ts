@@ -24,6 +24,7 @@ export interface Property {
     other_property: Property;
     cross_table?: SequelizeTable;
     autoIncrement?: boolean;
+    length?: number;
     is_reference(): boolean;
     is_list(): boolean;
     get_other_trellis(): Trellis;

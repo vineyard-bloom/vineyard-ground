@@ -39,6 +39,7 @@ export interface Property_Source {
   defaultValue?: any
   unique?: boolean
   autoIncrement?: boolean
+  length?: number
 }
 
 export interface Table_Source {
@@ -162,6 +163,9 @@ function load_property(name: string, property_source: Property_Source, trellis: 
 
   if (property_source.unique === true)
     property.is_unique = true
+
+  if (property_source.length)
+    property.length = property_source.length
 
   if (typeof property_source.autoIncrement === 'boolean')
     property.autoIncrement = property_source.autoIncrement

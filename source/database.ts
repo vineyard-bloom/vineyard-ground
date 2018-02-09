@@ -84,6 +84,18 @@ function get_field(property: Property, library: Library, dialect: string): any {
           defaultValue: 0
         }
 
+      if (type === library.types.char)
+        return {
+          type: Sequelize.CHAR,
+          defaultValue: ""
+        }
+
+      if (type === library.types.short)
+        return {
+          type: Sequelize.SMALLINT,
+          defaultValue: 0
+        }
+
       throw new Error("Unknown primitive: " + type.name + '.')
 
     case Type_Category.list:
@@ -106,6 +118,9 @@ function create_field(property: Property, library: Library, dialect: string): an
   const field = get_field(property, library, dialect)
   if (!field)
     return null
+
+  if (property.length)
+    field.type = field.type(property.length)
 
   field.allowNull = property.is_nullable
 

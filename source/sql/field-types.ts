@@ -55,6 +55,11 @@ export function getFieldType(property: Property, library: Library): any {
           name: 'DATE'
         }
 
+      if (type === library.types.char)
+        return {
+          name: 'CHAR'
+        }
+
       if (type === library.types.datetime)
         return {
           name: 'TIMESTAMPZ'
@@ -75,6 +80,12 @@ export function getFieldType(property: Property, library: Library): any {
         return {
           name: 'NUMERIC',
           defaultValue: '0'
+        }
+
+      if (type === library.types.short)
+        return {
+          name: 'SMALLINT',
+          defaultValue: 0
         }
 
       throw new Error("Unknown primitive: " + type.name + '.')

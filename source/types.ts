@@ -1,6 +1,6 @@
 import * as vineyardSchema from './schema'
-import {Collection} from "./collection";
-import {SequelizeModel} from "./clients/sequelize-client";
+import { Collection } from "./collection";
+import { SequelizeModel } from "./clients/sequelize-client";
 
 export interface Table {
   name: string
@@ -33,6 +33,7 @@ export interface Property {
   other_property: Property
   cross_table?: SequelizeTable
   autoIncrement?: boolean
+  length?: number
 
   is_reference(): boolean
 

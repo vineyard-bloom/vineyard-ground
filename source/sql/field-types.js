@@ -44,6 +44,10 @@ function getFieldType(property, library) {
                 return {
                     name: 'DATE'
                 };
+            if (type === library.types.char)
+                return {
+                    name: 'CHAR'
+                };
             if (type === library.types.datetime)
                 return {
                     name: 'TIMESTAMPZ'
@@ -61,6 +65,11 @@ function getFieldType(property, library) {
                 return {
                     name: 'NUMERIC',
                     defaultValue: '0'
+                };
+            if (type === library.types.short)
+                return {
+                    name: 'SMALLINT',
+                    defaultValue: 0
                 };
             throw new Error("Unknown primitive: " + type.name + '.');
         case schema_1.Type_Category.list:
