@@ -1,6 +1,6 @@
-import {Add, Operation, Operation_Type} from './list-operations'
-import {processFields, to_lower} from "./utility"
-import {Property, TableClient, Trellis} from "./types";
+import { Add, Operation, Operation_Type } from './list-operations'
+import { processFields, to_lower } from "./utility"
+import { Property, TableClient, Trellis } from "./types";
 
 function prepare_reference(reference: Property, value: any) {
   const other_primary_key = reference.get_other_trellis().primary_keys[0].name
@@ -147,8 +147,9 @@ export function update<T>(seed: any, trellis: Trellis, table: TableClient<T>, ch
   const identity = trellis.get_identity(seed)
   const newSeed = prepare_seed(changes || seed, trellis)
 
-  const filter: any = {}
-  filter[primary_key] = identity
+  const filter: any = typeof identity === 'object'
+    ? identity
+    : { [primary_key]: identity }
 
   return table.update(newSeed, filter)
     .then((result: any) => post_process(result[1][0], identity, changes, trellis, table))

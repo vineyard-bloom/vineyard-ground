@@ -157,6 +157,20 @@ describe('Sequelize Test', function () {
 
       const records = await model.ground.query(`SELECT * FROM odd_records`)
       expect(records).lengthOf(2)
+
+      await model.OddRecord.update({
+        strange: 11,
+        unknown: "mist2"},
+        {
+          data: {
+            "something": "wow"
+          }
+        })
+
+      const record = await model.ground.querySingle(`SELECT * FROM odd_records WHERE strange = 11`)
+      assert.deepEqual(record.data, {
+        "something": "wow"
+      })
     })
 
     it('Supports custom table names', async function () {
