@@ -97,7 +97,7 @@ function load_type(source: Property_Source, loader: Loader): Type {
 }
 
 function find_other_references(trellis: Trellis, other_trellis: Trellis): Reference[] {
-  const result = []
+  const result: any = []
   for (let name in other_trellis.properties) {
     const property = other_trellis.properties [name]
     if (property.is_reference()) {

@@ -24,7 +24,7 @@ export class QueryGenerator extends TrellisSqlGenerator {
     if (!where)
       return ''
 
-    const conditions = []
+    const conditions: any = []
 
     for (let i in where) {
       conditions.push([
@@ -41,7 +41,7 @@ export class QueryGenerator extends TrellisSqlGenerator {
     if (!order)
       return ''
 
-    const tokens = []
+    const tokens: any = []
     for (let item of order) {
       if (item == 'desc' || item == 'DESC') {
         tokens.push('DESC')

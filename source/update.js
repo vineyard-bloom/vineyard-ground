@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const list_operations_1 = require("./list-operations");
-const utility_1 = require("./utility");
+var list_operations_1 = require("./list-operations");
+var utility_1 = require("./utility");
 function prepare_reference(reference, value) {
-    const other_primary_key = reference.get_other_trellis().primary_keys[0].name;
+    var other_primary_key = reference.get_other_trellis().primary_keys[0].name;
     if (typeof value === 'object') {
         if (!value) {
             if (reference.is_nullable)
@@ -40,9 +40,9 @@ function prepare_property(property, value) {
     }
 }
 function prepare_seed(seed, trellis) {
-    const newSeed = {};
-    for (let i in seed) {
-        const property = trellis.properties[i];
+    var newSeed = {};
+    for (var i in seed) {
+        var property = trellis.properties[i];
         if (!property)
             throw new Error("Invalid property: " + trellis.name + "." + i + '.');
         if (!property.is_list()) {
@@ -58,10 +58,10 @@ function formatOperation(operation) {
     return list_operations_1.Add(operation);
 }
 function perform_operation(identity, list, operationOrIdentity) {
-    const operation = formatOperation(operationOrIdentity);
+    var operation = formatOperation(operationOrIdentity);
     switch (operation.type) {
         case list_operations_1.Operation_Type.add: {
-            const fields = {};
+            var fields = {};
             fields[utility_1.to_lower(list.trellis.name)] = identity;
             fields[utility_1.to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item);
             if (!list.cross_table)
@@ -69,7 +69,7 @@ function perform_operation(identity, list, operationOrIdentity) {
             return list.cross_table.create(fields);
         }
         case list_operations_1.Operation_Type.remove: {
-            const fields = {};
+            var fields = {};
             fields[utility_1.to_lower(list.trellis.name)] = identity;
             fields[utility_1.to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item);
             if (!list.cross_table)
@@ -84,48 +84,53 @@ function perform_operation(identity, list, operationOrIdentity) {
     }
 }
 function update_list(identity, seed, list, table) {
-    const value = seed[list.name];
+    var value = seed[list.name];
     if (Array.isArray(value)) {
-        return Promise.all(value.map(item => perform_operation(identity, list, item)));
+        return Promise.all(value.map(function (item) { return perform_operation(identity, list, item); }));
     }
     else {
         return perform_operation(identity, list, value);
     }
 }
 function update_lists(identity, seed, trellis, table) {
-    let promise = Promise.resolve();
-    for (let list of trellis.get_lists()) {
+    var promise = Promise.resolve();
+    var _loop_1 = function (list) {
         if (seed[list.name])
-            promise = promise.then(() => update_list(identity, seed, list, table));
+            promise = promise.then(function () { return update_list(identity, seed, list, table); });
+    };
+    for (var _i = 0, _a = trellis.get_lists(); _i < _a.length; _i++) {
+        var list = _a[_i];
+        _loop_1(list);
     }
     return promise;
 }
 function post_process(result, identity, seed, trellis, table) {
     utility_1.processFields(result.dataValues, trellis);
     return update_lists(identity, seed, trellis, table)
-        .then(() => result.dataValues);
+        .then(function () { return result.dataValues; });
 }
 function create(seed, trellis, table) {
-    const newSeed = prepare_seed(seed, trellis);
+    var newSeed = prepare_seed(seed, trellis);
     return table.create(newSeed)
-        .then(result => post_process(result, trellis.get_identity(result), seed, trellis, table));
+        .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, table); });
 }
 exports.create = create;
 function create_or_update(seed, trellis, table) {
-    const newSeed = prepare_seed(seed, trellis);
+    var newSeed = prepare_seed(seed, trellis);
     return table.upsert(newSeed)
-        .then(result => post_process(result, trellis.get_identity(result), seed, trellis, table));
+        .then(function (result) { return post_process(result, trellis.get_identity(result), seed, trellis, table); });
 }
 exports.create_or_update = create_or_update;
 function update(seed, trellis, table, changes) {
-    const primary_key = trellis.primary_keys[0].name;
-    const identity = trellis.get_identity(seed);
-    const newSeed = prepare_seed(changes || seed, trellis);
-    const filter = typeof identity === 'object'
+    var primary_key = trellis.primary_keys[0].name;
+    var identity = trellis.get_identity(seed);
+    var newSeed = prepare_seed(changes || seed, trellis);
+    var filter = typeof identity === 'object'
         ? identity
-        : { [primary_key]: identity };
+        : (_a = {}, _a[primary_key] = identity, _a);
     return table.update(newSeed, filter)
-        .then((result) => post_process(result[1][0], identity, changes, trellis, table));
+        .then(function (result) { return post_process(result[1][0], identity, changes, trellis, table); });
+    var _a;
 }
 exports.update = update;
 //# sourceMappingURL=update.js.map

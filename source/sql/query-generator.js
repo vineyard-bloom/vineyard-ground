@@ -1,15 +1,26 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const sql_building_1 = require("./sql-building");
-class QueryGenerator extends sql_building_1.TrellisSqlGenerator {
-    constructor(trellis) {
-        super(trellis);
+var sql_building_1 = require("./sql-building");
+var QueryGenerator = /** @class */ (function (_super) {
+    __extends(QueryGenerator, _super);
+    function QueryGenerator(trellis) {
+        return _super.call(this, trellis) || this;
     }
-    buildWhere(where) {
+    QueryGenerator.prototype.buildWhere = function (where) {
         if (!where)
             return '';
-        const conditions = [];
-        for (let i in where) {
+        var conditions = [];
+        for (var i in where) {
             conditions.push([
                 this.builder.quote(i),
                 '=',
@@ -17,12 +28,13 @@ class QueryGenerator extends sql_building_1.TrellisSqlGenerator {
             ]);
         }
         return ['WHERE', sql_building_1.delimit(conditions, 'AND')];
-    }
-    buildOrderBy(order) {
+    };
+    QueryGenerator.prototype.buildOrderBy = function (order) {
         if (!order)
             return '';
-        const tokens = [];
-        for (let item of order) {
+        var tokens = [];
+        for (var _i = 0, order_1 = order; _i < order_1.length; _i++) {
+            var item = order_1[_i];
             if (item == 'desc' || item == 'DESC') {
                 tokens.push('DESC');
             }
@@ -36,19 +48,20 @@ class QueryGenerator extends sql_building_1.TrellisSqlGenerator {
             }
         }
         return ['ORDER BY', tokens];
-    }
-    buildRange(command, value) {
+    };
+    QueryGenerator.prototype.buildRange = function (command, value) {
         if (!value)
             return '';
         if (typeof value != 'number')
             throw new Error("Range values must be numbers.");
         return [command, value.toString()];
-    }
-    buildSelect(attributes) {
+    };
+    QueryGenerator.prototype.buildSelect = function (attributes) {
         return '*';
-    }
-    generate(options = {}) {
-        const finalToken = [
+    };
+    QueryGenerator.prototype.generate = function (options) {
+        if (options === void 0) { options = {}; }
+        var finalToken = [
             'SELECT',
             this.buildSelect(options.attributes),
             'FROM',
@@ -59,7 +72,8 @@ class QueryGenerator extends sql_building_1.TrellisSqlGenerator {
             this.buildRange('OFFSET', options.offset),
         ];
         return this.builder.flatten(finalToken);
-    }
-}
+    };
+    return QueryGenerator;
+}(sql_building_1.TrellisSqlGenerator));
 exports.QueryGenerator = QueryGenerator;
 //# sourceMappingURL=query-generator.js.map

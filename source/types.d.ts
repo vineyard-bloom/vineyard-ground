@@ -98,4 +98,5 @@ export interface DatabaseConfig {
 }
 export interface GeneralDatabaseConfig extends DatabaseConfig {
     dialect: string;
+    logging?: boolean;
 }
