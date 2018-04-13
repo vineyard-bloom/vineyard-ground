@@ -7,7 +7,7 @@ export interface Arg {
 export type Token = string | any[] | Arg
 
 export function delimit(tokens: Token[], delimiter: string): Token {
-  let result = []
+  let result: any = []
   for (let i = 0; i < tokens.length; ++i) {
     if (i > 0)
       result.push(delimiter)
