@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize_client_1 = require("./sequelize-client");
 var PostgresClient = /** @class */ (function () {
     function PostgresClient(databaseConfig) {
@@ -25,3 +25,4 @@ var PostgresClient = /** @class */ (function () {
     return PostgresClient;
 }());
 exports.PostgresClient = PostgresClient;
+//# sourceMappingURL=postgres-client.js.map

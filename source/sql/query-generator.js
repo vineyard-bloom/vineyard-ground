@@ -9,7 +9,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var sql_building_1 = require("./sql-building");
 var QueryGenerator = /** @class */ (function (_super) {
     __extends(QueryGenerator, _super);
@@ -76,3 +76,4 @@ var QueryGenerator = /** @class */ (function (_super) {
     return QueryGenerator;
 }(sql_building_1.TrellisSqlGenerator));
 exports.QueryGenerator = QueryGenerator;
+//# sourceMappingURL=query-generator.js.map

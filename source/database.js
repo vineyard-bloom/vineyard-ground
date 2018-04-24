@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var schema_1 = require("./schema");
 var Sequelize = require('sequelize');
 var node_uuid = require('uuid');
@@ -96,8 +96,8 @@ function create_field(property, library, dialect) {
     if (property.length)
         field.type = field.type(property.length);
     field.allowNull = property.is_nullable;
-    if (property["default"] !== undefined)
-        field.defaultValue = property["default"];
+    if (property.default !== undefined)
+        field.defaultValue = property.default;
     if (property.is_unique)
         field.unique = true;
     return field;
@@ -143,8 +143,8 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
     }
 }
 function initialize_relationships(schema, tables, sequelize) {
-    for (var name_1 in schema.trellises) {
-        var trellis = schema.trellises[name_1];
+    for (var name in schema.trellises) {
+        var trellis = schema.trellises[name];
         for (var i in trellis.properties) {
             var property = trellis.properties[i];
             initialize_relationship(property, trellis, schema, tables, sequelize);
@@ -210,10 +210,11 @@ function create_table(trellis, schema, sequelize) {
 }
 function vineyard_to_sequelize(schema, keys, sequelize) {
     var tables = {};
-    for (var name_2 in keys) {
-        tables[name_2] = create_table(schema.trellises[name_2], schema, sequelize);
+    for (var name in keys) {
+        tables[name] = create_table(schema.trellises[name], schema, sequelize);
     }
     initialize_relationships(schema, tables, sequelize);
     return tables;
 }
 exports.vineyard_to_sequelize = vineyard_to_sequelize;
+//# sourceMappingURL=database.js.map

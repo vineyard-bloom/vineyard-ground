@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var query_1 = require("./query");
 var update_1 = require("./update");
 var Collection = /** @class */ (function () {
@@ -54,3 +54,4 @@ var Collection = /** @class */ (function () {
     return Collection;
 }());
 exports.Collection = Collection;
+//# sourceMappingURL=collection.js.map

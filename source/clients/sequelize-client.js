@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize = require("sequelize");
 var SequelizeLegacyClient = /** @class */ (function () {
     function SequelizeLegacyClient() {
@@ -59,3 +59,4 @@ var SequelizeTableClient = /** @class */ (function () {
     return SequelizeTableClient;
 }());
 exports.SequelizeTableClient = SequelizeTableClient;
+//# sourceMappingURL=sequelize-client.js.map

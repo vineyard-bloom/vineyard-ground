@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 function delimit(tokens, delimiter) {
     var result = [];
     for (var i = 0; i < tokens.length; ++i) {
@@ -87,3 +87,4 @@ var TrellisSqlGenerator = /** @class */ (function () {
     return TrellisSqlGenerator;
 }());
 exports.TrellisSqlGenerator = TrellisSqlGenerator;
+//# sourceMappingURL=sql-building.js.map

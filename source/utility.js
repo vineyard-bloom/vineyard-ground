@@ -1,5 +1,5 @@
 "use strict";
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var bignumber_js_1 = require("bignumber.js");
 function to_lower_snake_case(text) {
     if (text.length == 1)
@@ -43,3 +43,4 @@ function processFields(result, trellis) {
     return result;
 }
 exports.processFields = processFields;
+//# sourceMappingURL=utility.js.map

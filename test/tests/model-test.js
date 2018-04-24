@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
+Object.defineProperty(exports, "__esModule", { value: true });
 var utility_1 = require("../../source/utility");
 require('source-map-support').install();
 var chai_1 = require("chai");
@@ -46,7 +46,7 @@ var mainWorld, dangerousTag, flyingTag;
 var contexts = [
     {
         name: 'Sequelize',
-        client: new source_1.SequelizeClient(config.database)
+        client: new source_1.SequelizeClient(config.database),
     }
 ];
 // createSuite('Sequelize', new SequelizeClient(config.database))
@@ -253,7 +253,7 @@ describe('Sequelize Test', function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, model.RenamedRecord.create({
-                                unknown: 16
+                                unknown: 16,
                             })];
                         case 1:
                             _a.sent();
@@ -331,3 +331,4 @@ function initializeModel(client, schemaName) {
         });
     });
 }
+//# sourceMappingURL=model-test.js.map
