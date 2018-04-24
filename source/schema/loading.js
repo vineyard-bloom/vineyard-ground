@@ -170,17 +170,31 @@ function initialize_primary_keys(trellis, source, loader) {
         trellis.primary_keys.push(initialize_primary_key(primaryKeys[i], trellis, loader));
     }
 }
+// loadIndexes function returns an array of indexes
+function loadIndexes(trellis, source) {
+    if (!source.table.indexes)
+        return [];
+    return source.table.indexes.map(function (indexSource) {
+        return ({
+            properties: indexSource.properties.map(function (name) {
+                return trellis.properties[name];
+            })
+        });
+    });
+}
 function load_trellis(name, source, loader) {
     var trellis = new trellis_1.TrellisImplementation(name);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
     var sourceTable = source.table || {};
-    trellis.table = {
-        name: sourceTable.name || pluralize(snakeCaseTables ? utility_1.to_lower_snake_case(trellis.name) : trellis.name.toLowerCase())
-    };
     for (var name_1 in source.properties) {
         var property_source = source.properties[name_1];
         trellis.properties[name_1] = load_property(name_1, property_source, trellis, loader);
     }
+    trellis.table = {
+        name: sourceTable.name || pluralize(snakeCaseTables ? utility_1.to_lower_snake_case(trellis.name) : trellis.name.toLowerCase()),
+        // Call loadIndexes function to assign indexes to trellis.table.indexes
+        indexes: loadIndexes(trellis, source)
+    };
     if (source.additional)
         trellis.additional = source.additional;
     if (source.softDelete)

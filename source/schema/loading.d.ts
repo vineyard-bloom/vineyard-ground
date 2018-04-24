@@ -17,7 +17,7 @@ export interface IndexSource {
 }
 export interface Table_Source {
     name?: string;
-    indexes?: IndexSource[];
+    indexes: IndexSource[];
 }
 export interface Trellis_Source {
     primary_key?: string | string[];

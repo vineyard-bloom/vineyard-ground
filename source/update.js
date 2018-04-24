@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var list_operations_1 = require("./list-operations");
 var utility_1 = require("./utility");
 function prepare_reference(reference, value) {
@@ -133,4 +133,3 @@ function update(seed, trellis, table, changes) {
     var _a;
 }
 exports.update = update;
-//# sourceMappingURL=update.js.map

@@ -34,7 +34,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var utility_1 = require("../../source/utility");
 require('source-map-support').install();
 var chai_1 = require("chai");
@@ -46,7 +46,7 @@ var mainWorld, dangerousTag, flyingTag;
 var contexts = [
     {
         name: 'Sequelize',
-        client: new source_1.SequelizeClient(config.database),
+        client: new source_1.SequelizeClient(config.database)
     }
 ];
 // createSuite('Sequelize', new SequelizeClient(config.database))
@@ -253,7 +253,7 @@ describe('Sequelize Test', function () {
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, model.RenamedRecord.create({
-                                unknown: 16,
+                                unknown: 16
                             })];
                         case 1:
                             _a.sent();
@@ -261,6 +261,37 @@ describe('Sequelize Test', function () {
                         case 2:
                             record = _a.sent();
                             chai_1.expect(record.unknown).equal(16);
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
+        it('Creates trellis indexes', function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var original;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, model.OddRecord.create({
+                                strange: 10,
+                                unknown: "mist",
+                                vast: "1000000000000000000000000000021",
+                                sampleDate: new Date("June 15, 2016"),
+                                sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
+                                veryBig: new bignumber_js_1.BigNumber("1023.1334"),
+                                nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
+                                data: {
+                                    frogs: [
+                                        { name: "Froggy" },
+                                        { name: "Pac Frog" }
+                                    ]
+                                }
+                            })
+                            // Make sure trellis.table.indices matches a string array of the properties?
+                        ];
+                        case 1:
+                            original = _a.sent();
+                            // Make sure trellis.table.indices matches a string array of the properties?
+                            chai_1.assert.deepEqual(Object.values(original), original.indexes);
                             return [2 /*return*/];
                     }
                 });
@@ -300,4 +331,3 @@ function initializeModel(client, schemaName) {
         });
     });
 }
-//# sourceMappingURL=model-test.js.map

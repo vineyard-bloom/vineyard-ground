@@ -43,7 +43,7 @@ export interface Property_Source {
 }
 
 export interface IndexSource {
-  name?: string // Not implmented yet
+  name?: string // Not implemented yet
   properties: string[]
 }
 
@@ -238,12 +238,12 @@ function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loade
   }
 }
 
-// Add loadIndexes function to return an array of indexes
+// loadIndexes function returns an array of indexes
 function loadIndexes(trellis: Trellis, source: Trellis_Source) {
-  if (!source.indexes)
+  if (!source.table.indexes)
     return []
 
-  return source.indexes.map(indexSource =>
+  return source.table.indexes.map(indexSource =>
     ({
       properties: indexSource.properties.map(name =>
         trellis.properties[name]

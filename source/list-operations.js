@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var Operation_Type;
 (function (Operation_Type) {
     Operation_Type[Operation_Type["add"] = 0] = "add";
@@ -26,4 +26,3 @@ function Remove(item) {
     };
 }
 exports.Remove = Remove;
-//# sourceMappingURL=list-operations.js.map

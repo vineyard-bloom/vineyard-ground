@@ -9,15 +9,15 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var schema_1 = require("./schema");
 var collection_1 = require("./collection");
 var database_1 = require("./database");
 function sync_collections(schema, collections, keys, sequelize_models, client) {
-    for (var name in keys) {
-        var trellis = schema.trellises[name];
-        var table = client.createTableInterface(trellis, sequelize_models[name]);
-        collections[name] = new collection_1.Collection(trellis, table, client);
+    for (var name_1 in keys) {
+        var trellis = schema.trellises[name_1];
+        var table = client.createTableInterface(trellis, sequelize_models[name_1]);
+        collections[name_1] = new collection_1.Collection(trellis, table, client);
     }
 }
 function initializeTrellises(schema, collections, keys, db, client) {
@@ -77,4 +77,3 @@ var DevModeler = /** @class */ (function (_super) {
     return DevModeler;
 }(Modeler));
 exports.DevModeler = DevModeler;
-//# sourceMappingURL=modeler.js.map

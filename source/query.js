@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 var sequelize = require('sequelize');
 var utility_1 = require("./utility");
 var query_generator_1 = require("./sql/query-generator");
@@ -117,8 +117,7 @@ var Query_Implementation = /** @class */ (function () {
         return this.queryWithQueryGenerator()
             .then(function (result) { return _this.has_expansions()
             ? _this.process_result_with_expansions(result)
-            : _this.process_result(result); })
-            .catch(function (error) {
+            : _this.process_result(result); })["catch"](function (error) {
             if (_this.bundle)
                 console.error(_this.bundle);
             else
@@ -197,4 +196,3 @@ function Count(path) {
     return sequelize.fn('COUNT', sequelize.col(path));
 }
 exports.Count = Count;
-//# sourceMappingURL=query.js.map
