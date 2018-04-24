@@ -243,10 +243,9 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
     deletedAt: deleted,
     paranoid: !!deleted,
     // Create Sequelize indexes
-    // CREATE INDEX transactions_to ON transactions ("to");
     indexes: [{
       unique: true,
-      fields: ['transactions_to']
+      fields: trellis.table.indexes
     }]
   })
 
