@@ -49,7 +49,7 @@ export interface IndexSource {
 
 export interface Table_Source {
   name?: string
-  indexes?: IndexSource[]
+  indexes: IndexSource[]
 }
 
 export interface Trellis_Source {
@@ -243,14 +243,12 @@ function loadIndexes(trellis: Trellis, source: Trellis_Source) {
   if (!source.indexes)
     return []
 
-  return source.indexes.map(
-    indexSource =>
-    new {
-      properties: indexSource.properties.map(
-        name =>
+  return source.indexes.map(indexSource =>
+    ({
+      properties: indexSource.properties.map(name =>
         trellis.properties[name]
       )
-    }
+    })
   )
 }
 
