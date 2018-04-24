@@ -2,9 +2,15 @@ import * as vineyardSchema from './schema'
 import { Collection } from "./collection";
 import { SequelizeModel } from "./clients/sequelize-client";
 
+export interface Index {
+  name?: string // Not implmented yet
+  properties: Property[]
+}
+
 export interface Table {
   name: string
   isCross?: boolean
+  indexes?: Index[]
 }
 
 export interface SequelizeTable extends Table {
