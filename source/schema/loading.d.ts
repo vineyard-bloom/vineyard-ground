@@ -11,8 +11,13 @@ export interface Property_Source {
     autoIncrement?: boolean;
     length?: number;
 }
+export interface IndexSource {
+    name?: string;
+    properties: string[];
+}
 export interface Table_Source {
     name?: string;
+    indexes?: IndexSource[];
 }
 export interface Trellis_Source {
     primary_key?: string | string[];

@@ -42,8 +42,14 @@ export interface Property_Source {
   length?: number
 }
 
+export interface IndexSource {
+  name?: string // Not implmented yet
+  properties: string[]
+}
+
 export interface Table_Source {
   name?: string
+  indexes?: IndexSource[]
 }
 
 export interface Trellis_Source {

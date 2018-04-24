@@ -1,9 +1,10 @@
 import { QueryBuilder } from './query';
 import { CollectionTrellis, DatabaseClient, TableClient, Trellis } from './types';
+import { Collection as DataCollection } from 'vineyard-data/legacy';
 export interface ICollection {
     getTrellis(): Trellis;
 }
-export declare class Collection<T> implements ICollection {
+export declare class Collection<T> implements ICollection, DataCollection<T> {
     private table;
     private client;
     private trellis;
