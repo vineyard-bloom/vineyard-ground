@@ -182,9 +182,24 @@ describe('Sequelize Test', function () {
       expect(record.unknown).equal(16)
     })
 
-    // it('Creates trellis indexes', async function () {
-      // Make sure indexes match what we expect
-    // })
+    it('Creates trellis indexes', async function () {
+      await model.OddRecord.create({
+        strange: 49,
+        unknown: "ukulele",
+        vast: new BigNumber("1000000000002840060278347587468"),
+        sampleDate: new Date("August 3, 2083"),
+        sampleDatetime: new Date("2097-10-23T18:24:05.026Z"),
+        veryBig: "829405.29603",
+        data: {
+          "nothing": null
+        }
+      })
+      const properties = await model.OddRecord.all()
+      const indexes = await model.OddRecord
+      console.log('indexes', indexes.trellis.indexes)
+      console.log('properties', properties)
+      assert.deepEqual(indexes.trellis.indexes, properties)
+    })
   })
 })
 
