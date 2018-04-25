@@ -241,7 +241,13 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
     createdAt: created,
     updatedAt: modified,
     deletedAt: deleted,
-    paranoid: !!deleted
+    paranoid: !!deleted,
+    // Create Sequelize indexes
+    indexes: trellis.table.indexes.map(index =>
+      ({
+        fields: index.properties.map(property => property.name)
+      })
+    )
   })
 
   return oldTable

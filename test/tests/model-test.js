@@ -266,6 +266,38 @@ describe('Sequelize Test', function () {
                 });
             });
         });
+        it('Creates trellis indexes', function () {
+            return __awaiter(this, void 0, void 0, function () {
+                var properties, indexes;
+                return __generator(this, function (_a) {
+                    switch (_a.label) {
+                        case 0: return [4 /*yield*/, model.OddRecord.create({
+                                strange: 49,
+                                unknown: "ukulele",
+                                vast: new bignumber_js_1.BigNumber("1000000000002840060278347587468"),
+                                sampleDate: new Date("August 3, 2083"),
+                                sampleDatetime: new Date("2097-10-23T18:24:05.026Z"),
+                                veryBig: "829405.29603",
+                                data: {
+                                    "nothing": null
+                                }
+                            })];
+                        case 1:
+                            _a.sent();
+                            return [4 /*yield*/, model.OddRecord.all()];
+                        case 2:
+                            properties = _a.sent();
+                            return [4 /*yield*/, model.OddRecord];
+                        case 3:
+                            indexes = _a.sent();
+                            console.log('indexes', indexes.trellis.indexes);
+                            console.log('properties', properties);
+                            chai_1.assert.deepEqual(indexes.trellis.indexes, properties);
+                            return [2 /*return*/];
+                    }
+                });
+            });
+        });
     });
 });
 describe('Simple unit tests', function () {

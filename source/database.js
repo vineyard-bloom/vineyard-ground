@@ -198,7 +198,13 @@ function create_table(trellis, schema, sequelize) {
         createdAt: created,
         updatedAt: modified,
         deletedAt: deleted,
-        paranoid: !!deleted
+        paranoid: !!deleted,
+        // Create Sequelize indexes
+        indexes: trellis.table.indexes.map(function (index) {
+            return ({
+                fields: index.properties.map(function (property) { return property.name; })
+            });
+        })
     });
     return oldTable;
 }
