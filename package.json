@@ -5,13 +5,14 @@
   "main": "source/index.js",
   "types": "source/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": "git@github.com:vineyard-bloom/vineyard-ground.git",
   "author": "Christopher W. Johnson",
   "license": "MIT",
   "dependencies": {
     "bignumber.js": "^4.0.4",
+    "npm": "^6.0.0",
     "pg": "6.4.2",
     "pluralize": "^7.0.0",
     "sequelize": "^4.16.2",

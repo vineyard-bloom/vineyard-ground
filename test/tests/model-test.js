@@ -266,37 +266,26 @@ describe('Sequelize Test', function () {
                 });
             });
         });
-        it('Creates trellis indexes', function () {
-            return __awaiter(this, void 0, void 0, function () {
-                var original;
-                return __generator(this, function (_a) {
-                    switch (_a.label) {
-                        case 0: return [4 /*yield*/, model.OddRecord.create({
-                                strange: 10,
-                                unknown: "mist",
-                                vast: "1000000000000000000000000000021",
-                                sampleDate: new Date("June 15, 2016"),
-                                sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
-                                veryBig: new bignumber_js_1.BigNumber("1023.1334"),
-                                nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
-                                data: {
-                                    frogs: [
-                                        { name: "Froggy" },
-                                        { name: "Pac Frog" }
-                                    ]
-                                }
-                            })
-                            // Make sure trellis.table.indices matches a string array of the properties?
-                        ];
-                        case 1:
-                            original = _a.sent();
-                            // Make sure trellis.table.indices matches a string array of the properties?
-                            chai_1.assert.deepEqual(Object.values(original), original.indexes);
-                            return [2 /*return*/];
-                    }
-                });
-            });
-        });
+        // it('Creates trellis indexes', async function () {
+        //   // Create a DB of the arbitrary.json data
+        //   const original = await model.OddRecord.create({
+        //     strange: 10,
+        //     unknown: "mist",
+        //     vast: "1000000000000000000000000000021",
+        //     sampleDate: new Date("June 15, 2016"),
+        //     sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
+        //     veryBig: new BigNumber("1023.1334"),
+        //     nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
+        //     data: {
+        //       frogs: [
+        //         {name: "Froggy"},
+        //         {name: "Pac Frog"}
+        //       ]
+        //     }
+        //   })
+        //   // Make sure trellis.table.indices matches a string array of the properties?
+        //   assert.deepEqual(Object.values(original), original.indexes)
+        // })
     });
 });
 describe('Simple unit tests', function () {
