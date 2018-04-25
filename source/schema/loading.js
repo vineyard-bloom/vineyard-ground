@@ -172,9 +172,9 @@ function initialize_primary_keys(trellis, source, loader) {
 }
 // loadIndexes function returns an array of indexes
 function loadIndexes(trellis, source) {
-    if (!source.table.indexes)
+    if (!source.indexes)
         return [];
-    return source.table.indexes.map(function (indexSource) {
+    return source.indexes.map(function (indexSource) {
         return ({
             properties: indexSource.properties.map(function (name) {
                 return trellis.properties[name];

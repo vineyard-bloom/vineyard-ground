@@ -266,26 +266,16 @@ describe('Sequelize Test', function () {
                 });
             });
         });
-        // it('Creates trellis indexes', async function () {
-        //   // Create a DB of the arbitrary.json data
-        //   const original = await model.OddRecord.create({
-        //     strange: 10,
-        //     unknown: "mist",
-        //     vast: "1000000000000000000000000000021",
-        //     sampleDate: new Date("June 15, 2016"),
-        //     sampleDatetime: new Date("2017-10-23T18:24:05.026Z"),
-        //     veryBig: new BigNumber("1023.1334"),
-        //     nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
-        //     data: {
-        //       frogs: [
-        //         {name: "Froggy"},
-        //         {name: "Pac Frog"}
-        //       ]
-        //     }
-        //   })
-        //   // Make sure trellis.table.indices matches a string array of the properties?
-        //   assert.deepEqual(Object.values(original), original.indexes)
-        // })
+        it('Creates trellis indexes', function () {
+            return __awaiter(this, void 0, void 0, function () {
+                return __generator(this, function (_a) {
+                    // Create a DB of the arbitrary.json data
+                    // Make sure trellis.indexes matches a string array of the properties?
+                    chai_1.assert.equal(3, 3);
+                    return [2 /*return*/];
+                });
+            });
+        });
     });
 });
 describe('Simple unit tests', function () {
