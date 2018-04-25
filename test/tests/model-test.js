@@ -276,7 +276,7 @@ describe('Sequelize Test', function () {
                             record = _a.sent();
                             console.log('Full indexing info:', record);
                             console.log('Index definition:', record[0].indexdef);
-                            chai_1.assert.equal(record[0].indexdef, 'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown, vast, veryBig, sampleData, sampleDatetime, nullableDattime, date)');
+                            chai_1.assert.equal(record[0].indexdef, 'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown, vast, veryBig, sampleData, sampleDatetime, nullableDatetime, data)');
                             return [2 /*return*/];
                     }
                 });

@@ -186,7 +186,7 @@ describe('Sequelize Test', function () {
       const record = await model.ground.query(`SELECT * FROM pg_indexes WHERE tablename = 'odd_records';`)
       console.log('Full indexing info:', record)
       console.log('Index definition:', record[0].indexdef)
-      assert.equal(record[0].indexdef, 'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown, vast, veryBig, sampleData, sampleDatetime, nullableDattime, date)')
+      assert.equal(record[0].indexdef, 'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown, vast, veryBig, sampleData, sampleDatetime, nullableDatetime, data)')
     })
   })
 })
