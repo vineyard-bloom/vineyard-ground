@@ -182,12 +182,9 @@ describe('Sequelize Test', function () {
       expect(record.unknown).equal(16)
     })
 
-    it('Creates trellis indexes', async function () {
-      // Create a DB of the arbitrary.json data
-      
-      // Make sure trellis.indexes matches a string array of the properties?
-      assert.equal(3, 3)
-    })
+    // it('Creates trellis indexes', async function () {
+      // Make sure indexes match what we expect
+    // })
   })
 })
 

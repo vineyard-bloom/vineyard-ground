@@ -195,6 +195,7 @@ function load_trellis(name, source, loader) {
         // Call loadIndexes function to assign indexes to trellis.table.indexes
         indexes: loadIndexes(trellis, source)
     };
+    console.log('INDEXES', trellis.table.indexes);
     if (source.additional)
         trellis.additional = source.additional;
     if (source.softDelete)

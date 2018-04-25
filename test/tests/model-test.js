@@ -266,16 +266,9 @@ describe('Sequelize Test', function () {
                 });
             });
         });
-        it('Creates trellis indexes', function () {
-            return __awaiter(this, void 0, void 0, function () {
-                return __generator(this, function (_a) {
-                    // Create a DB of the arbitrary.json data
-                    // Make sure trellis.indexes matches a string array of the properties?
-                    chai_1.assert.equal(3, 3);
-                    return [2 /*return*/];
-                });
-            });
-        });
+        // it('Creates trellis indexes', async function () {
+        // Make sure indexes match what we expect
+        // })
     });
 });
 describe('Simple unit tests', function () {
