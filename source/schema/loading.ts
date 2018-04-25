@@ -268,8 +268,6 @@ function load_trellis(name: string, source: Trellis_Source, loader: Loader): Tre
     indexes: loadIndexes(trellis, source)
   }
 
-  console.log('INDEXES', trellis.table.indexes)
-
   if (source.additional)
     trellis.additional = source.additional
 
