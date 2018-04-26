@@ -240,10 +240,10 @@ function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loade
 
 // loadIndexes function returns an array of indexes
 function loadIndexes(trellis: Trellis, source: Trellis_Source) {
-  if (!source.indexes)
+  if (!source.table || !source.table.indexes)
     return []
 
-  return source.indexes.map(indexSource =>
+  return source.table.indexes.map(indexSource =>
     ({
       properties: indexSource.properties.map(name =>
         trellis.properties[name]
@@ -255,7 +255,7 @@ function loadIndexes(trellis: Trellis, source: Trellis_Source) {
 function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
   const trellis = new TrellisImplementation(name)
   loader.library.types[name] = new Trellis_Type(name, trellis)
-  const sourceTable = source.table || {}
+  const sourceTable = source.table || { name: undefined }
 
   for (let name in source.properties) {
     const property_source = source.properties [name]

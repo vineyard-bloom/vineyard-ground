@@ -172,9 +172,9 @@ function initialize_primary_keys(trellis, source, loader) {
 }
 // loadIndexes function returns an array of indexes
 function loadIndexes(trellis, source) {
-    if (!source.indexes)
+    if (!source.table || !source.table.indexes)
         return [];
-    return source.indexes.map(function (indexSource) {
+    return source.table.indexes.map(function (indexSource) {
         return ({
             properties: indexSource.properties.map(function (name) {
                 return trellis.properties[name];
@@ -185,7 +185,7 @@ function loadIndexes(trellis, source) {
 function load_trellis(name, source, loader) {
     var trellis = new trellis_1.TrellisImplementation(name);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
-    var sourceTable = source.table || {};
+    var sourceTable = source.table || { name: undefined };
     for (var name_1 in source.properties) {
         var property_source = source.properties[name_1];
         trellis.properties[name_1] = load_property(name_1, property_source, trellis, loader);

@@ -183,10 +183,19 @@ describe('Sequelize Test', function () {
     })
 
     it('Creates trellis indexes', async function () {
+      // Example of manual index creation
+      // await model.ground.query(`CREATE INDEX odd_records_vast ON public.odd_records (vast);`)
+
       const record = await model.ground.query(`SELECT * FROM pg_indexes WHERE tablename = 'odd_records';`)
-      console.log('Full indexing info:', record)
-      console.log('Index definition:', record[0].indexdef)
-      assert.equal(record[0].indexdef, 'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown, vast, veryBig, sampleData, sampleDatetime, nullableDatetime, data)')
+
+
+      const actual = [record[0].indexdef, record[1].indexdef]
+
+      const expected = [
+        'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown)',
+        'CREATE INDEX odd_records_vast ON public.odd_records USING btree (vast)',
+      ]
+      assert.deepEqual(expected, actual)
     })
   })
 })

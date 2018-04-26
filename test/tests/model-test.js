@@ -268,15 +268,18 @@ describe('Sequelize Test', function () {
         });
         it('Creates trellis indexes', function () {
             return __awaiter(this, void 0, void 0, function () {
-                var record;
+                var record, actual, expected;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, model.ground.query("SELECT * FROM pg_indexes WHERE tablename = 'odd_records';")];
                         case 1:
                             record = _a.sent();
-                            console.log('Full indexing info:', record);
-                            console.log('Index definition:', record[0].indexdef);
-                            chai_1.assert.equal(record[0].indexdef, 'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown, vast, veryBig, sampleData, sampleDatetime, nullableDatetime, data)');
+                            actual = [record[0].indexdef, record[1].indexdef];
+                            expected = [
+                                'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown)',
+                                'CREATE INDEX odd_records_vast ON public.odd_records USING btree (vast)',
+                            ];
+                            chai_1.assert.deepEqual(expected, actual);
                             return [2 /*return*/];
                     }
                 });
