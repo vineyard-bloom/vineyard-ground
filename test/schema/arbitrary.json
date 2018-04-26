@@ -1,5 +1,12 @@
 {
   "OddRecord": {
+    "table": {
+      "indexes": [
+        {
+          "properties": ["vast", "veryBig", "sampleDate", "sampleDatetime", "nullableDatetime", "data"]
+        }
+      ]
+    },
     "primary": ["strange", "unknown"],
     "properties": {
       "strange": {

@@ -193,6 +193,11 @@ function create_table(trellis, schema, sequelize) {
         if (autoFields.indexOf('modified') == -1)
             modified = false;
     }
+    var indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(function (index) {
+        return ({
+            fields: index.properties.map(function (property) { return property.name; })
+        });
+    });
     var oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
         underscored: true,
         createdAt: created,
@@ -200,11 +205,7 @@ function create_table(trellis, schema, sequelize) {
         deletedAt: deleted,
         paranoid: !!deleted,
         // Create Sequelize indexes
-        indexes: trellis.table.indexes.map(function (index) {
-            return ({
-                fields: index.properties.map(function (property) { return property.name; })
-            });
-        })
+        indexes: indexArray
     });
     return oldTable;
 }
