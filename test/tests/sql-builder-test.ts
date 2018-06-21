@@ -35,6 +35,8 @@ describe('sql-builder-test', function () {
     assert.equal(bundle.args.length, 0)
   })
 
+  // TODO add test for diffing?
+
   // it.skip('generate', function () {
   //   const sql = generate(schema as any)
   //   checkDiff('test/resources/game.sql', sql, config.diffViewerPath)

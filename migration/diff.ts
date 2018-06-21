@@ -92,4 +92,5 @@ export function get_diff(path: string, firstCommit: string, secondCommit: string
   const first:any = new Schema(firstJson).trellises
   const second:any = new Schema(secondJson).trellises
   return findChangedTrellises(first, second)
+  // Return more complex object of changes plus the first schema?
 }
