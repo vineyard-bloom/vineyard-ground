@@ -1,4 +1,4 @@
-import {generate} from "../../migration";
+import {generate, findChangedTrellises} from "../../migration";
 
 require('source-map-support').install()
 import {QueryGenerator} from "../../source/sql/query-generator";
@@ -8,9 +8,11 @@ const Sequelize = require('sequelize')
 import {checkDiff} from "../utility/diff";
 import {Schema} from "../../source/schema";
 import {SequelizeClient} from "../../source/clients/sequelize-client";
+import { SqlSchemaBuilder } from "../../migration/sql-schema-builder";
 
 const config = require('../config/config.json')
 const schema = new Schema(require('../schema/game.json'))
+const schema2 = new Schema(require('../schema/game-2.json'))
 const client = new SequelizeClient(config.database)
 const modeler = new DevModeler(schema, client)
 
@@ -35,7 +37,16 @@ describe('sql-builder-test', function () {
     assert.equal(bundle.args.length, 0)
   })
 
-  // TODO add test for diffing?
+  it('diff generation', function () {
+    const first: any = schema.trellises
+    const second: any = schema2.trellises
+    const changes = findChangedTrellises(first, second)
+    console.log('changes', changes)
+
+    const builder = new SqlSchemaBuilder(schema)
+    const result = builder.build(changes)
+    console.log('result is', result)
+  })
 
   // it.skip('generate', function () {
   //   const sql = generate(schema as any)

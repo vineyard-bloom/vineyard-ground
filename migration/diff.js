@@ -74,12 +74,14 @@ function findChangedTrellises(first, second) {
     }
     return result;
 }
+exports.findChangedTrellises = findChangedTrellises;
 function get_diff(path, firstCommit, secondCommit) {
     var firstJson = getJson(firstCommit, path);
     var secondJson = getJson(secondCommit, path);
     var first = new schema_1.Schema(firstJson).trellises;
     var second = new schema_1.Schema(secondJson).trellises;
     return findChangedTrellises(first, second);
+    // TODO Return more complex object of changes plus the first schema?
 }
 exports.get_diff = get_diff;
 //# sourceMappingURL=diff.js.map

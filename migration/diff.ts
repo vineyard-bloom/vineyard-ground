@@ -62,7 +62,7 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
   return result
 }
 
-function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [] {
+export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [] {
   let result: Change[] = []
   for (let name in first) {
     if (!second[name]) {
@@ -92,5 +92,5 @@ export function get_diff(path: string, firstCommit: string, secondCommit: string
   const first:any = new Schema(firstJson).trellises
   const second:any = new Schema(secondJson).trellises
   return findChangedTrellises(first, second)
-  // Return more complex object of changes plus the first schema?
+  // TODO Return more complex object of changes plus the first schema?
 }
