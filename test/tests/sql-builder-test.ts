@@ -37,15 +37,15 @@ describe('sql-builder-test', function () {
     assert.equal(bundle.args.length, 0)
   })
 
-  it('diff generation', function () {
-    const first: any = schema.trellises
-    const second: any = schema2.trellises
-    const changes = findChangedTrellises(first, second)
+  it('can generate sql to update from an old schema to a newer one', function () {
+    const changes = findChangedTrellises(schema.trellises, schema2.trellises)
     console.log('changes', changes)
+
+    assert.equal(changes.length, 1, "There should only be one change")
 
     const builder = new SqlSchemaBuilder(schema)
     const result = builder.build(changes)
-    console.log('result is', result)
+    console.log('change result is', result)
   })
 
   // it.skip('generate', function () {

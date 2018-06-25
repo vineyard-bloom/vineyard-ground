@@ -179,25 +179,25 @@ export class SqlSchemaBuilder {
     return result
   }
 
+  // TODO remove type assertions once everything is fleshed out?
   private processChange(change: Change, context: Context) {
-    throw new Error("Not implemented.")
-
-    // switch (change.type) {
-    //   case ChangeType.createTable:
-    //     return this.createTable(change.trellis, context)
-    //
-    //   case ChangeType.changeFieldNullable:
-    //     return this.changeFieldNullable(change.property)
-    //
-    //   case ChangeType.changeFieldType:
-    //     return this.changeFieldType(change.property)
-    //
-    //   case ChangeType.deleteField:
-    //     return this.deleteField(change.property)
-    //
-    //   case ChangeType.deleteTable:
-    //     return this.deleteTable(change.property)
-    // }
+    // throw new Error("Not implemented.")
+    switch (change.type) {
+      case ChangeType.createTable:
+        return this.createTable(change.trellis!, context)
+    
+      case ChangeType.changeFieldNullable:
+        return this.changeFieldNullable(change.property!)
+    
+      case ChangeType.changeFieldType:
+        return this.changeFieldType(change.property!)
+    
+      case ChangeType.deleteField:
+        return this.deleteField(change.property!)
+    
+      case ChangeType.deleteTable:
+        return this.deleteTable(change.property!)
+    }
   }
 
   private buildChange(change: Change, context: Context) {

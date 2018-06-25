@@ -32,14 +32,13 @@ describe('sql-builder-test', function () {
         assert.equal(bundle.sql, "SELECT * FROM \"creatures\" ORDER BY \"name\", \"health\" DESC LIMIT 5");
         assert.equal(bundle.args.length, 0);
     });
-    it('diff generation', function () {
-        var first = schema.trellises;
-        var second = schema2.trellises;
-        var changes = migration_1.findChangedTrellises(first, second);
+    it('can generate sql to update from an old schema to a newer one', function () {
+        var changes = migration_1.findChangedTrellises(schema.trellises, schema2.trellises);
         console.log('changes', changes);
+        assert.equal(changes.length, 1, "There should only be one change");
         var builder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
         var result = builder.build(changes);
-        console.log('result is', result);
+        console.log('change result is', result);
     });
     // it.skip('generate', function () {
     //   const sql = generate(schema as any)

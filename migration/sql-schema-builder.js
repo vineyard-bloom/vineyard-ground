@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var types_1 = require("./types");
 var sql_building_1 = require("../source/sql/sql-building");
 var field_types_1 = require("../source/sql/field-types");
 // import *  as vineyardSchema from 'vineyard-schema'
@@ -139,24 +140,21 @@ var SqlSchemaBuilder = /** @class */ (function () {
         }
         return result;
     };
+    // TODO remove type assertions once everything is fleshed out?
     SqlSchemaBuilder.prototype.processChange = function (change, context) {
-        throw new Error("Not implemented.");
-        // switch (change.type) {
-        //   case ChangeType.createTable:
-        //     return this.createTable(change.trellis, context)
-        //
-        //   case ChangeType.changeFieldNullable:
-        //     return this.changeFieldNullable(change.property)
-        //
-        //   case ChangeType.changeFieldType:
-        //     return this.changeFieldType(change.property)
-        //
-        //   case ChangeType.deleteField:
-        //     return this.deleteField(change.property)
-        //
-        //   case ChangeType.deleteTable:
-        //     return this.deleteTable(change.property)
-        // }
+        // throw new Error("Not implemented.")
+        switch (change.type) {
+            case types_1.ChangeType.createTable:
+                return this.createTable(change.trellis, context);
+            case types_1.ChangeType.changeFieldNullable:
+                return this.changeFieldNullable(change.property);
+            case types_1.ChangeType.changeFieldType:
+                return this.changeFieldType(change.property);
+            case types_1.ChangeType.deleteField:
+                return this.deleteField(change.property);
+            case types_1.ChangeType.deleteTable:
+                return this.deleteTable(change.property);
+        }
     };
     SqlSchemaBuilder.prototype.buildChange = function (change, context) {
         var token = this.processChange(change, context);
