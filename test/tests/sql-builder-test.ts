@@ -15,6 +15,7 @@ const config = require('../config/config.json')
 const schema = new Schema(require('../schema/game.json'))
 const schema2 = new Schema(require('../schema/game-2.json'))
 const schema3 = new Schema(require('../schema/game-3.json'))
+const schema4 = new Schema(require('../schema/game-4.json'))
 const client = new SequelizeClient(config.database)
 const modeler = new DevModeler(schema, client)
 
@@ -126,6 +127,30 @@ describe('sql-builder-test', function () {
       console.log('SQL Database Error:', error.message)
     }
     assert.equal(fieldExists, undefined, 'The field should have been deleted from the table')
+  })
+
+  it('can change a field type by generating sql diff', async function () {
+    await modeler.regenerate()
+
+    const changes = findChangedTrellises(schema.trellises, schema4.trellises)
+    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes[0].type, ChangeType.changeFieldType, 'The change should be to change the field type')
+
+    const sqlDiff = schemaBuilder.build(changes)
+    console.log('sql diff is', sqlDiff)
+
+    // Need to test that this SQL is correct
+    const expected = `ALTER TABLE "creatures"\n  ALTER COLUMN "health" CHARACTER VARYING(255);`
+    // assert.equal(sqlDiff, expected, 'Should generate SQL to delete a field from an existing table')
+
+  //   await modeler.query(sqlDiff)
+
+  //   try {
+  //     var fieldExists = await modeler.query(`SELECT "isFuzzy"\nFROM creatures`)
+  //   } catch (error) {
+  //     console.log('SQL Database Error:', error.message)
+  //   }
+  //   assert.equal(fieldExists, undefined, 'The field should have been deleted from the table')
   })
 
 })

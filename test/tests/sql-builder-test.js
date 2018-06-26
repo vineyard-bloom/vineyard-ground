@@ -50,6 +50,7 @@ var config = require('../config/config.json');
 var schema = new schema_1.Schema(require('../schema/game.json'));
 var schema2 = new schema_1.Schema(require('../schema/game-2.json'));
 var schema3 = new schema_1.Schema(require('../schema/game-3.json'));
+var schema4 = new schema_1.Schema(require('../schema/game-4.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
 var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
@@ -202,6 +203,25 @@ describe('sql-builder-test', function () {
                         return [3 /*break*/, 6];
                     case 6:
                         assert.equal(fieldExists, undefined, 'The field should have been deleted from the table');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can change a field type by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, sqlDiff, expected;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema.trellises, schema4.trellises);
+                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes[0].type, types_1.ChangeType.changeFieldType, 'The change should be to change the field type');
+                        sqlDiff = schemaBuilder.build(changes);
+                        console.log('sql diff is', sqlDiff);
+                        expected = "ALTER TABLE \"creatures\"\n  ALTER COLUMN \"health\" CHARACTER VARYING(255);";
                         return [2 /*return*/];
                 }
             });

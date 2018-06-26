@@ -129,7 +129,7 @@ export class SqlSchemaBuilder {
   }
 
   private changeFieldNullable(property: Property) {
-
+    
   }
 
   private changeFieldType(property: Property) {
