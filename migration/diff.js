@@ -36,8 +36,6 @@ function findChangedProperties(firstProperties, secondProperties) {
             });
         }
         else {
-            console.log("the first type of " + name + " is " + first.type.name);
-            console.log("the second type of " + name + " is " + second.type.name);
             if (first.type.name != second.type.name)
                 result.push({
                     type: types_1.ChangeType.changeFieldType,
