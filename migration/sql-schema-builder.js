@@ -85,7 +85,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
         }
         return [
             sequencePre,
-            'CREATE TABLE',
+            'CREATE TABLE IF NOT EXISTS',
             trellis.table.name,
             '(\n',
             this.renderPropertyCreations(trellis),
@@ -99,7 +99,12 @@ var SqlSchemaBuilder = /** @class */ (function () {
     };
     SqlSchemaBuilder.prototype.deleteField = function (property) {
     };
-    SqlSchemaBuilder.prototype.deleteTable = function (property) {
+    SqlSchemaBuilder.prototype.deleteTable = function (trellis) {
+        return [
+            'DROP TABLE IF EXISTS',
+            trellis.table.name,
+            'CASCADE;'
+        ];
     };
     SqlSchemaBuilder.prototype.createForeignKey = function (trellis) {
         var name = trellis.name[0].toLowerCase() + trellis.name.substr(1);
@@ -153,7 +158,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
             case types_1.ChangeType.deleteField:
                 return this.deleteField(change.property);
             case types_1.ChangeType.deleteTable:
-                return this.deleteTable(change.property);
+                return this.deleteTable(change.trellis);
         }
     };
     SqlSchemaBuilder.prototype.buildChange = function (change, context) {

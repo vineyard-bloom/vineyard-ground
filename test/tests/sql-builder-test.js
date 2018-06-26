@@ -89,7 +89,7 @@ describe('sql-builder-test', function () {
                         assert.equal(changes[0].type, types_1.ChangeType.createTable, "The change should be to create a table");
                         builder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
                         sqlDiff = builder.build(changes);
-                        expected = "CREATE SEQUENCE characters_id_seq;\nCREATE TABLE characters (\n  \"id\" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  \"name\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"profession\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"created\" TIMESTAMPTZ NOT NULL,\n  \"modified\" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT \"characters_pkey\" PRIMARY KEY (\"id\")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters.\"id\";\n";
+                        expected = "CREATE SEQUENCE characters_id_seq;\nCREATE TABLE IF NOT EXISTS characters (\n  \"id\" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  \"name\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"profession\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"created\" TIMESTAMPTZ NOT NULL,\n  \"modified\" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT \"characters_pkey\" PRIMARY KEY (\"id\")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters.\"id\";\n";
                         assert.equal(sqlDiff, expected, "Should generate SQL to add a new table");
                         return [4 /*yield*/, modeler.query(sqlDiff)];
                     case 3:
@@ -98,6 +98,35 @@ describe('sql-builder-test', function () {
                     case 4:
                         tableExists = _a.sent();
                         assert(tableExists[0].to_regclass, "The new table should exist in the DB");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can generate sql diff to delete a table', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var modeler2, changes, builder, sqlDiff, expected, tableExists;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        modeler2 = new modeler_1.DevModeler(schema2, client);
+                        return [4 /*yield*/, modeler2.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema2.trellises, schema.trellises);
+                        assert.equal(changes.length, 1, "There should only be one change");
+                        assert.equal(changes[0].type, types_1.ChangeType.deleteTable, "The change should be to delete a table");
+                        builder = new sql_schema_builder_1.SqlSchemaBuilder(schema2);
+                        sqlDiff = builder.build(changes);
+                        expected = "DROP TABLE IF EXISTS characters CASCADE;";
+                        assert.equal(sqlDiff, expected, "Should generate SQL to delete an existing table");
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT to_regclass('characters');")];
+                    case 3:
+                        tableExists = _a.sent();
+                        assert.equal(tableExists[0].to_regclass, null, "The table should no longer exist in the DB");
                         return [2 /*return*/];
                 }
             });

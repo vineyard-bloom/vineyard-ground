@@ -53,12 +53,32 @@ describe('sql-builder-test', function () {
 
     const builder = new SqlSchemaBuilder(schema)
     const sqlDiff = builder.build(changes)
-    const expected = `CREATE SEQUENCE characters_id_seq;\nCREATE TABLE characters (\n  "id" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  "name" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "profession" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "created" TIMESTAMPTZ NOT NULL,\n  "modified" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT "characters_pkey" PRIMARY KEY ("id")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters."id";\n`
+
+    const expected = `CREATE SEQUENCE characters_id_seq;\nCREATE TABLE IF NOT EXISTS characters (\n  "id" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  "name" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "profession" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "created" TIMESTAMPTZ NOT NULL,\n  "modified" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT "characters_pkey" PRIMARY KEY ("id")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters."id";\n`
     assert.equal(sqlDiff, expected, "Should generate SQL to add a new table")
 
     await modeler.query(sqlDiff)
     const tableExists = await modeler.query(`SELECT to_regclass('characters');`)
     assert(tableExists[0].to_regclass, "The new table should exist in the DB")
+  })
+
+  it('can generate sql diff to delete a table', async function () {
+    const modeler2 = new DevModeler(schema2, client)
+    await modeler2.regenerate()
+
+    const changes = findChangedTrellises(schema2.trellises, schema.trellises)
+    assert.equal(changes.length, 1, "There should only be one change")
+    assert.equal(changes[0].type, ChangeType.deleteTable, "The change should be to delete a table")
+
+    const builder = new SqlSchemaBuilder(schema2)
+    const sqlDiff = builder.build(changes)
+
+    const expected = `DROP TABLE IF EXISTS characters CASCADE;`
+    assert.equal(sqlDiff, expected, "Should generate SQL to delete an existing table")
+
+    await modeler.query(sqlDiff)
+    const tableExists = await modeler.query(`SELECT to_regclass('characters');`)
+    assert.equal(tableExists[0].to_regclass, null, "The table should no longer exist in the DB")
   })
 
 })

@@ -110,7 +110,7 @@ export class SqlSchemaBuilder {
 
     return [
       sequencePre,
-      'CREATE TABLE',
+      'CREATE TABLE IF NOT EXISTS',
       trellis.table.name,
       '(\n',
       this.renderPropertyCreations(trellis),
@@ -131,8 +131,12 @@ export class SqlSchemaBuilder {
 
   }
 
-  private deleteTable(property: Property) {
-
+  private deleteTable(trellis: Trellis) {
+    return [
+      'DROP TABLE IF EXISTS',
+      trellis.table.name,
+      'CASCADE;'
+    ]
   }
 
   private createForeignKey(trellis: Trellis) {
@@ -196,7 +200,7 @@ export class SqlSchemaBuilder {
         return this.deleteField(change.property!)
     
       case ChangeType.deleteTable:
-        return this.deleteTable(change.property!)
+        return this.deleteTable(change.trellis!)
     }
   }
 

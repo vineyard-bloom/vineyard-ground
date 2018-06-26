@@ -13,7 +13,7 @@ export declare class SqlSchemaBuilder {
     private changeFieldNullable(property);
     private changeFieldType(property);
     private deleteField(property);
-    private deleteTable(property);
+    private deleteTable(trellis);
     private createForeignKey(trellis);
     private createCrossTable(property);
     private createCrossTables(properties);
