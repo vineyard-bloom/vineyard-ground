@@ -2,6 +2,7 @@ import {Change, ChangeType} from "./types";
 import {delimit, SqlBuilder} from "../source/sql/sql-building";
 import {getFieldType} from "../source/sql/field-types";
 import {Property, Schema, Trellis} from "../source/types";
+import { precompile } from "handlebars";
 // import *  as vineyardSchema from 'vineyard-schema'
 
 const indent = '  '
@@ -93,7 +94,7 @@ export class SqlSchemaBuilder {
         if (this.isAutoIncrement(property)) {
           const sequence = this.getSequenceName(property)
           sequencePre.push('CREATE SEQUENCE ' + sequence + ';\n')
-          sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';\n')
+          sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';')
         }
       }
     }
@@ -116,6 +117,14 @@ export class SqlSchemaBuilder {
       this.renderPropertyCreations(trellis),
       ');\n',
       sequencePost
+    ]
+  }
+
+  private createField(property: Property) {
+    const createdProperty = this.createProperty(property, property.autoIncrement)
+    const formattedProperty = createdProperty === '' ? '' : createdProperty.join(' ').substr(2)
+    return [
+      `ALTER TABLE ${property.trellis.table.name}\n  ADD ${formattedProperty};`
     ]
   }
 
@@ -185,22 +194,24 @@ export class SqlSchemaBuilder {
 
   // TODO remove type assertions once everything is fleshed out?
   private processChange(change: Change, context: Context) {
-    // throw new Error("Not implemented.")
     switch (change.type) {
       case ChangeType.createTable:
         return this.createTable(change.trellis!, context)
     
-      case ChangeType.changeFieldNullable:
-        return this.changeFieldNullable(change.property!)
-    
-      case ChangeType.changeFieldType:
-        return this.changeFieldType(change.property!)
+      case ChangeType.createField:
+        return this.createField(change.property!)
     
       case ChangeType.deleteField:
         return this.deleteField(change.property!)
     
       case ChangeType.deleteTable:
         return this.deleteTable(change.trellis!)
+    
+      case ChangeType.changeFieldType:
+        return this.changeFieldType(change.property!)
+
+      case ChangeType.changeFieldNullable:
+        return this.changeFieldNullable(change.property!)
     }
   }
 

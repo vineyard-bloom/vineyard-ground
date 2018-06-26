@@ -10,6 +10,7 @@ export declare class SqlSchemaBuilder {
     createProperty(property: Property, autoIncrement?: boolean): any[] | "";
     private renderPropertyCreations(trellis);
     private createTable(trellis, context);
+    private createField(property);
     private changeFieldNullable(property);
     private changeFieldType(property);
     private deleteField(property);

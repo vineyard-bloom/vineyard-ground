@@ -70,7 +70,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
                 if (this.isAutoIncrement(property)) {
                     var sequence = this.getSequenceName(property);
                     sequencePre.push('CREATE SEQUENCE ' + sequence + ';\n');
-                    sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';\n');
+                    sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';');
                 }
             }
         }
@@ -91,6 +91,13 @@ var SqlSchemaBuilder = /** @class */ (function () {
             this.renderPropertyCreations(trellis),
             ');\n',
             sequencePost
+        ];
+    };
+    SqlSchemaBuilder.prototype.createField = function (property) {
+        var createdProperty = this.createProperty(property, property.autoIncrement);
+        var formattedProperty = createdProperty === '' ? '' : createdProperty.join(' ').substr(2);
+        return [
+            "ALTER TABLE " + property.trellis.table.name + "\n  ADD " + formattedProperty + ";"
         ];
     };
     SqlSchemaBuilder.prototype.changeFieldNullable = function (property) {
@@ -147,18 +154,19 @@ var SqlSchemaBuilder = /** @class */ (function () {
     };
     // TODO remove type assertions once everything is fleshed out?
     SqlSchemaBuilder.prototype.processChange = function (change, context) {
-        // throw new Error("Not implemented.")
         switch (change.type) {
             case types_1.ChangeType.createTable:
                 return this.createTable(change.trellis, context);
-            case types_1.ChangeType.changeFieldNullable:
-                return this.changeFieldNullable(change.property);
-            case types_1.ChangeType.changeFieldType:
-                return this.changeFieldType(change.property);
+            case types_1.ChangeType.createField:
+                return this.createField(change.property);
             case types_1.ChangeType.deleteField:
                 return this.deleteField(change.property);
             case types_1.ChangeType.deleteTable:
                 return this.deleteTable(change.trellis);
+            case types_1.ChangeType.changeFieldType:
+                return this.changeFieldType(change.property);
+            case types_1.ChangeType.changeFieldNullable:
+                return this.changeFieldNullable(change.property);
         }
     };
     SqlSchemaBuilder.prototype.buildChange = function (change, context) {
