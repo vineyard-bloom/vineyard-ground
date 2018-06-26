@@ -5,8 +5,6 @@ function getFieldType(property, library) {
     var type = property.type;
     switch (type.get_category()) {
         case schema_1.Type_Category.primitive:
-            console.log('type name is', type.name);
-            console.log('library type name is', library.types.int.name);
             if (type.name === library.types.long.name)
                 return {
                     name: 'BIGINT',

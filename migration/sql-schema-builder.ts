@@ -38,9 +38,7 @@ export class SqlSchemaBuilder {
   }
 
   createProperty(property: Property, autoIncrement: boolean = false) {
-    console.log('Library is', this.schema.library)
     const type = getFieldType(property, this.schema.library)
-    console.log('Field type is', type.name)
     if (!type)
       return ''
 

@@ -9,6 +9,7 @@ import {checkDiff} from "../utility/diff";
 import {Schema} from "../../source/schema";
 import {SequelizeClient} from "../../source/clients/sequelize-client";
 import { SqlSchemaBuilder } from "../../migration/sql-schema-builder";
+import { ChangeType } from "../../migration/types";
 
 const config = require('../config/config.json')
 const schema = new Schema(require('../schema/game.json'))
@@ -37,19 +38,27 @@ describe('sql-builder-test', function () {
     assert.equal(bundle.args.length, 0)
   })
 
-  it('can generate sql diff to add a new table', function () {
-    const changes = findChangedTrellises(schema.trellises, schema2.trellises)
-    console.log('changes', changes)
-
-    assert.equal(changes.length, 1, "There should only be one change")
-
-    const builder = new SqlSchemaBuilder(schema)
-    const result = builder.build(changes)
-    console.log('change result is', result)
+  it.skip('generate', function () {
+    const sql = generate(schema as any)
+    checkDiff('test/resources/game.sql', sql, config.diffViewerPath)
   })
 
-  // it.skip('generate', function () {
-  //   const sql = generate(schema as any)
-  //   checkDiff('test/resources/game.sql', sql, config.diffViewerPath)
-  // })
+  it('can generate sql diff to add a new table', async function () {
+    await modeler.regenerate()
+    await modeler.query(`DROP TABLE IF EXISTS characters CASCADE;`)
+
+    const changes = findChangedTrellises(schema.trellises, schema2.trellises)
+    assert.equal(changes.length, 1, "There should only be one change")
+    assert.equal(changes[0].type, ChangeType.createTable, "The change should be to create a table")
+
+    const builder = new SqlSchemaBuilder(schema)
+    const sqlDiff = builder.build(changes)
+    const expected = `CREATE SEQUENCE characters_id_seq;\nCREATE TABLE characters (\n  "id" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  "name" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "profession" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "created" TIMESTAMPTZ NOT NULL,\n  "modified" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT "characters_pkey" PRIMARY KEY ("id")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters."id";\n`
+    assert.equal(sqlDiff, expected, "Should generate SQL to add a new table")
+
+    await modeler.query(sqlDiff)
+    const tableExists = await modeler.query(`SELECT to_regclass('characters');`)
+    assert(tableExists[0].to_regclass, "The new table should exist in the DB")
+  })
+
 })

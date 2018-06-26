@@ -7,9 +7,6 @@ export function getFieldType(property: Property, library: Library): any {
   switch (type.get_category()) {
     case Type_Category.primitive:
 
-      console.log('type name is', type.name)
-      console.log('library type name is', library.types.int.name)
-
       if (type.name === library.types.long.name)
         return {
           name: 'BIGINT',
