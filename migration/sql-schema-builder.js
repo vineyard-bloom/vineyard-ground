@@ -26,7 +26,9 @@ var SqlSchemaBuilder = /** @class */ (function () {
     };
     SqlSchemaBuilder.prototype.createProperty = function (property, autoIncrement) {
         if (autoIncrement === void 0) { autoIncrement = false; }
+        console.log('Library is', this.schema.library);
         var type = field_types_1.getFieldType(property, this.schema.library);
+        console.log('Field type is', type.name);
         if (!type)
             return '';
         var defaultValue = this.getDefaultValue(type, autoIncrement ? this.getSequenceName(property) : null);

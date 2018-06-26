@@ -37,7 +37,7 @@ describe('sql-builder-test', function () {
     assert.equal(bundle.args.length, 0)
   })
 
-  it('can generate sql to update from an old schema to a newer one', function () {
+  it('can generate sql diff to add a new table', function () {
     const changes = findChangedTrellises(schema.trellises, schema2.trellises)
     console.log('changes', changes)
 

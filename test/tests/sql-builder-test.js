@@ -32,7 +32,7 @@ describe('sql-builder-test', function () {
         assert.equal(bundle.sql, "SELECT * FROM \"creatures\" ORDER BY \"name\", \"health\" DESC LIMIT 5");
         assert.equal(bundle.args.length, 0);
     });
-    it('can generate sql to update from an old schema to a newer one', function () {
+    it('can generate sql diff to add a new table', function () {
         var changes = migration_1.findChangedTrellises(schema.trellises, schema2.trellises);
         console.log('changes', changes);
         assert.equal(changes.length, 1, "There should only be one change");
