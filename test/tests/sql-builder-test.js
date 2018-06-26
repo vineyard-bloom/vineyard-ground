@@ -52,6 +52,7 @@ var schema2 = new schema_1.Schema(require('../schema/game-2.json'));
 var schema3 = new schema_1.Schema(require('../schema/game-3.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
+var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
 describe('sql-builder-test', function () {
     this.timeout(5000);
     it('selection', function () {
@@ -76,7 +77,7 @@ describe('sql-builder-test', function () {
     });
     it('can create a table by generating sql diff', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var changes, builder, sqlDiff, expected, tableExists;
+            var changes, sqlDiff, expected, tableExists;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, modeler.regenerate()];
@@ -88,8 +89,7 @@ describe('sql-builder-test', function () {
                         changes = migration_1.findChangedTrellises(schema.trellises, schema2.trellises);
                         assert.equal(changes.length, 1, 'There should only be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.createTable, 'The change should be to create a table');
-                        builder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
-                        sqlDiff = builder.build(changes);
+                        sqlDiff = schemaBuilder.build(changes);
                         expected = "CREATE SEQUENCE characters_id_seq;\nCREATE TABLE IF NOT EXISTS characters (\n  \"id\" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  \"name\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"profession\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"created\" TIMESTAMPTZ NOT NULL,\n  \"modified\" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT \"characters_pkey\" PRIMARY KEY (\"id\")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters.\"id\";";
                         assert.equal(sqlDiff, expected, 'Should generate SQL to add a new table');
                         return [4 /*yield*/, modeler.query(sqlDiff)];
@@ -106,7 +106,7 @@ describe('sql-builder-test', function () {
     });
     it('can delete a table by generating sql diff', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var modeler2, changes, builder, sqlDiff, expected, tableExists;
+            var modeler2, changes, sqlDiff, expected, tableExists;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -117,9 +117,8 @@ describe('sql-builder-test', function () {
                         changes = migration_1.findChangedTrellises(schema2.trellises, schema.trellises);
                         assert.equal(changes.length, 1, 'There should only be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.deleteTable, 'The change should be to delete a table');
-                        builder = new sql_schema_builder_1.SqlSchemaBuilder(schema2);
-                        sqlDiff = builder.build(changes);
-                        expected = "DROP TABLE IF EXISTS characters CASCADE;";
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = "DROP TABLE IF EXISTS \"characters\" CASCADE;";
                         assert.equal(sqlDiff, expected, 'Should generate SQL to delete an existing table');
                         return [4 /*yield*/, modeler.query(sqlDiff)];
                     case 2:
@@ -135,28 +134,74 @@ describe('sql-builder-test', function () {
     });
     it('can create a field by generating sql diff', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var modeler, changes, builder, sqlDiff, expected, fieldExists;
+            var changes, sqlDiff, expected, fieldExists, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        modeler = new modeler_1.DevModeler(schema, client);
-                        return [4 /*yield*/, modeler.regenerate()];
+                    case 0: 
+                    // const modeler = new DevModeler(schema, client)
+                    return [4 /*yield*/, modeler.regenerate()];
                     case 1:
+                        // const modeler = new DevModeler(schema, client)
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema3.trellises);
                         assert.equal(changes.length, 1, 'There should only be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.createField, 'The change should be to create a field');
-                        builder = new sql_schema_builder_1.SqlSchemaBuilder(schema3);
-                        sqlDiff = builder.build(changes);
-                        expected = "ALTER TABLE creatures\n  ADD \"isFuzzy\" BOOLEAN DEFAULT false NOT NULL;";
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = "ALTER TABLE \"creatures\"\n  ADD \"isFuzzy\" BOOLEAN DEFAULT false NOT NULL;";
                         assert.equal(sqlDiff, expected, 'Should generate SQL to create a new field on an existing table');
                         return [4 /*yield*/, modeler.query(sqlDiff)];
                     case 2:
                         _a.sent();
-                        return [4 /*yield*/, modeler.query("SELECT \"isFuzzy\"\nFROM creatures")];
+                        _a.label = 3;
                     case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("SELECT \"isFuzzy\"\nFROM creatures")];
+                    case 4:
                         fieldExists = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_1 = _a.sent();
+                        console.log('SQL Database Error:', error_1.message);
+                        return [3 /*break*/, 6];
+                    case 6:
                         assert(fieldExists, 'The new field should exist on the table');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can delete a field by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var modeler, changes, sqlDiff, expected, fieldExists, error_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        modeler = new modeler_1.DevModeler(schema3, client);
+                        return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema3.trellises, schema.trellises);
+                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes[0].type, types_1.ChangeType.deleteField, 'The change should be to delete a field');
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = "ALTER TABLE \"creatures\"\n  DROP COLUMN \"isFuzzy\";";
+                        assert.equal(sqlDiff, expected, 'Should generate SQL to delete a field from an existing table');
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("SELECT \"isFuzzy\"\nFROM creatures")];
+                    case 4:
+                        fieldExists = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_2 = _a.sent();
+                        console.log('SQL Database Error:', error_2.message);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        assert.equal(fieldExists, undefined, 'The field should have been deleted from the table');
                         return [2 /*return*/];
                 }
             });

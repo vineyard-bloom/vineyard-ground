@@ -97,7 +97,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
         var createdProperty = this.createProperty(property, property.autoIncrement);
         var formattedProperty = createdProperty === '' ? '' : createdProperty.join(' ').substr(2);
         return [
-            "ALTER TABLE " + property.trellis.table.name + "\n  ADD " + formattedProperty + ";"
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ADD " + formattedProperty + ";"
         ];
     };
     SqlSchemaBuilder.prototype.changeFieldNullable = function (property) {
@@ -105,12 +105,13 @@ var SqlSchemaBuilder = /** @class */ (function () {
     SqlSchemaBuilder.prototype.changeFieldType = function (property) {
     };
     SqlSchemaBuilder.prototype.deleteField = function (property) {
+        return [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  DROP COLUMN \"" + property.name + "\";"
+        ];
     };
     SqlSchemaBuilder.prototype.deleteTable = function (trellis) {
         return [
-            'DROP TABLE IF EXISTS',
-            trellis.table.name,
-            'CASCADE;'
+            "DROP TABLE IF EXISTS \"" + trellis.table.name + "\" CASCADE;"
         ];
     };
     SqlSchemaBuilder.prototype.createForeignKey = function (trellis) {

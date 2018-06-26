@@ -124,7 +124,7 @@ export class SqlSchemaBuilder {
     const createdProperty = this.createProperty(property, property.autoIncrement)
     const formattedProperty = createdProperty === '' ? '' : createdProperty.join(' ').substr(2)
     return [
-      `ALTER TABLE ${property.trellis.table.name}\n  ADD ${formattedProperty};`
+      `ALTER TABLE "${property.trellis.table.name}"\n  ADD ${formattedProperty};`
     ]
   }
 
@@ -137,14 +137,14 @@ export class SqlSchemaBuilder {
   }
 
   private deleteField(property: Property) {
-
+    return [
+      `ALTER TABLE "${property.trellis.table.name}"\n  DROP COLUMN "${property.name}";`
+    ]
   }
 
   private deleteTable(trellis: Trellis) {
     return [
-      'DROP TABLE IF EXISTS',
-      trellis.table.name,
-      'CASCADE;'
+      `DROP TABLE IF EXISTS "${trellis.table.name}" CASCADE;`
     ]
   }
 

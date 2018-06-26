@@ -18,6 +18,8 @@ const schema3 = new Schema(require('../schema/game-3.json'))
 const client = new SequelizeClient(config.database)
 const modeler = new DevModeler(schema, client)
 
+const schemaBuilder = new SqlSchemaBuilder(schema)
+
 describe('sql-builder-test', function () {
   this.timeout(5000)
 
@@ -52,8 +54,7 @@ describe('sql-builder-test', function () {
     assert.equal(changes.length, 1, 'There should only be one change')
     assert.equal(changes[0].type, ChangeType.createTable, 'The change should be to create a table')
 
-    const builder = new SqlSchemaBuilder(schema)
-    const sqlDiff = builder.build(changes)
+    const sqlDiff = schemaBuilder.build(changes)
 
     const expected = `CREATE SEQUENCE characters_id_seq;\nCREATE TABLE IF NOT EXISTS characters (\n  "id" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  "name" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "profession" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  "created" TIMESTAMPTZ NOT NULL,\n  "modified" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT "characters_pkey" PRIMARY KEY ("id")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters."id";`
     assert.equal(sqlDiff, expected, 'Should generate SQL to add a new table')
@@ -71,10 +72,9 @@ describe('sql-builder-test', function () {
     assert.equal(changes.length, 1, 'There should only be one change')
     assert.equal(changes[0].type, ChangeType.deleteTable, 'The change should be to delete a table')
 
-    const builder = new SqlSchemaBuilder(schema2)
-    const sqlDiff = builder.build(changes)
+    const sqlDiff = schemaBuilder.build(changes)
 
-    const expected = `DROP TABLE IF EXISTS characters CASCADE;`
+    const expected = `DROP TABLE IF EXISTS "characters" CASCADE;`
     assert.equal(sqlDiff, expected, 'Should generate SQL to delete an existing table')
 
     await modeler.query(sqlDiff)
@@ -83,23 +83,49 @@ describe('sql-builder-test', function () {
   })
 
   it('can create a field by generating sql diff', async function () {
-    const modeler = new DevModeler(schema, client)
+    // const modeler = new DevModeler(schema, client)
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema.trellises, schema3.trellises)
     assert.equal(changes.length, 1, 'There should only be one change')
     assert.equal(changes[0].type, ChangeType.createField, 'The change should be to create a field')
 
-    const builder = new SqlSchemaBuilder(schema3)
-    const sqlDiff = builder.build(changes)
+    const sqlDiff = schemaBuilder.build(changes)
 
-    const expected = `ALTER TABLE creatures\n  ADD "isFuzzy" BOOLEAN DEFAULT false NOT NULL;`
+    const expected = `ALTER TABLE "creatures"\n  ADD "isFuzzy" BOOLEAN DEFAULT false NOT NULL;`
     assert.equal(sqlDiff, expected, 'Should generate SQL to create a new field on an existing table')
 
     await modeler.query(sqlDiff)
-    const fieldExists = await modeler.query(`SELECT "isFuzzy"\nFROM creatures`)
+
+    try {
+      var fieldExists = await modeler.query(`SELECT "isFuzzy"\nFROM creatures`)
+    } catch (error) {
+      console.log('SQL Database Error:', error.message)
+    }
     assert(fieldExists, 'The new field should exist on the table')
   })
 
+  it('can delete a field by generating sql diff', async function () {
+    const modeler = new DevModeler(schema3, client)
+    await modeler.regenerate()
+
+    const changes = findChangedTrellises(schema3.trellises, schema.trellises)
+    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes[0].type, ChangeType.deleteField, 'The change should be to delete a field')
+
+    const sqlDiff = schemaBuilder.build(changes)
+
+    const expected = `ALTER TABLE "creatures"\n  DROP COLUMN "isFuzzy";`
+    assert.equal(sqlDiff, expected, 'Should generate SQL to delete a field from an existing table')
+
+    await modeler.query(sqlDiff)
+
+    try {
+      var fieldExists = await modeler.query(`SELECT "isFuzzy"\nFROM creatures`)
+    } catch (error) {
+      console.log('SQL Database Error:', error.message)
+    }
+    assert.equal(fieldExists, undefined, 'The field should have been deleted from the table')
+  })
 
 })
