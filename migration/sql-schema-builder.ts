@@ -198,7 +198,6 @@ export class SqlSchemaBuilder {
     return result
   }
 
-  // TODO remove type assertions once everything is fleshed out?
   private processChange(change: Change, context: Context) {
     switch (change.type) {
       case ChangeType.createTable:

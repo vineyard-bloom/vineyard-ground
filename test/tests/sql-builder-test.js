@@ -52,6 +52,7 @@ var schema2 = new schema_1.Schema(require('../schema/game-2.json'));
 var schema3 = new schema_1.Schema(require('../schema/game-3.json'));
 var schema4 = new schema_1.Schema(require('../schema/game-4.json'));
 var schema5 = new schema_1.Schema(require('../schema/game-5.json'));
+var schema6 = new schema_1.Schema(require('../schema/game-6.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
 var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
@@ -309,6 +310,64 @@ describe('sql-builder-test', function () {
                         return [3 /*break*/, 6];
                     case 6:
                         assert.equal(fieldType[0].is_nullable, 'NO', 'The field should not be nullable');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can make multiple changes by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, sqlDiff, tableAdded, tableDeleted, fieldAdded, fieldChanged, fieldNullable, fieldDeleted, error_6;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("DROP TABLE IF EXISTS characters CASCADE;")];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("DROP TABLE IF EXISTS weapons CASCADE;")];
+                    case 3:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema.trellises, schema6.trellises);
+                        assert.equal(changes.length, 6, 'There should be 6 changes');
+                        sqlDiff = schemaBuilder.build(changes);
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 4:
+                        _a.sent();
+                        _a.label = 5;
+                    case 5:
+                        _a.trys.push([5, 12, , 13]);
+                        return [4 /*yield*/, modeler.query("SELECT to_regclass('weapons');")];
+                    case 6:
+                        tableAdded = _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT to_regclass('worlds');")];
+                    case 7:
+                        tableDeleted = _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT \"isFluffy\"\nFROM creatures;")];
+                    case 8:
+                        fieldAdded = _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'creatures' AND COLUMN_NAME = 'world';")];
+                    case 9:
+                        fieldChanged = _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'creatures' AND COLUMN_NAME = 'world';")];
+                    case 10:
+                        fieldNullable = _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT \"health\"\nFROM creatures;")];
+                    case 11:
+                        fieldDeleted = _a.sent();
+                        return [3 /*break*/, 13];
+                    case 12:
+                        error_6 = _a.sent();
+                        console.log('SQL Database Error:', error_6.message);
+                        return [3 /*break*/, 13];
+                    case 13:
+                        assert(tableAdded[0].to_regclass, 'A new table should exist in the DB');
+                        assert.equal(tableDeleted[0].to_regclass, null, 'An old table should no longer exist in the DB');
+                        assert(fieldAdded, 'A new field should exist on an existing table');
+                        assert.equal(fieldDeleted, undefined, 'An old field should have been deleted from an existing table');
+                        assert.equal(fieldChanged[0].data_type, 'character varying', 'The field type should be "character varying"');
+                        assert.equal(fieldNullable[0].is_nullable, 'YES', 'The field should be nullable');
                         return [2 /*return*/];
                 }
             });

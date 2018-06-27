@@ -161,7 +161,6 @@ var SqlSchemaBuilder = /** @class */ (function () {
         }
         return result;
     };
-    // TODO remove type assertions once everything is fleshed out?
     SqlSchemaBuilder.prototype.processChange = function (change, context) {
         switch (change.type) {
             case types_1.ChangeType.createTable:

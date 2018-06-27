@@ -17,6 +17,7 @@ const schema2 = new Schema(require('../schema/game-2.json'))
 const schema3 = new Schema(require('../schema/game-3.json'))
 const schema4 = new Schema(require('../schema/game-4.json'))
 const schema5 = new Schema(require('../schema/game-5.json'))
+const schema6 = new Schema(require('../schema/game-6.json'))
 const client = new SequelizeClient(config.database)
 const modeler = new DevModeler(schema, client)
 
@@ -206,6 +207,36 @@ describe('sql-builder-test', function () {
       console.log('SQL Database Error:', error.message)
     }
     assert.equal(fieldType[0].is_nullable, 'NO', 'The field should not be nullable')
+  })
+
+  it('can make multiple changes by generating sql diff', async function () {
+    await modeler.regenerate()
+    await modeler.query(`DROP TABLE IF EXISTS characters CASCADE;`)
+    await modeler.query(`DROP TABLE IF EXISTS weapons CASCADE;`)
+
+    const changes = findChangedTrellises(schema.trellises, schema6.trellises)
+    assert.equal(changes.length, 6, 'There should be 6 changes')
+
+    const sqlDiff = schemaBuilder.build(changes)
+    await modeler.query(sqlDiff)
+
+    try {
+      var tableAdded = await modeler.query(`SELECT to_regclass('weapons');`)
+      var tableDeleted = await modeler.query(`SELECT to_regclass('worlds');`)
+      var fieldAdded = await modeler.query(`SELECT "isFluffy"\nFROM creatures;`)
+      var fieldChanged = await modeler.query(`SELECT DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'creatures' AND COLUMN_NAME = 'world';`)
+      var fieldNullable = await modeler.query(`SELECT IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'creatures' AND COLUMN_NAME = 'world';`)
+      var fieldDeleted = await modeler.query(`SELECT "health"\nFROM creatures;`)
+    } catch (error) {
+      console.log('SQL Database Error:', error.message)
+    }
+
+    assert(tableAdded[0].to_regclass, 'A new table should exist in the DB')
+    assert.equal(tableDeleted[0].to_regclass, null, 'An old table should no longer exist in the DB')
+    assert(fieldAdded, 'A new field should exist on an existing table')
+    assert.equal(fieldDeleted, undefined, 'An old field should have been deleted from an existing table')
+    assert.equal(fieldChanged[0].data_type, 'character varying', 'The field type should be "character varying"')
+    assert.equal(fieldNullable[0].is_nullable, 'YES', 'The field should be nullable')
   })
 
 })
