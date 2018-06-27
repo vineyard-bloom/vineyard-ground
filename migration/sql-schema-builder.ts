@@ -129,7 +129,10 @@ export class SqlSchemaBuilder {
   }
 
   private changeFieldNullable(property: Property) {
-    
+    const action = property.is_nullable ? 'DROP' : 'SET'
+    return [
+      `ALTER TABLE "${property.trellis.table.name}"\n  ALTER COLUMN "${property.name}" ${action} NOT NULL;`
+    ]
   }
 
   private changeFieldType(property: Property) {

@@ -101,6 +101,10 @@ var SqlSchemaBuilder = /** @class */ (function () {
         ];
     };
     SqlSchemaBuilder.prototype.changeFieldNullable = function (property) {
+        var action = property.is_nullable ? 'DROP' : 'SET';
+        return [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ALTER COLUMN \"" + property.name + "\" " + action + " NOT NULL;"
+        ];
     };
     SqlSchemaBuilder.prototype.changeFieldType = function (property) {
         var type = field_types_1.getFieldType(property, this.schema.library);

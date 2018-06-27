@@ -51,6 +51,7 @@ var schema = new schema_1.Schema(require('../schema/game.json'));
 var schema2 = new schema_1.Schema(require('../schema/game-2.json'));
 var schema3 = new schema_1.Schema(require('../schema/game-3.json'));
 var schema4 = new schema_1.Schema(require('../schema/game-4.json'));
+var schema5 = new schema_1.Schema(require('../schema/game-5.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
 var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
@@ -218,9 +219,8 @@ describe('sql-builder-test', function () {
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema4.trellises);
                         assert.equal(changes.length, 1, 'There should only be one change');
-                        assert.equal(changes[0].type, types_1.ChangeType.changeFieldType, 'The change should be to change the field type');
+                        assert.equal(changes[0].type, types_1.ChangeType.changeFieldType, 'The change should be the field type');
                         sqlDiff = schemaBuilder.build(changes);
-                        console.log('sql diff is', sqlDiff);
                         expected = "ALTER TABLE \"creatures\"\n  ALTER COLUMN \"health\" TYPE CHARACTER VARYING(255);";
                         assert.equal(sqlDiff, expected, 'Should generate SQL to change the field type');
                         return [4 /*yield*/, modeler.query(sqlDiff)];
@@ -238,8 +238,77 @@ describe('sql-builder-test', function () {
                         console.log('SQL Database Error:', error_3.message);
                         return [3 /*break*/, 6];
                     case 6:
-                        console.log('field type is', fieldType[0].data_type);
                         assert.equal(fieldType[0].data_type, 'character varying', 'The field type should be "character varying"');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can change a field to nullable by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, sqlDiff, expected, fieldType, error_4;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema.trellises, schema5.trellises);
+                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes[0].type, types_1.ChangeType.changeFieldNullable, 'The change should be field nullability');
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = "ALTER TABLE \"tags\"\n  ALTER COLUMN \"name\" DROP NOT NULL;";
+                        assert.equal(sqlDiff, expected, 'Should generate SQL to change the field to nullable');
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("SELECT IS_NULLABLE \n      FROM INFORMATION_SCHEMA.COLUMNS\n      WHERE \n           TABLE_NAME = 'tags' AND \n           COLUMN_NAME = 'name'")];
+                    case 4:
+                        fieldType = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_4 = _a.sent();
+                        console.log('SQL Database Error:', error_4.message);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        assert.equal(fieldType[0].is_nullable, 'YES', 'The field should be nullable');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can change a field to not nullable by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, sqlDiff, expected, fieldType, error_5;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema5.trellises, schema.trellises);
+                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes[0].type, types_1.ChangeType.changeFieldNullable, 'The change should be field nullability');
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = "ALTER TABLE \"tags\"\n  ALTER COLUMN \"name\" SET NOT NULL;";
+                        assert.equal(sqlDiff, expected, 'Should generate SQL to change the field to not nullable');
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("SELECT IS_NULLABLE \n      FROM INFORMATION_SCHEMA.COLUMNS\n      WHERE \n           TABLE_NAME = 'tags' AND \n           COLUMN_NAME = 'name'")];
+                    case 4:
+                        fieldType = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_5 = _a.sent();
+                        console.log('SQL Database Error:', error_5.message);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        assert.equal(fieldType[0].is_nullable, 'NO', 'The field should not be nullable');
                         return [2 /*return*/];
                 }
             });
