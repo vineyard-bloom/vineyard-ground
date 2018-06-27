@@ -103,6 +103,10 @@ var SqlSchemaBuilder = /** @class */ (function () {
     SqlSchemaBuilder.prototype.changeFieldNullable = function (property) {
     };
     SqlSchemaBuilder.prototype.changeFieldType = function (property) {
+        var type = field_types_1.getFieldType(property, this.schema.library);
+        return [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ALTER COLUMN \"" + property.name + "\" TYPE " + type.name + ";"
+        ];
     };
     SqlSchemaBuilder.prototype.deleteField = function (property) {
         return [

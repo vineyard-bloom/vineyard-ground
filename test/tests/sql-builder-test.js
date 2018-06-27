@@ -210,7 +210,7 @@ describe('sql-builder-test', function () {
     });
     it('can change a field type by generating sql diff', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var changes, sqlDiff, expected;
+            var changes, sqlDiff, expected, fieldType, error_3;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, modeler.regenerate()];
@@ -221,7 +221,25 @@ describe('sql-builder-test', function () {
                         assert.equal(changes[0].type, types_1.ChangeType.changeFieldType, 'The change should be to change the field type');
                         sqlDiff = schemaBuilder.build(changes);
                         console.log('sql diff is', sqlDiff);
-                        expected = "ALTER TABLE \"creatures\"\n  ALTER COLUMN \"health\" CHARACTER VARYING(255);";
+                        expected = "ALTER TABLE \"creatures\"\n  ALTER COLUMN \"health\" TYPE CHARACTER VARYING(255);";
+                        assert.equal(sqlDiff, expected, 'Should generate SQL to change the field type');
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("SELECT DATA_TYPE \n      FROM INFORMATION_SCHEMA.COLUMNS\n      WHERE \n           TABLE_NAME = 'creatures' AND \n           COLUMN_NAME = 'health'")];
+                    case 4:
+                        fieldType = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_3 = _a.sent();
+                        console.log('SQL Database Error:', error_3.message);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        console.log('field type is', fieldType[0].data_type);
+                        assert.equal(fieldType[0].data_type, 'character varying', 'The field type should be "character varying"');
                         return [2 /*return*/];
                 }
             });

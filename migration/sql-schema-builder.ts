@@ -133,7 +133,10 @@ export class SqlSchemaBuilder {
   }
 
   private changeFieldType(property: Property) {
-
+    const type = getFieldType(property, this.schema.library)
+    return [
+      `ALTER TABLE "${property.trellis.table.name}"\n  ALTER COLUMN "${property.name}" TYPE ${type.name};`
+    ]
   }
 
   private deleteField(property: Property) {

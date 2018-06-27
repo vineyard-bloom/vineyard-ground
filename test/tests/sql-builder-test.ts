@@ -139,18 +139,22 @@ describe('sql-builder-test', function () {
     const sqlDiff = schemaBuilder.build(changes)
     console.log('sql diff is', sqlDiff)
 
-    // Need to test that this SQL is correct
-    const expected = `ALTER TABLE "creatures"\n  ALTER COLUMN "health" CHARACTER VARYING(255);`
-    // assert.equal(sqlDiff, expected, 'Should generate SQL to delete a field from an existing table')
+    const expected = `ALTER TABLE "creatures"\n  ALTER COLUMN "health" TYPE CHARACTER VARYING(255);`
+    assert.equal(sqlDiff, expected, 'Should generate SQL to change the field type')
 
-  //   await modeler.query(sqlDiff)
+    await modeler.query(sqlDiff)
 
-  //   try {
-  //     var fieldExists = await modeler.query(`SELECT "isFuzzy"\nFROM creatures`)
-  //   } catch (error) {
-  //     console.log('SQL Database Error:', error.message)
-  //   }
-  //   assert.equal(fieldExists, undefined, 'The field should have been deleted from the table')
+    try {
+      var fieldType = await modeler.query(`SELECT DATA_TYPE 
+      FROM INFORMATION_SCHEMA.COLUMNS
+      WHERE 
+           TABLE_NAME = 'creatures' AND 
+           COLUMN_NAME = 'health'`)
+    } catch (error) {
+      console.log('SQL Database Error:', error.message)
+    }
+    console.log('field type is', fieldType[0].data_type)
+    assert.equal(fieldType[0].data_type, 'character varying', 'The field type should be "character varying"')
   })
 
 })
