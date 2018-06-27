@@ -18,6 +18,7 @@ const schema3 = new Schema(require('../schema/game-3.json'))
 const schema4 = new Schema(require('../schema/game-4.json'))
 const schema5 = new Schema(require('../schema/game-5.json'))
 const schema6 = new Schema(require('../schema/game-6.json'))
+const schema7 = new Schema(require('../schema/game-7.json'))
 const client = new SequelizeClient(config.database)
 const modeler = new DevModeler(schema, client)
 
@@ -237,6 +238,24 @@ describe('sql-builder-test', function () {
     assert.equal(fieldDeleted, undefined, 'An old field should have been deleted from an existing table')
     assert.equal(fieldChanged[0].data_type, 'character varying', 'The field type should be "character varying"')
     assert.equal(fieldNullable[0].is_nullable, 'YES', 'The field should be nullable')
+  })
+
+  it('can add a cross table by generating sql diff', async function () {
+    await modeler.regenerate()
+    await modeler.query(`DROP TABLE IF EXISTS characters CASCADE;`)
+    await modeler.query(`DROP TABLE IF EXISTS weapons CASCADE;`)
+    await modeler.query(`DROP TABLE IF EXISTS tags CASCADE;`)
+
+    const changes = findChangedTrellises(schema7.trellises, schema.trellises)
+    console.log('changes are', changes)
+    assert.equal(changes.length, 2, 'There should be 2 changes')
+    assert.equal(changes[1].type, ChangeType.createTable, 'The second change should be a createTable')
+
+    const sqlDiff = schemaBuilder.build(changes)
+    await modeler.query(sqlDiff)
+
+    const crossTableExists = await modeler.query(`SELECT to_regclass('creatures_tags');`)
+    assert(crossTableExists[0].to_regclass, 'The cross table should exist in the DB')
   })
 
 })

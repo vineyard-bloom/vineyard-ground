@@ -53,6 +53,7 @@ var schema3 = new schema_1.Schema(require('../schema/game-3.json'));
 var schema4 = new schema_1.Schema(require('../schema/game-4.json'));
 var schema5 = new schema_1.Schema(require('../schema/game-5.json'));
 var schema6 = new schema_1.Schema(require('../schema/game-6.json'));
+var schema7 = new schema_1.Schema(require('../schema/game-7.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
 var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
@@ -368,6 +369,40 @@ describe('sql-builder-test', function () {
                         assert.equal(fieldDeleted, undefined, 'An old field should have been deleted from an existing table');
                         assert.equal(fieldChanged[0].data_type, 'character varying', 'The field type should be "character varying"');
                         assert.equal(fieldNullable[0].is_nullable, 'YES', 'The field should be nullable');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can add a cross table by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, sqlDiff, crossTableExists;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("DROP TABLE IF EXISTS characters CASCADE;")];
+                    case 2:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("DROP TABLE IF EXISTS weapons CASCADE;")];
+                    case 3:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("DROP TABLE IF EXISTS tags CASCADE;")];
+                    case 4:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema7.trellises, schema.trellises);
+                        console.log('changes are', changes);
+                        assert.equal(changes.length, 2, 'There should be 2 changes');
+                        assert.equal(changes[1].type, types_1.ChangeType.createTable, 'The second change should be a createTable');
+                        sqlDiff = schemaBuilder.build(changes);
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 5:
+                        _a.sent();
+                        return [4 /*yield*/, modeler.query("SELECT to_regclass('creatures_tags');")];
+                    case 6:
+                        crossTableExists = _a.sent();
+                        assert(crossTableExists[0].to_regclass, 'The cross table should exist in the DB');
                         return [2 /*return*/];
                 }
             });
