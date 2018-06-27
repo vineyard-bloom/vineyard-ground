@@ -69,8 +69,7 @@ describe('sql-builder-test', function () {
   })
 
   it('can delete a table by generating sql diff', async function () {
-    const modeler2 = new DevModeler(schema2, client)
-    await modeler2.regenerate()
+    await modeler.regenerate()
 
     const changes = findChangedTrellises(schema2.trellises, schema.trellises)
     assert.equal(changes.length, 1, 'There should only be one change')
@@ -87,7 +86,6 @@ describe('sql-builder-test', function () {
   })
 
   it('can create a field by generating sql diff', async function () {
-    // const modeler = new DevModeler(schema, client)
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema.trellises, schema3.trellises)

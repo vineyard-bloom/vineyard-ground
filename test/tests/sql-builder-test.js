@@ -110,12 +110,10 @@ describe('sql-builder-test', function () {
     });
     it('can delete a table by generating sql diff', function () {
         return __awaiter(this, void 0, void 0, function () {
-            var modeler2, changes, sqlDiff, expected, tableExists;
+            var changes, sqlDiff, expected, tableExists;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        modeler2 = new modeler_1.DevModeler(schema2, client);
-                        return [4 /*yield*/, modeler2.regenerate()];
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema2.trellises, schema.trellises);
@@ -141,11 +139,8 @@ describe('sql-builder-test', function () {
             var changes, sqlDiff, expected, fieldExists, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: 
-                    // const modeler = new DevModeler(schema, client)
-                    return [4 /*yield*/, modeler.regenerate()];
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
                     case 1:
-                        // const modeler = new DevModeler(schema, client)
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema3.trellises);
                         assert.equal(changes.length, 1, 'There should only be one change');
