@@ -1,0 +1,48 @@
+{
+  "Creature": {
+    "softDelete": true,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "isFluffy": {
+        "type": "bool"
+      },
+      "world": {
+        "type": "string",
+        "nullable": true
+      },
+      "tags": {
+        "type": "list",
+        "trellis": "Tag"
+      }
+    }
+  },
+  "Tag": {
+    "properties": {
+      "id": {
+        "type": "int"
+      },
+      "name": {
+        "type": "string"
+      },
+      "creatures": {
+        "type": "list",
+        "trellis": "Creature"
+      }
+    }
+  },
+  "Weapon": {
+    "properties": {
+      "id": {
+        "type": "int"
+      },
+      "name": {
+        "type": "string"
+      },
+      "deadly": {
+        "type": "bool"
+      }
+    }
+  }
+}

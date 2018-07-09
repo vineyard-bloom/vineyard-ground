@@ -1,8 +1,8 @@
-import {Change, ChangeType} from "./types";
-import {delimit, SqlBuilder} from "../source/sql/sql-building";
-import {getFieldType} from "../source/sql/field-types";
-import {Property, Schema, Trellis} from "../source/types";
-// import *  as vineyardSchema from 'vineyard-schema'
+import { Change, ChangeType } from "./types"
+import { SqlBuilder } from "../source/sql/sql-building"
+import { getFieldType } from "../source/sql/field-types"
+import { Property, Schema, Trellis } from "../source/types"
+import { TrellisImplementation, StandardProperty } from "../source/schema"
 
 const indent = '  '
 
@@ -93,7 +93,7 @@ export class SqlSchemaBuilder {
         if (this.isAutoIncrement(property)) {
           const sequence = this.getSequenceName(property)
           sequencePre.push('CREATE SEQUENCE ' + sequence + ';\n')
-          sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';\n')
+          sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';')
         }
       }
     }
@@ -110,7 +110,7 @@ export class SqlSchemaBuilder {
 
     return [
       sequencePre,
-      'CREATE TABLE',
+      'CREATE TABLE IF NOT EXISTS',
       trellis.table.name,
       '(\n',
       this.renderPropertyCreations(trellis),
@@ -119,85 +119,96 @@ export class SqlSchemaBuilder {
     ]
   }
 
-  private changeFieldNullable(property: Property) {
+  private createField(property: Property) {
+    const createdProperty = this.createProperty(property, property.autoIncrement)
+    const formattedProperty = createdProperty === '' ? '' : createdProperty.join(' ').substr(2)
+    return [
+      `ALTER TABLE "${property.trellis.table.name}"\n  ADD ${formattedProperty};`
+    ]
+  }
 
+  private changeFieldNullable(property: Property) {
+    const action = property.is_nullable ? 'DROP' : 'SET'
+    return [
+      `ALTER TABLE "${property.trellis.table.name}"\n  ALTER COLUMN "${property.name}" ${action} NOT NULL;`
+    ]
   }
 
   private changeFieldType(property: Property) {
-
+    const type = getFieldType(property, this.schema.library)
+    const result = !type ? [''] : [
+      `ALTER TABLE "${property.trellis.table.name}"\n  ALTER COLUMN "${property.name}" TYPE ${type.name};`
+    ]
+    return result
   }
 
   private deleteField(property: Property) {
-
+    return [
+      `ALTER TABLE "${property.trellis.table.name}"\n  DROP COLUMN "${property.name}";`
+    ]
   }
 
-  private deleteTable(property: Property) {
-
+  private deleteTable(trellis: Trellis) {
+    return [
+      `DROP TABLE IF EXISTS "${trellis.table.name}" CASCADE;`
+    ]
   }
 
   private createForeignKey(trellis: Trellis) {
     const name = trellis.name[0].toLowerCase() + trellis.name.substr(1)
-    throw new Error("Not implemented.")
-    // return new vineyardSchema.StandardProperty(name, trellis.primary_keys[0].type, null)
+    return new StandardProperty(name, trellis.primary_keys[0].type, trellis)
   }
 
-  private createCrossTable(property: Property) {
+  private createCrossTable(property: Property, context: Context) {
     const name = this.builder.getCrossTableName(property)
 
     const first = this.createForeignKey(property.trellis)
     const second = this.createForeignKey(property.get_other_trellis())
 
-    throw new Error("Not implemented.")
-    // const trellis: Trellis = {
-    //   table: {
-    //     name: name,
-    //     isCross: true,
-    //   },
-    //   name: name,
-    //   properties: {
-    //     [first.name]: first,
-    //     [second.name]: second,
-    //   },
-    //   primary_keys: [first, second],
-    //   additional: null
-    // }
-    //
-    // first.trellis = trellis
-    // second.trellis = trellis
-    //
-    // return this.buildChange({
-    //   type: ChangeType.createTable,
-    //   trellis: trellis
-    // }, null)
+    const trellis = new TrellisImplementation(name) 
+
+    trellis.table = {
+      name: name,
+      isCross: true
+    }
+    trellis.properties = {
+      [first.name]: first,
+      [second.name]: second
+    }
+    trellis.primary_keys = [first, second]
+    
+    const result = this.createTable(trellis, context)
+    return this.builder.flatten(result).sql
   }
 
-  private createCrossTables(properties:any) {
+  private createCrossTables(properties: any, context: Context) {
     const result = []
     for (let name in properties) {
-      result.push(this.createCrossTable(properties[name]))
+      result.push(this.createCrossTable(properties[name], context))
     }
     return result
   }
 
   private processChange(change: Change, context: Context) {
-    throw new Error("Not implemented.")
+    switch (change.type) {
+      case ChangeType.createTable:
+        return this.createTable(change.trellis!, context)
+    
+      case ChangeType.createField:
+        return this.createField(change.property!)
+    
+      case ChangeType.deleteField:
+        return this.deleteField(change.property!)
+    
+      case ChangeType.deleteTable:
+        return this.deleteTable(change.trellis!)
+    
+      case ChangeType.changeFieldType:
+        return this.changeFieldType(change.property!)
 
-    // switch (change.type) {
-    //   case ChangeType.createTable:
-    //     return this.createTable(change.trellis, context)
-    //
-    //   case ChangeType.changeFieldNullable:
-    //     return this.changeFieldNullable(change.property)
-    //
-    //   case ChangeType.changeFieldType:
-    //     return this.changeFieldType(change.property)
-    //
-    //   case ChangeType.deleteField:
-    //     return this.deleteField(change.property)
-    //
-    //   case ChangeType.deleteTable:
-    //     return this.deleteTable(change.property)
-    // }
+      case ChangeType.changeFieldNullable:
+        return this.changeFieldNullable(change.property!)
+    }
   }
 
   private buildChange(change: Change, context: Context) {
@@ -211,7 +222,7 @@ export class SqlSchemaBuilder {
       additional: []
     }
     let statements = changes.map(c => this.buildChange(c, context))
-    statements = statements.concat(this.createCrossTables(context.crossTables))
+    statements = statements.concat(this.createCrossTables(context.crossTables, context))
     const result = statements.join('\n')
     return result
   }

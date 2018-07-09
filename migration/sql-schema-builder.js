@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var types_1 = require("./types");
 var sql_building_1 = require("../source/sql/sql-building");
 var field_types_1 = require("../source/sql/field-types");
-// import *  as vineyardSchema from 'vineyard-schema'
+var schema_1 = require("../source/schema");
 var indent = '  ';
 var SqlSchemaBuilder = /** @class */ (function () {
     function SqlSchemaBuilder(schema) {
@@ -69,7 +70,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
                 if (this.isAutoIncrement(property)) {
                     var sequence = this.getSequenceName(property);
                     sequencePre.push('CREATE SEQUENCE ' + sequence + ';\n');
-                    sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';\n');
+                    sequencePost.push('ALTER SEQUENCE ' + sequence + ' OWNED BY ' + this.builder.getPath(property) + ';');
                 }
             }
         }
@@ -84,7 +85,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
         }
         return [
             sequencePre,
-            'CREATE TABLE',
+            'CREATE TABLE IF NOT EXISTS',
             trellis.table.name,
             '(\n',
             this.renderPropertyCreations(trellis),
@@ -92,71 +93,80 @@ var SqlSchemaBuilder = /** @class */ (function () {
             sequencePost
         ];
     };
+    SqlSchemaBuilder.prototype.createField = function (property) {
+        var createdProperty = this.createProperty(property, property.autoIncrement);
+        var formattedProperty = createdProperty === '' ? '' : createdProperty.join(' ').substr(2);
+        return [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ADD " + formattedProperty + ";"
+        ];
+    };
     SqlSchemaBuilder.prototype.changeFieldNullable = function (property) {
+        var action = property.is_nullable ? 'DROP' : 'SET';
+        return [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ALTER COLUMN \"" + property.name + "\" " + action + " NOT NULL;"
+        ];
     };
     SqlSchemaBuilder.prototype.changeFieldType = function (property) {
+        var type = field_types_1.getFieldType(property, this.schema.library);
+        var result = !type ? [''] : [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ALTER COLUMN \"" + property.name + "\" TYPE " + type.name + ";"
+        ];
+        return result;
     };
     SqlSchemaBuilder.prototype.deleteField = function (property) {
+        return [
+            "ALTER TABLE \"" + property.trellis.table.name + "\"\n  DROP COLUMN \"" + property.name + "\";"
+        ];
     };
-    SqlSchemaBuilder.prototype.deleteTable = function (property) {
+    SqlSchemaBuilder.prototype.deleteTable = function (trellis) {
+        return [
+            "DROP TABLE IF EXISTS \"" + trellis.table.name + "\" CASCADE;"
+        ];
     };
     SqlSchemaBuilder.prototype.createForeignKey = function (trellis) {
         var name = trellis.name[0].toLowerCase() + trellis.name.substr(1);
-        throw new Error("Not implemented.");
-        // return new vineyardSchema.StandardProperty(name, trellis.primary_keys[0].type, null)
+        return new schema_1.StandardProperty(name, trellis.primary_keys[0].type, trellis);
     };
-    SqlSchemaBuilder.prototype.createCrossTable = function (property) {
+    SqlSchemaBuilder.prototype.createCrossTable = function (property, context) {
         var name = this.builder.getCrossTableName(property);
         var first = this.createForeignKey(property.trellis);
         var second = this.createForeignKey(property.get_other_trellis());
-        throw new Error("Not implemented.");
-        // const trellis: Trellis = {
-        //   table: {
-        //     name: name,
-        //     isCross: true,
-        //   },
-        //   name: name,
-        //   properties: {
-        //     [first.name]: first,
-        //     [second.name]: second,
-        //   },
-        //   primary_keys: [first, second],
-        //   additional: null
-        // }
-        //
-        // first.trellis = trellis
-        // second.trellis = trellis
-        //
-        // return this.buildChange({
-        //   type: ChangeType.createTable,
-        //   trellis: trellis
-        // }, null)
+        var trellis = new schema_1.TrellisImplementation(name);
+        trellis.table = {
+            name: name,
+            isCross: true
+        };
+        trellis.properties = (_a = {},
+            _a[first.name] = first,
+            _a[second.name] = second,
+            _a);
+        trellis.primary_keys = [first, second];
+        var result = this.createTable(trellis, context);
+        return this.builder.flatten(result).sql;
+        var _a;
     };
-    SqlSchemaBuilder.prototype.createCrossTables = function (properties) {
+    SqlSchemaBuilder.prototype.createCrossTables = function (properties, context) {
         var result = [];
         for (var name in properties) {
-            result.push(this.createCrossTable(properties[name]));
+            result.push(this.createCrossTable(properties[name], context));
         }
         return result;
     };
     SqlSchemaBuilder.prototype.processChange = function (change, context) {
-        throw new Error("Not implemented.");
-        // switch (change.type) {
-        //   case ChangeType.createTable:
-        //     return this.createTable(change.trellis, context)
-        //
-        //   case ChangeType.changeFieldNullable:
-        //     return this.changeFieldNullable(change.property)
-        //
-        //   case ChangeType.changeFieldType:
-        //     return this.changeFieldType(change.property)
-        //
-        //   case ChangeType.deleteField:
-        //     return this.deleteField(change.property)
-        //
-        //   case ChangeType.deleteTable:
-        //     return this.deleteTable(change.property)
-        // }
+        switch (change.type) {
+            case types_1.ChangeType.createTable:
+                return this.createTable(change.trellis, context);
+            case types_1.ChangeType.createField:
+                return this.createField(change.property);
+            case types_1.ChangeType.deleteField:
+                return this.deleteField(change.property);
+            case types_1.ChangeType.deleteTable:
+                return this.deleteTable(change.trellis);
+            case types_1.ChangeType.changeFieldType:
+                return this.changeFieldType(change.property);
+            case types_1.ChangeType.changeFieldNullable:
+                return this.changeFieldNullable(change.property);
+        }
     };
     SqlSchemaBuilder.prototype.buildChange = function (change, context) {
         var token = this.processChange(change, context);
@@ -169,7 +179,7 @@ var SqlSchemaBuilder = /** @class */ (function () {
             additional: []
         };
         var statements = changes.map(function (c) { return _this.buildChange(c, context); });
-        statements = statements.concat(this.createCrossTables(context.crossTables));
+        statements = statements.concat(this.createCrossTables(context.crossTables, context));
         var result = statements.join('\n');
         return result;
     };

@@ -1,0 +1,28 @@
+{
+  "World": {
+    "properties": {
+      "creatures": {
+        "type": "list",
+        "trellis": "Creature"
+      }
+    }
+  },
+  "Creature": {
+    "softDelete": true,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "health": {
+        "type": "int"
+      },
+      "world": {
+        "type": "World",
+        "nullable": false
+      },
+      "tags": {
+        "type": "string"
+      }
+    }
+  }
+}

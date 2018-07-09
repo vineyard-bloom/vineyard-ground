@@ -1,0 +1,46 @@
+{
+  "World": {
+    "properties": {
+      "creatures": {
+        "type": "list",
+        "trellis": "Creature"
+      }
+    }
+  },
+  "Creature": {
+    "softDelete": true,
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "health": {
+        "type": "int"
+      },
+      "isFuzzy": {
+        "type": "bool"
+      },
+      "world": {
+        "type": "World",
+        "nullable": false
+      },
+      "tags": {
+        "type": "list",
+        "trellis": "Tag"
+      }
+    }
+  },
+  "Tag": {
+    "properties": {
+      "id": {
+        "type": "int"
+      },
+      "name": {
+        "type": "string"
+      },
+      "creatures": {
+        "type": "list",
+        "trellis": "Creature"
+      }
+    }
+  }
+}
