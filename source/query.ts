@@ -144,23 +144,23 @@ export class Query_Implementation<T, O> implements QueryBuilder<T, O> {
     const where: any = {}
     where[to_lower(reference.trellis.name)] = identity
 
-    return reference.other_property.trellis.oldTable.findAll({
+    return reference.other_property!.trellis.oldTable!.findAll({
       include: {
         model: reference.trellis.oldTable,
         through: {where: where},
-        as: reference.other_property.name,
+        as: reference.other_property!.name,
         required: true
       }
     })
-      .then((result: any) => result.map((r: any) => processFields(getData(r), reference.other_property.trellis)))
+      .then((result: any) => result.map((r: any) => processFields(getData(r), reference.other_property!.trellis)))
   }
 
   private perform_expansion(path: string, data: any) {
     const property = this.trellis.properties[path]
     if (property.is_list()) {
-      return property.other_property.is_list()
+      return property.other_property!.is_list()
         ? this.expand_cross_table(property, this.trellis.get_identity(data))
-        : this.get_other_collection(path).filter({[property.other_property.name]: data})
+        : this.get_other_collection(path).filter({[property.other_property!.name]: data})
     }
     else {
       return this.get_other_collection(path).get(data[path])

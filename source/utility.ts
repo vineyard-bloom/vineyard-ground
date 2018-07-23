@@ -14,7 +14,7 @@ export function to_lower(text: string) {
 }
 
 export function processFields(result: any, trellis: Trellis) {
-  if (trellis.oldTable.sequelize.getDialect() == 'mysql') {
+  if (trellis.oldTable!.sequelize.getDialect() == 'mysql') {
     for (let i in trellis.properties) {
       const property = trellis.properties[i]
       if (property.type.name == 'json') {

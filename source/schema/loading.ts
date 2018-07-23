@@ -1,7 +1,7 @@
 import { List_Type, Type, Type_Category } from './type'
 import { Library } from './library'
 import { Reference, StandardProperty, Trellis_Type, TrellisImplementation } from "./trellis"
-import { Property, Trellis } from "../types"
+import { Property, Table, Trellis } from "../types"
 import { to_lower_snake_case } from "../utility"
 
 const pluralize = require('pluralize')
@@ -239,13 +239,12 @@ function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loade
 }
 
 function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
-  const trellis = new TrellisImplementation(name)
-  loader.library.types[name] = new Trellis_Type(name, trellis)
   const sourceTable = source.table || {}
-
-  trellis.table = {
-    name: sourceTable.name || pluralize(snakeCaseTables ? to_lower_snake_case(trellis.name) : trellis.name.toLowerCase())
+  const table: Table = {
+    name: sourceTable.name || pluralize(snakeCaseTables ? to_lower_snake_case(name) : name.toLowerCase())
   }
+  const trellis = new TrellisImplementation(name, table)
+  loader.library.types[name] = new Trellis_Type(name, trellis)
 
   for (let name in source.properties) {
     const property_source = source.properties [name]

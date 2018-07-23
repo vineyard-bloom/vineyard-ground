@@ -45,6 +45,7 @@ var StandardProperty = /** @class */ (function () {
     function StandardProperty(name, type, trellis) {
         this.is_nullable = false;
         this.is_unique = false;
+        this.other_property = undefined;
         this.name = name;
         this.type = type;
         this.trellis = trellis;
@@ -95,12 +96,15 @@ function get_key_identity(data, name) {
 //   parent?: Trellis | null
 // }
 var TrellisImplementation = /** @class */ (function () {
-    function TrellisImplementation(name) {
+    function TrellisImplementation(name, table) {
+        this.oldTable = undefined;
         this.properties = {};
         this.primary_keys = [];
         this.softDelete = false;
+        this.lists = [];
         this.additional = {};
         this.name = name;
+        this.table = table;
     }
     TrellisImplementation.prototype.get_lists = function () {
         if (this.lists)

@@ -40,7 +40,7 @@ export class StandardProperty implements Property {
   is_nullable: boolean = false
   "default": any
   is_unique: boolean = false
-  other_property: Property
+  other_property: Property | undefined = undefined
 
   constructor(name: string, type: Type, trellis: Trellis) {
     this.name = name
@@ -100,7 +100,7 @@ function get_key_identity(data: any, name: string) {
 // }
 
 export class TrellisImplementation implements Trellis {
-  oldTable: SequelizeTable
+  oldTable: SequelizeTable | undefined = undefined
   table: Table
   name: string
   properties: { [name: string]: Property } = {}
@@ -109,11 +109,12 @@ export class TrellisImplementation implements Trellis {
   collection: any
   softDelete: boolean = false
 
-  private lists: Reference[]
+  private lists: Reference[] = []
   additional: any = {}
 
-  constructor(name: string) {
+  constructor(name: string, table: Table) {
     this.name = name
+    this.table = table
   }
 
   get_lists(): Reference[] {

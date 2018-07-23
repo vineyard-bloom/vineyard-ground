@@ -36,7 +36,7 @@ export interface Property {
   is_nullable: boolean
   "default": any
   is_unique: boolean
-  other_property: Property
+  other_property: Property | undefined
   cross_table?: SequelizeTable
   autoIncrement?: boolean
   length?: number
@@ -51,7 +51,7 @@ export interface Property {
 }
 
 export interface Trellis {
-  oldTable: SequelizeTable
+  oldTable: SequelizeTable | undefined
   table: Table
   name: string
   properties: { [name: string]: Property }

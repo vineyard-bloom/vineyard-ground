@@ -171,12 +171,12 @@ function initialize_primary_keys(trellis, source, loader) {
     }
 }
 function load_trellis(name, source, loader) {
-    var trellis = new trellis_1.TrellisImplementation(name);
-    loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
     var sourceTable = source.table || {};
-    trellis.table = {
-        name: sourceTable.name || pluralize(snakeCaseTables ? utility_1.to_lower_snake_case(trellis.name) : trellis.name.toLowerCase())
+    var table = {
+        name: sourceTable.name || pluralize(snakeCaseTables ? utility_1.to_lower_snake_case(name) : name.toLowerCase())
     };
+    var trellis = new trellis_1.TrellisImplementation(name, table);
+    loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
     for (var name_1 in source.properties) {
         var property_source = source.properties[name_1];
         trellis.properties[name_1] = load_property(name_1, property_source, trellis, loader);

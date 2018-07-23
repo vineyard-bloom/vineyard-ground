@@ -77,7 +77,7 @@ function perform_operation<T>(identity: any, list: Property, operationOrIdentity
     case Operation_Type.add: {
       const fields: any = {}
       fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item)
+      fields [to_lower(list.other_property!.trellis.name)] = list.other_property!.trellis.get_identity(operation.item)
       if (!list.cross_table)
         throw Error("List is missing cross table.")
 
@@ -87,7 +87,7 @@ function perform_operation<T>(identity: any, list: Property, operationOrIdentity
     case Operation_Type.remove: {
       const fields: any = {}
       fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.other_property.trellis.name)] = list.other_property.trellis.get_identity(operation.item)
+      fields [to_lower(list.other_property!.trellis.name)] = list.other_property!.trellis.get_identity(operation.item)
       if (!list.cross_table)
         throw Error("List is missing cross table.")
 

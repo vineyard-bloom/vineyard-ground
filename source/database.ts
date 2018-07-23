@@ -134,16 +134,16 @@ function create_field(property: Property, library: Library, dialect: string): an
 }
 
 function get_cross_table_name(trellises: Trellis []) {
-  return trellises.map(t => t.oldTable.getTableName()).sort().join('_')
+  return trellises.map(t => t.oldTable!.getTableName()).sort().join('_')
 }
 
 function initialize_many_to_many(list: Property, trellis: Trellis, schema: Schema, tables: any, sequelize: any) {
-  const table_trellises = [list.trellis, list.other_property.trellis]
+  const table_trellises = [list.trellis, list.other_property!.trellis]
   const cross_table_name = get_cross_table_name(table_trellises)
 
-  const relationship = trellis.oldTable.belongsToMany(list.get_other_trellis().oldTable, {
+  const relationship = trellis.oldTable!.belongsToMany(list.get_other_trellis().oldTable!, {
     as: list.name,
-    otherKey: list.other_property.trellis.name.toLowerCase(),
+    otherKey: list.other_property!.trellis.name.toLowerCase(),
     foreignKey: list.trellis.name.toLowerCase(),
     constraints: false,
     through: cross_table_name
@@ -156,8 +156,8 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
   if (property.type.get_category() == Type_Category.trellis) {
     const reference = property as Property
     if (!reference.other_property) {
-      const other_table = reference.get_other_trellis().oldTable
-      other_table.hasMany(trellis.oldTable, {
+      const other_table = reference.get_other_trellis().oldTable!
+      other_table.hasMany(trellis.oldTable!, {
         foreignKey: reference.name,
         constraints: true
       })
@@ -165,13 +165,13 @@ function initialize_relationship(property: Property, trellis: Trellis, schema: S
   }
   else if (property.type.get_category() == Type_Category.list) {
     const list = property as Property
-    if (list.other_property.type.get_category() == Type_Category.list) {
+    if (list.other_property!.type.get_category() == Type_Category.list) {
       initialize_many_to_many(list, trellis, schema, tables, sequelize)
     }
     else {
-      trellis.oldTable.hasMany(list.get_other_trellis().oldTable, {
+      trellis.oldTable!.hasMany(list.get_other_trellis().oldTable!, {
         as: list.name,
-        foreignKey: list.other_property.name,
+        foreignKey: list.other_property!.name,
         constraints: true
       })
     }

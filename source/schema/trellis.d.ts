@@ -13,7 +13,7 @@ export declare class StandardProperty implements Property {
     is_nullable: boolean;
     "default": any;
     is_unique: boolean;
-    other_property: Property;
+    other_property: Property | undefined;
     constructor(name: string, type: Type, trellis: Trellis);
     get_path(): string;
     is_reference(): boolean;
@@ -24,7 +24,7 @@ export declare class Reference extends StandardProperty {
     constructor(name: string, type: Type, trellis: Trellis, other_property?: Property);
 }
 export declare class TrellisImplementation implements Trellis {
-    oldTable: SequelizeTable;
+    oldTable: SequelizeTable | undefined;
     table: Table;
     name: string;
     properties: {
@@ -36,7 +36,7 @@ export declare class TrellisImplementation implements Trellis {
     softDelete: boolean;
     private lists;
     additional: any;
-    constructor(name: string);
+    constructor(name: string, table: Table);
     get_lists(): Reference[];
     get_identity(data: any): any;
     getIdentity(data: any): any;
