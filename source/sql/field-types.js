@@ -5,68 +5,68 @@ function getFieldType(property, library) {
     var type = property.type;
     switch (type.get_category()) {
         case schema_1.Type_Category.primitive:
-            if (type === library.types.long)
+            if (type.name === library.types.long.name)
                 return {
                     name: 'BIGINT',
                     defaultValue: '0'
                 };
-            if (type === library.types.int)
+            if (type.name === library.types.int.name)
                 return {
                     name: 'INTEGER',
                     defaultValue: '0'
                 };
-            if (type === library.types.string)
+            if (type.name === library.types.string.name)
                 return {
                     name: 'CHARACTER VARYING(255)',
                     defaultValue: "''"
                 };
-            if (type === library.types.text)
+            if (type.name === library.types.text.name)
                 return {
                     name: 'TEXT'
                 };
-            if (type === library.types.json)
+            if (type.name === library.types.json.name)
                 return { name: 'JSON' };
-            if (type === library.types.bool)
+            if (type.name === library.types.bool.name)
                 return {
                     name: 'BOOLEAN',
                     defaultValue: 'false'
                 };
-            if (type === library.types.guid)
+            if (type.name === library.types.guid.name)
                 return {
                     name: 'UUID'
                 };
-            if (type === library.types.float)
+            if (type.name === library.types.float.name)
                 return {
                     name: 'FLOAT',
                     defaultValue: '0'
                 };
-            if (type === library.types.date)
+            if (type.name === library.types.date.name)
                 return {
                     name: 'DATE'
                 };
-            if (type === library.types.char)
+            if (type.name === library.types.char.name)
                 return {
                     name: 'CHAR'
                 };
-            if (type === library.types.datetime)
+            if (type.name === library.types.datetime.name)
                 return {
                     name: 'TIMESTAMPZ'
                 };
-            if (type === library.types.time)
+            if (type.name === library.types.time.name)
                 return {
                     name: 'TIME'
                 };
-            if (type === library.types.colossal)
+            if (type.name === library.types.colossal.name)
                 return {
                     name: 'NUMERIC',
                     defaultValue: '0'
                 };
-            if (type === library.types.bignumber)
+            if (type.name === library.types.bignumber.name)
                 return {
                     name: 'NUMERIC',
                     defaultValue: '0'
                 };
-            if (type === library.types.short)
+            if (type.name === library.types.short.name)
                 return {
                     name: 'SMALLINT',
                     defaultValue: 0

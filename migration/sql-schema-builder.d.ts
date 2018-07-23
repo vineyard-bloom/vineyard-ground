@@ -10,13 +10,14 @@ export declare class SqlSchemaBuilder {
     createProperty(property: Property, autoIncrement?: boolean): any[] | "";
     private renderPropertyCreations(trellis);
     private createTable(trellis, context);
+    private createField(property);
     private changeFieldNullable(property);
     private changeFieldType(property);
     private deleteField(property);
-    private deleteTable(property);
+    private deleteTable(trellis);
     private createForeignKey(trellis);
-    private createCrossTable(property);
-    private createCrossTables(properties);
+    private createCrossTable(property, context);
+    private createCrossTables(properties, context);
     private processChange(change, context);
     private buildChange(change, context);
     build(changes: Change[]): string;

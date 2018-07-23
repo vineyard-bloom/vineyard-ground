@@ -181,6 +181,22 @@ describe('Sequelize Test', function () {
       const record = await model.ground.querySingle(`SELECT * FROM mysteries`)
       expect(record.unknown).equal(16)
     })
+
+    it('Creates trellis indexes', async function () {
+      // Example of manual index creation
+      // await model.ground.query(`CREATE INDEX odd_records_vast ON public.odd_records (vast);`)
+
+      const record = await model.ground.query(`SELECT * FROM pg_indexes WHERE tablename = 'odd_records';`)
+
+
+      const actual = [record[0].indexdef, record[1].indexdef]
+
+      const expected = [
+        'CREATE UNIQUE INDEX odd_records_pkey ON public.odd_records USING btree (strange, unknown)',
+        'CREATE INDEX odd_records_vast ON public.odd_records USING btree (vast)',
+      ]
+      assert.deepEqual(expected, actual)
+    })
   })
 })
 

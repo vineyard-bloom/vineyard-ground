@@ -1,4 +1,5 @@
 import {Type_Category, Trellis_Type, Library} from "./schema"
+import {Table_Source} from "./schema/loading"
 
 const Sequelize = require('sequelize')
 import {Table_Trellis, Trellis, Property, Schema, Table} from "./types";
@@ -236,12 +237,21 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
       modified = false
   }
 
+  const indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(index =>
+      ({
+        fields: index.properties.map(property => property.name)
+      })
+    )
+
+
   const oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
     underscored: true,
     createdAt: created,
     updatedAt: modified,
     deletedAt: deleted,
-    paranoid: !!deleted
+    paranoid: !!deleted,
+    // Create Sequelize indexes
+    indexes: indexArray
   })
 
   return oldTable

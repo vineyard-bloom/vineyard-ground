@@ -43,13 +43,13 @@ export interface Property_Source {
 }
 
 export interface IndexSource {
-  name?: string // Not implmented yet
+  name?: string // Not implemented yet
   properties: string[]
 }
 
 export interface Table_Source {
   name?: string
-  indexes?: IndexSource[]
+  indexes: IndexSource[]
 }
 
 export interface Trellis_Source {
@@ -238,13 +238,30 @@ function initialize_primary_keys(trellis: Trellis, source: Trellis_Source, loade
   }
 }
 
+// loadIndexes function returns an array of indexes
+function loadIndexes(trellis: Trellis, source: Trellis_Source) {
+  if (!source.table || !source.table.indexes)
+    return []
+
+  return source.table.indexes.map(indexSource =>
+    ({
+      properties: indexSource.properties.map(name =>
+        trellis.properties[name]
+      )
+    })
+  )
+}
+
 function load_trellis(name: string, source: Trellis_Source, loader: Loader): Trellis {
-  const sourceTable = source.table || {}
+  const sourceTable = source.table || { name: undefined }
   const table: Table = {
-    name: sourceTable.name || pluralize(snakeCaseTables ? to_lower_snake_case(name) : name.toLowerCase())
+    name: sourceTable.name || pluralize(snakeCaseTables ? to_lower_snake_case(name) : name.toLowerCase()),
+    // Call loadIndexes function to assign indexes to trellis.table.indexes
+    indexes: []
   }
   const trellis = new TrellisImplementation(name, table)
   loader.library.types[name] = new Trellis_Type(name, trellis)
+  table.indexes = loadIndexes(trellis, source)
 
   for (let name in source.properties) {
     const property_source = source.properties [name]
