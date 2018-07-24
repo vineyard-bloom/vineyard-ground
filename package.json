@@ -1,6 +1,6 @@
 {
   "name": "vineyard-ground",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "SQL ORM for Node.js",
   "main": "source/index.js",
   "types": "source/index.d.ts",
