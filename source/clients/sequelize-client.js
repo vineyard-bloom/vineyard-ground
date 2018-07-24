@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 var sequelize = require("sequelize");
-var SequelizeLegacyClient = /** @class */ (function () {
+var SequelizeLegacyClient = (function () {
     function SequelizeLegacyClient() {
     }
     SequelizeLegacyClient.prototype.findAll = function (table, options) {
@@ -10,7 +10,7 @@ var SequelizeLegacyClient = /** @class */ (function () {
     return SequelizeLegacyClient;
 }());
 exports.SequelizeLegacyClient = SequelizeLegacyClient;
-var SequelizeClient = /** @class */ (function () {
+var SequelizeClient = (function () {
     function SequelizeClient(databaseConfig) {
         this.sequelize = new sequelize(databaseConfig);
         this.legacyClient = new SequelizeLegacyClient();
@@ -30,7 +30,7 @@ var SequelizeClient = /** @class */ (function () {
     return SequelizeClient;
 }());
 exports.SequelizeClient = SequelizeClient;
-var SequelizeTableClient = /** @class */ (function () {
+var SequelizeTableClient = (function () {
     function SequelizeTableClient(client, sequelizeModel) {
         this.client = client;
         this.sequelizeModel = sequelizeModel;

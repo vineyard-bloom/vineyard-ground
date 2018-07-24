@@ -23,7 +23,7 @@ function smartJoin(items) {
     return result;
 }
 exports.smartJoin = smartJoin;
-var Flattener = /** @class */ (function () {
+var Flattener = (function () {
     function Flattener() {
         this.args = [];
     }
@@ -45,7 +45,7 @@ var Flattener = /** @class */ (function () {
     return Flattener;
 }());
 exports.Flattener = Flattener;
-var SqlBuilder = /** @class */ (function () {
+var SqlBuilder = (function () {
     function SqlBuilder() {
     }
     SqlBuilder.prototype.quote = function (text) {
@@ -75,7 +75,7 @@ var SqlBuilder = /** @class */ (function () {
     return SqlBuilder;
 }());
 exports.SqlBuilder = SqlBuilder;
-var TrellisSqlGenerator = /** @class */ (function () {
+var TrellisSqlGenerator = (function () {
     function TrellisSqlGenerator(trellis) {
         this.builder = new SqlBuilder();
         this.trellis = trellis;

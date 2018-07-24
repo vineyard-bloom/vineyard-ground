@@ -5,7 +5,7 @@ var sql_building_1 = require("../source/sql/sql-building");
 var field_types_1 = require("../source/sql/field-types");
 var schema_1 = require("../source/schema");
 var indent = '  ';
-var SqlSchemaBuilder = /** @class */ (function () {
+var SqlSchemaBuilder = (function () {
     function SqlSchemaBuilder(schema) {
         this.builder = new sql_building_1.SqlBuilder();
         this.schema = schema;

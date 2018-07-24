@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var query_1 = require("./query");
 var update_1 = require("./update");
-var Collection = /** @class */ (function () {
+var Collection = (function () {
     function Collection(trellis, table, client) {
         this.trellis = trellis;
         this.table = table;

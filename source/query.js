@@ -13,7 +13,7 @@ var Reduce_Mode;
 function getData(row) {
     return row.dataValues || row;
 }
-var Query_Implementation = /** @class */ (function () {
+var Query_Implementation = (function () {
     function Query_Implementation(table, client, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;
