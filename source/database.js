@@ -195,7 +195,7 @@ function create_table(trellis, schema, sequelize) {
     }
     var indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(function (index) {
         return ({
-            fields: index.properties.map(function (property) { return property.name; })
+            fields: index.properties
         });
     });
     var oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
@@ -204,7 +204,6 @@ function create_table(trellis, schema, sequelize) {
         updatedAt: modified,
         deletedAt: deleted,
         paranoid: !!deleted,
-        // Create Sequelize indexes
         indexes: indexArray
     });
     return oldTable;
