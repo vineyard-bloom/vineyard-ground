@@ -239,7 +239,7 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
 
   const indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(index =>
       ({
-        fields: index.properties.map(property => property.name)
+        fields: index.properties
       })
     )
 
@@ -250,7 +250,6 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
     updatedAt: modified,
     deletedAt: deleted,
     paranoid: !!deleted,
-    // Create Sequelize indexes
     indexes: indexArray
   })
 
