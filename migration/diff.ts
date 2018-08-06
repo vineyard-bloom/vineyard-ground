@@ -1,16 +1,22 @@
 const shell = require('shelljs')
-import {Change, ChangeType} from "./types";
-import {Property, Trellis, Trellis_Map} from "../source/types";
-import {Schema} from "../source/schema";
+import { Change, ChangeType, DiffBundle } from "./types";
+import { Property, Trellis_Map } from "../source";
+import { Schema } from "../source/schema";
+import * as fs from 'fs'
 
-function shellCommand(command: string) {
-  console.log('shell', command)
-  if (process.platform === 'win32') {
-    return shell.exec('powershell "' + command + '"')
+function shellCommand(command: string, echo: Boolean = false) {
+  if (echo)
+    console.log('shell', command)
+
+  const options = {
+    silent: !echo
   }
-  else {
-    return shell.exec(command)
-  }
+
+  const extendedCommand = process.platform === 'win32'
+    ? 'powershell "' + command + '"'
+    : command
+
+  return shell.exec(extendedCommand, options)
 }
 
 function getJson(commit: string, path: string) {
@@ -86,11 +92,74 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
   return result
 }
 
-export function get_diff(path: string, firstCommit: string, secondCommit: string) {
-  const firstJson = getJson(firstCommit, path)
-  const secondJson = getJson(secondCommit, path)
-  const first:any = new Schema(firstJson).trellises
-  const second:any = new Schema(secondJson).trellises
-  return findChangedTrellises(first, second)
-  // TODO Return more complex object of changes plus the first schema?
+function loadSchemaFromCommit(path: string, hash: string): Schema {
+  const pathOffset = (shellCommand('git rev-parse --show-prefix') as string).trim()
+  const fullPath = pathOffset + path
+  const firstJson = getJson(hash, fullPath)
+  return new Schema(firstJson)
+}
+
+export function getDiff(path: string, firstCommit: string, secondCommit: string): DiffBundle {
+  const first = loadSchemaFromCommit(path, firstCommit)
+  const second = loadSchemaFromCommit(path, secondCommit)
+  return {
+    changes: findChangedTrellises(first.trellises, second.trellises),
+    originalSchema: first,
+    firstCommit,
+    secondCommit
+  }
+}
+
+export function getCommitHashes(path: string, limit: number = 1): string[] {
+  const shellOutput = (shellCommand('git log --pretty="%H" -' + limit + ' ' + path) as string).trim()
+  return shellOutput.split(/\s+/g)
+}
+
+interface SchemaBundle {
+  schema: Schema,
+  name: string
+}
+
+function loadSchemaBundleFromCommit(path: string, hash: string): SchemaBundle {
+  return {
+    schema: loadSchemaFromCommit(path, hash),
+    name: hash
+  }
+}
+
+function routeSchemaGathering(path: string, commitHashes: string[]): [SchemaBundle, SchemaBundle] {
+  if (commitHashes.length < 0 || commitHashes.length > 2)
+    throw new Error("Invalid commitHash count: " + commitHashes.length)
+
+  if (commitHashes.length == 2) {
+    return [
+      loadSchemaBundleFromCommit(path, commitHashes[0]),
+      loadSchemaBundleFromCommit(path, commitHashes[1])
+    ]
+  }
+
+  const commits = getCommitHashes(path, 2)
+  if (commits.length < 1)
+    throw new Error("There are not enough Git commits to that file to make a diff.")
+
+  const firstCommit = commitHashes.length > 0
+    ? loadSchemaBundleFromCommit(path, commitHashes[0])
+    : loadSchemaBundleFromCommit(path, commits[1])
+
+  const current = {
+    schema: new Schema(JSON.parse(fs.readFileSync(path, 'utf8'))),
+    name: 'current'
+  }
+
+  return [firstCommit, current]
+}
+
+export function getLatestDiff(path: string, commitHashes: string[] = []): DiffBundle {
+  const commits = routeSchemaGathering(path, commitHashes)
+  return {
+    changes: findChangedTrellises(commits[0].schema.trellises, commits[1].schema.trellises),
+    originalSchema: commits[0].schema,
+    firstCommit: commits[0].name,
+    secondCommit: commits[1].name
+  }
 }

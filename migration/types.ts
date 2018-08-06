@@ -20,3 +20,10 @@ export interface TableChange {
   trellis: Trellis
   property?: undefined
 }
+
+export interface DiffBundle {
+  changes: any
+  originalSchema: any
+  firstCommit: string
+  secondCommit: string
+}

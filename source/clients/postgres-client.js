@@ -1,28 +1,27 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var sequelize_client_1 = require("./sequelize-client");
-var PostgresClient = (function () {
-    function PostgresClient(databaseConfig) {
+const sequelize_client_1 = require("./sequelize-client");
+class PostgresClient {
+    constructor(databaseConfig) {
         this.sequelizeClient = new sequelize_client_1.SequelizeClient(databaseConfig);
-        var pg = require('pg');
-        var pgConfig = Object.assign(databaseConfig, {
+        const pg = require('pg');
+        const pgConfig = Object.assign(databaseConfig, {
             user: databaseConfig.username
         });
         this.pgPool = new pg.Pool(pgConfig);
     }
-    PostgresClient.prototype.getLegacyClient = function () {
+    getLegacyClient() {
         return undefined;
-    };
-    PostgresClient.prototype.getLegacyDatabaseInterface = function () {
+    }
+    getLegacyDatabaseInterface() {
         return this.sequelizeClient.getLegacyDatabaseInterface();
-    };
-    PostgresClient.prototype.query = function (sql, args) {
+    }
+    query(sql, args) {
         return this.pgPool.query(sql, args);
-    };
-    PostgresClient.prototype.createTableInterface = function (trellis, sequelizeModel) {
+    }
+    createTableInterface(trellis, sequelizeModel) {
         return this.sequelizeClient.createTableInterface(trellis, sequelizeModel);
-    };
-    return PostgresClient;
-}());
+    }
+}
 exports.PostgresClient = PostgresClient;
 //# sourceMappingURL=postgres-client.js.map

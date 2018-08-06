@@ -1,8 +1,8 @@
-import {ChangeType, TableChange} from "./types";
+import { ChangeType, DiffBundle, TableChange } from "./types";
 import {SqlSchemaBuilder} from "./sql-schema-builder";
-import {Schema} from "../source/types";
+import {Schema} from "../source";
 
-export function generate(schema: Schema): string {
+export function generateInitializationSql(schema: Schema): string {
   let changes:TableChange[] = []
   for (let name in schema.trellises) {
     const trellis = schema.trellises [name]
@@ -23,4 +23,9 @@ export function generate(schema: Schema): string {
 
   const builder = new SqlSchemaBuilder(schema)
   return builder.build(changes)
+}
+
+export function generateMigrationSql(diffBundle: DiffBundle): string {
+  const builder = new SqlSchemaBuilder(diffBundle.originalSchema)
+  return builder.build(diffBundle.changes)
 }

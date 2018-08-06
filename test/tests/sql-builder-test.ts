@@ -1,4 +1,4 @@
-import {generate, findChangedTrellises} from '../../migration'
+import {generateInitializationSql, findChangedTrellises} from '../../migration'
 
 require('source-map-support').install()
 import {QueryGenerator} from '../../source/sql/query-generator'
@@ -46,7 +46,7 @@ describe('sql-builder-test', function () {
   })
 
   it.skip('generate', function () {
-    const sql = generate(schema as any)
+    const sql = generateInitializationSql(schema as any)
     checkDiff('test/resources/game.sql', sql, config.diffViewerPath)
   })
 
