@@ -191,7 +191,7 @@ function create_table(trellis, schema, sequelize) {
             modified = false;
     }
     const indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(index => ({
-        fields: index.properties.map(property => property.name)
+        fields: index.properties
     }));
     const oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
         underscored: true,
@@ -199,7 +199,6 @@ function create_table(trellis, schema, sequelize) {
         updatedAt: modified,
         deletedAt: deleted,
         paranoid: !!deleted,
-        // Create Sequelize indexes
         indexes: indexArray
     });
     return oldTable;

@@ -165,12 +165,11 @@ export class SqlSchemaBuilder {
     const first = this.createForeignKey(property.trellis)
     const second = this.createForeignKey(property.get_other_trellis())
 
-    const trellis = new TrellisImplementation(name) 
-
-    trellis.table = {
+    const trellis = new TrellisImplementation(name, {
       name: name,
       isCross: true
-    }
+    })
+
     trellis.properties = {
       [first.name]: first,
       [second.name]: second
