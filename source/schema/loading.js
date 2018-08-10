@@ -157,11 +157,11 @@ function initialize_primary_keys(trellis, source, loader) {
     }
 }
 // loadIndexes function returns an array of indexes
-function loadIndexes(trellis, source) {
+function loadIndexes(source) {
     if (!source.table || !source.table.indexes)
         return [];
     return source.table.indexes.map(indexSource => ({
-        properties: indexSource.properties.map(name => trellis.properties[name])
+        properties: indexSource.properties.map(name => name)
     }));
 }
 function load_trellis(name, source, loader) {
@@ -169,11 +169,10 @@ function load_trellis(name, source, loader) {
     const table = {
         name: sourceTable.name || pluralize(snakeCaseTables ? utility_1.to_lower_snake_case(name) : name.toLowerCase()),
         // Call loadIndexes function to assign indexes to trellis.table.indexes
-        indexes: []
+        indexes: loadIndexes(source)
     };
     const trellis = new trellis_1.TrellisImplementation(name, table);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
-    table.indexes = loadIndexes(trellis, source);
     for (let name in source.properties) {
         const property_source = source.properties[name];
         trellis.properties[name] = load_property(name, property_source, trellis, loader);
