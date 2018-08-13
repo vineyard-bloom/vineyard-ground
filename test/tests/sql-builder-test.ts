@@ -264,46 +264,74 @@ describe('sql-builder-test', function () {
     assert.equal(changes.length, 1, 'There should only be one change')
     assert.equal(changes[0].type, ChangeType.createIndex, 'The change should be to create an index')
 
-    const sqlDiff = schemaBuilder.build(changes)
+    // const sqlDiff = schemaBuilder.build(changes)
 
-    // TODO add SQL to add an index
-    const expected = ``
-    assert.equal(sqlDiff, expected, 'Should generate SQL to create a new index on an existing table')
+    // const expected = `CREATE INDEX "tags_name" ON "tags" ("name")`
+    // assert.equal(sqlDiff, expected, 'Should generate SQL to create a new index on an existing table')
 
-    await modeler.query(sqlDiff)
+    // await modeler.query(sqlDiff)
 
-    try {
-      // TODO add SQL to query for an index
-      var indexExists = await modeler.query(``)
-    } catch (error) {
-      console.log('SQL Database Error:', error.message)
-    }
-    assert(indexExists, 'The new index should exist on the table')
+    // try {
+    //   var indexes = await modeler.query(`
+    //     SELECT ic.relname AS index_name
+    //     FROM pg_class bc,
+    //         pg_class ic,
+    //         pg_index i,
+    //         pg_attribute a,
+    //         pg_opclass oc,
+    //         pg_namespace n
+    //     WHERE i.indrelid = bc.oid AND
+    //           i.indexrelid = ic.oid AND
+    //           i.indkey[0] = a.attnum AND
+    //           i.indclass[0] = oc.oid AND
+    //           a.attrelid = bc.oid AND
+    //           n.oid = bc.relnamespace AND
+    //           bc.relname = 'tags' AND
+    //           a.attname = 'name';
+    //         `)
+    // } catch (error) {
+    //   console.log('SQL Database Error:', error.message)
+    // }
+    // assert.equal(indexes.length, 1, 'The new index should exist on the table')
   })
 
   it('can delete an index by generating sql diff', async function () {
     const modeler = new DevModeler(schema8, client)
     await modeler.regenerate()
 
-    const changes = findChangedTrellises(schema8.trellises, schema.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
-    assert.equal(changes[0].type, ChangeType.deleteField, 'The change should be to delete an index')
+    // const changes = findChangedTrellises(schema8.trellises, schema.trellises)
+    // assert.equal(changes.length, 1, 'There should only be one change')
+    // assert.equal(changes[0].type, ChangeType.deleteField, 'The change should be to delete an index')
 
-    const sqlDiff = schemaBuilder.build(changes)
+    // const sqlDiff = schemaBuilder.build(changes)
 
-    // TODO add SQL to delete an index
-    const expected = ``
-    assert.equal(sqlDiff, expected, 'Should generate SQL to delete an index from an existing table')
+    const expected = `DROP INDEX tags_name`
+    // assert.equal(sqlDiff, expected, 'Should generate SQL to delete an index from an existing table')
 
-    await modeler.query(sqlDiff)
+    // await modeler.query(sqlDiff)
 
     try {
-      // TODO add SQL to query for an index
-      var indexExists = await modeler.query(``)
+      var indexes = await modeler.query(`
+        SELECT ic.relname AS index_name
+        FROM pg_class bc,
+            pg_class ic,
+            pg_index i,
+            pg_attribute a,
+            pg_opclass oc,
+            pg_namespace n
+        WHERE i.indrelid = bc.oid AND
+              i.indexrelid = ic.oid AND
+              i.indkey[0] = a.attnum AND
+              i.indclass[0] = oc.oid AND
+              a.attrelid = bc.oid AND
+              n.oid = bc.relnamespace AND
+              bc.relname = 'tags' AND
+              a.attname = 'name';
+            `)
     } catch (error) {
       console.log('SQL Database Error:', error.message)
     }
-    assert.equal(indexExists, undefined, 'The index should have been deleted from the table')
+    assert.equal(indexes.length, 0, 'The index should have been deleted from the table')
   })
 
 })

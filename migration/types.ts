@@ -3,8 +3,10 @@ import {Property, Trellis} from "../source/types";
 export enum ChangeType {
   createTable,
   createField,
+  createIndex,
   deleteField,
   deleteTable,
+  deleteIndex,
   changeFieldType,
   changeFieldNullable,
 }
