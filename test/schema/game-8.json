@@ -27,7 +27,7 @@
     },
     "table": {
       "indexes": [
-        { "properties": ["name"]}
+        { "properties": ["name", "health"]}
       ]
     }
   },

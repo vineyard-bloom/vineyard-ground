@@ -56,7 +56,7 @@ describe('sql-builder-test', function () {
     await modeler.query(`DROP TABLE IF EXISTS characters CASCADE;`)
 
     const changes = findChangedTrellises(schema.trellises, schema2.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.createTable, 'The change should be to create a table')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -73,7 +73,7 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema2.trellises, schema.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.deleteTable, 'The change should be to delete a table')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -90,7 +90,7 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema.trellises, schema3.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.createField, 'The change should be to create a field')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -113,7 +113,7 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema3.trellises, schema.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.deleteField, 'The change should be to delete a field')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -135,7 +135,7 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema.trellises, schema4.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.changeFieldType, 'The change should be the field type')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -161,7 +161,7 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema.trellises, schema5.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.changeFieldNullable, 'The change should be field nullability')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -187,7 +187,7 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema5.trellises, schema.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
+    assert.equal(changes.length, 1, 'There should be one change')
     assert.equal(changes[0].type, ChangeType.changeFieldNullable, 'The change should be field nullability')
 
     const sqlDiff = schemaBuilder.build(changes)
@@ -261,54 +261,16 @@ describe('sql-builder-test', function () {
     await modeler.regenerate()
 
     const changes = findChangedTrellises(schema.trellises, schema8.trellises)
-    assert.equal(changes.length, 1, 'There should only be one change')
-    assert.equal(changes[0].type, ChangeType.createIndex, 'The change should be to create an index')
+    assert.equal(changes.length, 2, 'There should be two changes')
+    assert.equal(changes[0].type, ChangeType.createIndex, 'The first change should be to create an index')
+    assert.equal(changes[1].type, ChangeType.createIndex, 'The second change should be to create an index')
 
-    // const sqlDiff = schemaBuilder.build(changes)
+    const sqlDiff = schemaBuilder.build(changes)
 
-    // const expected = `CREATE INDEX "tags_name" ON "tags" ("name")`
-    // assert.equal(sqlDiff, expected, 'Should generate SQL to create a new index on an existing table')
+    const expected = 'CREATE INDEX "creatures_health" ON "creatures" ("health");\nCREATE INDEX "tags_name" ON "tags" ("name");'
+    assert.equal(sqlDiff, expected, 'Should generate SQL to create a new index on an existing table')
 
-    // await modeler.query(sqlDiff)
-
-    // try {
-    //   var indexes = await modeler.query(`
-    //     SELECT ic.relname AS index_name
-    //     FROM pg_class bc,
-    //         pg_class ic,
-    //         pg_index i,
-    //         pg_attribute a,
-    //         pg_opclass oc,
-    //         pg_namespace n
-    //     WHERE i.indrelid = bc.oid AND
-    //           i.indexrelid = ic.oid AND
-    //           i.indkey[0] = a.attnum AND
-    //           i.indclass[0] = oc.oid AND
-    //           a.attrelid = bc.oid AND
-    //           n.oid = bc.relnamespace AND
-    //           bc.relname = 'tags' AND
-    //           a.attname = 'name';
-    //         `)
-    // } catch (error) {
-    //   console.log('SQL Database Error:', error.message)
-    // }
-    // assert.equal(indexes.length, 1, 'The new index should exist on the table')
-  })
-
-  it('can delete an index by generating sql diff', async function () {
-    const modeler = new DevModeler(schema8, client)
-    await modeler.regenerate()
-
-    // const changes = findChangedTrellises(schema8.trellises, schema.trellises)
-    // assert.equal(changes.length, 1, 'There should only be one change')
-    // assert.equal(changes[0].type, ChangeType.deleteField, 'The change should be to delete an index')
-
-    // const sqlDiff = schemaBuilder.build(changes)
-
-    const expected = `DROP INDEX tags_name`
-    // assert.equal(sqlDiff, expected, 'Should generate SQL to delete an index from an existing table')
-
-    // await modeler.query(sqlDiff)
+    await modeler.query(sqlDiff)
 
     try {
       var indexes = await modeler.query(`
@@ -331,7 +293,47 @@ describe('sql-builder-test', function () {
     } catch (error) {
       console.log('SQL Database Error:', error.message)
     }
-    assert.equal(indexes.length, 0, 'The index should have been deleted from the table')
+    assert.equal(indexes.length, 1, 'The new tags_name index should exist on the table')
+  })
+
+  it('can delete an index by generating sql diff', async function () {
+    const modeler = new DevModeler(schema8, client)
+    await modeler.regenerate()
+
+    const changes = findChangedTrellises(schema8.trellises, schema.trellises)
+    assert.equal(changes.length, 2, 'There should be two changes')
+    assert.equal(changes[0].type, ChangeType.deleteIndex, 'The first change should be to delete an index')
+    assert.equal(changes[1].type, ChangeType.deleteIndex, 'The second change should be to delete an index')
+
+    const sqlDiff = schemaBuilder.build(changes)
+
+    const expected = 'DROP INDEX "creatures_health";\nDROP INDEX "tags_name";'
+    assert.equal(sqlDiff, expected, 'Should generate SQL to delete an index from an existing table')
+
+    await modeler.query(sqlDiff)
+
+    try {
+      var indexes = await modeler.query(`
+        SELECT ic.relname AS index_name
+        FROM pg_class bc,
+            pg_class ic,
+            pg_index i,
+            pg_attribute a,
+            pg_opclass oc,
+            pg_namespace n
+        WHERE i.indrelid = bc.oid AND
+              i.indexrelid = ic.oid AND
+              i.indkey[0] = a.attnum AND
+              i.indclass[0] = oc.oid AND
+              a.attrelid = bc.oid AND
+              n.oid = bc.relnamespace AND
+              bc.relname = 'tags' AND
+              a.attname = 'name';
+            `)
+    } catch (error) {
+      console.log('SQL Database Error:', error.message)
+    }
+    assert.equal(indexes.length, 0, 'The index tags_name should have been deleted from the table')
   })
 
 })
