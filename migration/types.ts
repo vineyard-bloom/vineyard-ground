@@ -15,7 +15,8 @@ export interface Change {
   type: ChangeType
   trellis?: Trellis
   property?: Property
-  index?: string
+  tableName?: string
+  propertyName?: string
 }
 
 export interface TableChange {

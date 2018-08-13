@@ -68,28 +68,45 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
   return result
 }
 
-function findChangedIndexes(firstIndexes: string[], secondIndexes: string[]): Change[] {
+function findChangedIndexes(tableName: string, firstIndexes: Index[], secondIndexes: Index[]): Change[] {
   let result: Change[] = []
-  firstIndexes.forEach(index => {
-    if (secondIndexes.indexOf(index) === -1) {
+  let firstProperties: string[] = []
+  let secondProperties: string[] = []
+
+  firstIndexes.forEach(indexArray => {
+    indexArray.properties.forEach(property => {
+      firstProperties.push(property)
+    })
+  })
+  secondIndexes.forEach(indexArray => {
+    indexArray.properties.forEach(property => {
+      secondProperties.push(property)
+    })
+  })
+
+  firstProperties.forEach(property => {
+    if (secondProperties.indexOf(property) === -1) {
       result.push({
         type: ChangeType.deleteIndex,
-        index: index
+        tableName: tableName,
+        propertyName: property
       })
     }
   })
-  secondIndexes.forEach(index => {
-    if (firstIndexes.indexOf(index) === -1) {
+  secondProperties.forEach(property => {
+    if (secondProperties.indexOf(property) === -1) {
       result.push({
         type: ChangeType.createIndex,
-        index: index
+        tableName: tableName,
+        propertyName: property
       })
     }
   })
+
   return result
 }
 
-export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [] {
+export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change[] {
   let result: Change[] = []
   for (let name in first) {
     if (!second[name]) {
@@ -98,7 +115,6 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
         trellis: first[name]
       })
     }
-    // Also look through indexes?
   }
   for (let name in second) {
     if (!first[name]) {
@@ -110,7 +126,32 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
     else {
       result = result.concat(findChangedProperties(first[name].properties, second[name].properties))
     }
-    // Also look through indexes?
+  }
+
+  for (let name in first) {
+    if (first[name].table.indexes && !second[name].table.indexes) {
+      first[name].table.indexes!.forEach(index => {
+        index.properties.forEach(property => {
+          result.push({
+            type: ChangeType.deleteIndex,
+            tableName: first[name].name,
+            propertyName: property
+          })
+        })
+      })
+    } else if (second[name].table.indexes && !first[name].table.indexes) {
+      second[name].table.indexes!.forEach(index => {
+        index.properties.forEach(property => {
+          result.push({
+            type: ChangeType.createIndex,
+            tableName: second[name].name,
+            propertyName: property
+          })
+        })
+      })
+    } else {
+      result = result.concat(findChangedIndexes(first[name].name, first[name].table.indexes!, second[name].table.indexes!))
+    }
   }
   return result
 }
