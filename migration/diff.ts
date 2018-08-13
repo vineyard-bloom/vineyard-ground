@@ -94,7 +94,7 @@ function findChangedIndexes(tableName: string, firstIndexes: Index[], secondInde
     }
   })
   secondProperties.forEach(property => {
-    if (secondProperties.indexOf(property) === -1) {
+    if (firstProperties.indexOf(property) === -1) {
       result.push({
         type: ChangeType.createIndex,
         tableName: tableName,
@@ -129,28 +129,31 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
   }
 
   for (let name in first) {
-    if (first[name].table.indexes && !second[name].table.indexes) {
-      first[name].table.indexes!.forEach(index => {
-        index.properties.forEach(property => {
-          result.push({
-            type: ChangeType.deleteIndex,
-            tableName: first[name].name,
-            propertyName: property
+    if (first[name].table.indexes!.length > 0 || second[name].table.indexes!.length > 0) {
+      // May not need this first part
+      if (first[name].table.indexes!.length > 0 && second[name].table.indexes!.length === 0) {
+        first[name].table.indexes!.forEach(index => {
+          index.properties.forEach(property => {
+            result.push({
+              type: ChangeType.deleteIndex,
+              tableName: first[name].table.name,
+              propertyName: property
+            })
           })
         })
-      })
-    } else if (second[name].table.indexes && !first[name].table.indexes) {
-      second[name].table.indexes!.forEach(index => {
-        index.properties.forEach(property => {
-          result.push({
-            type: ChangeType.createIndex,
-            tableName: second[name].name,
-            propertyName: property
+      } else if (second[name].table.indexes!.length > 0 && first[name].table.indexes!.length === 0) {
+        second[name].table.indexes!.forEach(index => {
+          index.properties.forEach(property => {
+            result.push({
+              type: ChangeType.createIndex,
+              tableName: second[name].table.name,
+              propertyName: property
+            })
           })
         })
-      })
-    } else {
-      result = result.concat(findChangedIndexes(first[name].name, first[name].table.indexes!, second[name].table.indexes!))
+      } else {
+        result = result.concat(findChangedIndexes(first[name].table.name, first[name].table.indexes!, second[name].table.indexes!))
+      }
     }
   }
   return result

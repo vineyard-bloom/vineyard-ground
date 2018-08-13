@@ -209,7 +209,7 @@ export class SqlSchemaBuilder {
         return this.createField(change.property!)
 
       case ChangeType.createIndex:
-        return this.createIndex(change.tableName, change.propertyName)
+        return this.createIndex(change.tableName!, change.propertyName!)
     
       case ChangeType.deleteField:
         return this.deleteField(change.property!)
@@ -218,7 +218,7 @@ export class SqlSchemaBuilder {
         return this.deleteTable(change.trellis!)
     
       case ChangeType.deleteIndex:
-        return this.deleteIndex(change.tableName, change.propertyName)
+        return this.deleteIndex(change.tableName!, change.propertyName!)
 
       case ChangeType.changeFieldType:
         return this.changeFieldType(change.property!)
