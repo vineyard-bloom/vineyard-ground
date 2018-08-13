@@ -1,6 +1,6 @@
 const shell = require('shelljs')
 import { Change, ChangeType, DiffBundle } from "./types";
-import { Property, Trellis_Map } from "../source";
+import { Property, Trellis_Map, Index } from "../source";
 import { Schema } from "../source/schema";
 import * as fs from 'fs'
 
@@ -68,6 +68,27 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
   return result
 }
 
+function findChangedIndexes(firstIndexes: string[], secondIndexes: string[]): Change[] {
+  let result: Change[] = []
+  firstIndexes.forEach(index => {
+    if (secondIndexes.indexOf(index) === -1) {
+      result.push({
+        type: ChangeType.deleteIndex,
+        index: index
+      })
+    }
+  })
+  secondIndexes.forEach(index => {
+    if (firstIndexes.indexOf(index) === -1) {
+      result.push({
+        type: ChangeType.createIndex,
+        index: index
+      })
+    }
+  })
+  return result
+}
+
 export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [] {
   let result: Change[] = []
   for (let name in first) {
@@ -77,6 +98,7 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
         trellis: first[name]
       })
     }
+    // Also look through indexes?
   }
   for (let name in second) {
     if (!first[name]) {
@@ -88,6 +110,7 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
     else {
       result = result.concat(findChangedProperties(first[name].properties, second[name].properties))
     }
+    // Also look through indexes?
   }
   return result
 }
