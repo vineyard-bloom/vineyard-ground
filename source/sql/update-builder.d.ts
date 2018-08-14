@@ -2,7 +2,7 @@ import { Trellis } from "../types";
 import { TrellisSqlGenerator } from "./sql-building";
 export declare class UpdateBuilder extends TrellisSqlGenerator {
     constructor(trellis: Trellis);
-    private prepareFieldsAndValues(seed);
+    private prepareFieldsAndValues;
     formatAssignment(assignment: any): (string | {
         value: any;
     })[];

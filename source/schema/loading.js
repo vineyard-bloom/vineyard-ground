@@ -1,43 +1,60 @@
 "use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    }
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
-const type_1 = require("./type");
-const trellis_1 = require("./trellis");
-const utility_1 = require("../utility");
-const pluralize = require('pluralize');
-let snakeCaseTables = true;
+var type_1 = require("./type");
+var trellis_1 = require("./trellis");
+var utility_1 = require("../utility");
+var pluralize = require('pluralize');
+var snakeCaseTables = true;
 function setSnakeCaseTables(value) {
     snakeCaseTables = value;
 }
 exports.setSnakeCaseTables = setSnakeCaseTables;
-class Incomplete_Type extends type_1.Type {
-    constructor(target_name, source) {
-        super("Incomplete: " + target_name);
-        this.target_name = target_name;
-        this.source = source;
+var Incomplete_Type = /** @class */ (function (_super) {
+    __extends(Incomplete_Type, _super);
+    function Incomplete_Type(target_name, source) {
+        var _this = _super.call(this, "Incomplete: " + target_name) || this;
+        _this.target_name = target_name;
+        _this.source = source;
+        return _this;
     }
-    get_category() {
+    Incomplete_Type.prototype.get_category = function () {
         return type_1.Type_Category.incomplete;
-    }
-    get_other_trellis_name() {
+    };
+    Incomplete_Type.prototype.get_other_trellis_name = function () {
         return this.target_name;
-    }
-}
-class Loader {
-    constructor(library) {
+    };
+    return Incomplete_Type;
+}(type_1.Type));
+var Loader = /** @class */ (function () {
+    function Loader(library) {
         this.incomplete = {};
         this.library = library;
     }
-}
+    return Loader;
+}());
 function load_type(source, loader) {
-    const types = loader.library.types;
-    const result = types[source.type];
+    var types = loader.library.types;
+    var result = types[source.type];
     if (result)
         return result;
     if (source.type == 'list') {
         if (source.trellis) {
-            const result = types[source.trellis];
-            if (result)
-                return new type_1.List_Type(result.name, result);
+            var result_1 = types[source.trellis];
+            if (result_1)
+                return new type_1.List_Type(result_1.name, result_1);
         }
         return new Incomplete_Type(source.trellis || "", source);
     }
@@ -45,11 +62,11 @@ function load_type(source, loader) {
     // throw Error("Not supported: " + JSON.stringify(source))
 }
 function find_other_references(trellis, other_trellis) {
-    const result = [];
-    for (let name in other_trellis.properties) {
-        const property = other_trellis.properties[name];
+    var result = [];
+    for (var name in other_trellis.properties) {
+        var property = other_trellis.properties[name];
         if (property.is_reference()) {
-            const reference = property;
+            var reference = property;
             if (reference.type.get_other_trellis_name() == trellis.name)
                 result.push(reference);
         }
@@ -57,14 +74,14 @@ function find_other_references(trellis, other_trellis) {
     return result;
 }
 function find_other_reference_or_null(trellis, other_trellis) {
-    const references = find_other_references(trellis, other_trellis);
+    var references = find_other_references(trellis, other_trellis);
     if (references.length > 1)
         console.error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".");
     // throw Error("Multiple ambiguous other references for " + trellis.name + " and " + other_trellis.name + ".")
     return references[0];
 }
 function find_other_reference(trellis, other_trellis) {
-    const reference = find_other_reference_or_null(trellis, other_trellis);
+    var reference = find_other_reference_or_null(trellis, other_trellis);
     if (!reference)
         throw Error("Could not find other reference for " + trellis.name + " and " + other_trellis.name + ".");
     return reference;
@@ -72,7 +89,7 @@ function find_other_reference(trellis, other_trellis) {
 function load_property_inner(name, source, trellis, loader) {
     if (!source.type)
         throw new Error(trellis.name + "." + name + " is missing a type property.");
-    const type = load_type(source, loader);
+    var type = load_type(source, loader);
     if (type.get_category() == type_1.Type_Category.primitive) {
         return new trellis_1.StandardProperty(name, type, trellis);
     }
@@ -80,13 +97,13 @@ function load_property_inner(name, source, trellis, loader) {
         return new trellis_1.Reference(name, type, trellis, find_other_reference_or_null(trellis, type.trellis));
     }
     else if (type.get_category() == type_1.Type_Category.list) {
-        const list_type = type;
+        var list_type = type;
         return new trellis_1.Reference(name, type, trellis, find_other_reference(trellis, list_type.child_type.trellis));
     }
     else if (type.get_category() == type_1.Type_Category.incomplete) {
-        const property = new trellis_1.Reference(name, type, trellis);
-        const target = type.target_name;
-        const incomplete = loader.incomplete[target] = loader.incomplete[target] || [];
+        var property = new trellis_1.Reference(name, type, trellis);
+        var target = type.target_name;
+        var incomplete = loader.incomplete[target] = loader.incomplete[target] || [];
         incomplete.push({
             property: property,
             source: source
@@ -98,7 +115,7 @@ function load_property_inner(name, source, trellis, loader) {
     }
 }
 function load_property(name, property_source, trellis, loader) {
-    const property = trellis.properties[name] = load_property_inner(name, property_source, trellis, loader);
+    var property = trellis.properties[name] = load_property_inner(name, property_source, trellis, loader);
     if (property_source.nullable === true)
         property.is_nullable = true;
     if (property_source.unique === true)
@@ -115,12 +132,12 @@ function load_property(name, property_source, trellis, loader) {
     return property;
 }
 function update_incomplete(trellis, loader) {
-    const incomplete = loader.incomplete[trellis.name];
+    var incomplete = loader.incomplete[trellis.name];
     if (incomplete) {
-        for (let i = 0; i < incomplete.length; ++i) {
-            const entry = incomplete[i];
-            const property = entry.property;
-            const type = property.type = load_type(entry.source, loader);
+        for (var i = 0; i < incomplete.length; ++i) {
+            var entry = incomplete[i];
+            var property = entry.property;
+            var type = property.type = load_type(entry.source, loader);
             if (type.get_category() == type_1.Type_Category.incomplete)
                 throw Error("Error resolving incomplete type.");
             if (type.get_category() == type_1.Type_Category.trellis) {
@@ -150,9 +167,9 @@ function format_primary_keys(primary_keys, trellis_name) {
     throw new Error("Invalid primary keys format for trellis " + trellis_name + '.');
 }
 function initialize_primary_keys(trellis, source, loader) {
-    const initialPrimaryKeys = source.primaryKeys || source.primary || source.primary_key;
-    const primaryKeys = format_primary_keys(initialPrimaryKeys, trellis.name);
-    for (let i = 0; i < primaryKeys.length; ++i) {
+    var initialPrimaryKeys = source.primaryKeys || source.primary || source.primary_key;
+    var primaryKeys = format_primary_keys(initialPrimaryKeys, trellis.name);
+    for (var i = 0; i < primaryKeys.length; ++i) {
         trellis.primary_keys.push(initialize_primary_key(primaryKeys[i], trellis, loader));
     }
 }
@@ -160,22 +177,24 @@ function initialize_primary_keys(trellis, source, loader) {
 function loadIndexes(source) {
     if (!source.table || !source.table.indexes)
         return [];
-    return source.table.indexes.map(indexSource => ({
-        properties: indexSource.properties.map(name => name)
-    }));
+    return source.table.indexes.map(function (indexSource) {
+        return ({
+            properties: indexSource.properties.map(function (name) { return name; })
+        });
+    });
 }
 function load_trellis(name, source, loader) {
-    const sourceTable = source.table || { name: undefined };
-    const table = {
+    var sourceTable = source.table || { name: undefined };
+    var table = {
         name: sourceTable.name || pluralize(snakeCaseTables ? utility_1.to_lower_snake_case(name) : name.toLowerCase()),
         // Call loadIndexes function to assign indexes to trellis.table.indexes
         indexes: loadIndexes(source)
     };
-    const trellis = new trellis_1.TrellisImplementation(name, table);
+    var trellis = new trellis_1.TrellisImplementation(name, table);
     loader.library.types[name] = new trellis_1.Trellis_Type(name, trellis);
-    for (let name in source.properties) {
-        const property_source = source.properties[name];
-        trellis.properties[name] = load_property(name, property_source, trellis, loader);
+    for (var name_1 in source.properties) {
+        var property_source = source.properties[name_1];
+        trellis.properties[name_1] = load_property(name_1, property_source, trellis, loader);
     }
     if (source.additional)
         trellis.additional = source.additional;
@@ -186,20 +205,20 @@ function load_trellis(name, source, loader) {
     return trellis;
 }
 function load_schema(definitions, trellises, library) {
-    const loader = new Loader(library);
-    for (let name in definitions) {
-        const definition = definitions[name];
+    var loader = new Loader(library);
+    for (var name in definitions) {
+        var definition = definitions[name];
         trellises[name] = load_trellis(name, definition, loader);
     }
-    for (let name in definitions) {
-        const definition = definitions[name];
+    for (var name in definitions) {
+        var definition = definitions[name];
         if (typeof definition.parent == 'string') {
             if (!trellises[definition.parent])
                 throw Error("Invalid parent trellis: " + definition.parent + '.');
             trellises[name].parent = trellises[definition.parent];
         }
     }
-    for (let a in loader.incomplete) {
+    for (var a in loader.incomplete) {
         throw Error("Unknown type '" + a + "'.");
     }
 }

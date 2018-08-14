@@ -13,9 +13,9 @@ export interface QueryBundle {
 }
 export declare class QueryGenerator extends TrellisSqlGenerator {
     constructor(trellis: Trellis);
-    private buildWhere(where);
-    private buildOrderBy(order);
-    private buildRange(command, value);
-    private buildSelect(attributes);
+    private buildWhere;
+    private buildOrderBy;
+    private buildRange;
+    private buildSelect;
     generate(options?: QueryOptions): QueryBundle;
 }
