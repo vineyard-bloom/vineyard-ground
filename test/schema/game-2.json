@@ -24,6 +24,11 @@
         "type": "list",
         "trellis": "Tag"
       }
+    },
+    "table": {
+      "indexes": [
+        { "properties": ["name"] }
+      ]
     }
   },
   "Tag": {
@@ -51,6 +56,11 @@
       "profession": {
         "type": "string"
       }
+    },
+    "table": {
+      "indexes": [
+        { "properties": ["name"] }
+      ]
     }
   }
 }

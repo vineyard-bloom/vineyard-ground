@@ -23,6 +23,11 @@
       "tags": {
         "type": "string"
       }
+    },
+    "table": {
+      "indexes": [
+        { "properties": ["name"] }
+      ]
     }
   }
 }

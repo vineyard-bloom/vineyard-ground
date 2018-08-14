@@ -16,9 +16,6 @@
       "health": {
         "type": "int"
       },
-      "isFuzzy": {
-        "type": "bool"
-      },
       "world": {
         "type": "World",
         "nullable": false
@@ -30,7 +27,8 @@
     },
     "table": {
       "indexes": [
-        { "properties": ["name"] }
+        { "properties": [ "name" ] },
+        { "properties": [ "health" ] }
       ]
     }
   },
@@ -46,6 +44,11 @@
         "type": "list",
         "trellis": "Creature"
       }
+    },
+    "table": {
+      "indexes": [
+        { "properties": ["name"] }
+      ]
     }
   }
 }

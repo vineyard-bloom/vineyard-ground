@@ -2,7 +2,7 @@
 
 # Vineyard Schema
 
-Vineyard Schema is a library for defining data structures and their relationships.  The definition for a schema is normally stored in a JSON file.
+Vineyard Schema is a library for defining data structures and their relationships.  The definition for a schema is normally stored in a JSON file.  Fields added as properties to the "indexes" array will be indexed.
 
 ## Defining a Schema
 
@@ -28,9 +28,18 @@ const schema = new Schema({
             name: {
                 type: "string"
             },
+            ability: {
+                type: "string"
+            }
             character: {
                 type: "Character",
             },
+        },
+        table: {
+          indexes: [
+            { properties: [ "name" ] },
+            { properties: [ "ability" ] }
+          ]
         }
     },                
 ```

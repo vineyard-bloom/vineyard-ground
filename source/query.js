@@ -1,9 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const sequelize = require('sequelize');
-const utility_1 = require("./utility");
-const query_generator_1 = require("./sql/query-generator");
-const BigNumber = require("bignumber.js");
+var sequelize = require('sequelize');
+var utility_1 = require("./utility");
+var query_generator_1 = require("./sql/query-generator");
+var BigNumber = require("bignumber.js");
 var Reduce_Mode;
 (function (Reduce_Mode) {
     Reduce_Mode[Reduce_Mode["none"] = 0] = "none";
@@ -13,8 +13,8 @@ var Reduce_Mode;
 function getData(row) {
     return row.dataValues || row;
 }
-class Query_Implementation {
-    constructor(table, client, trellis) {
+var Query_Implementation = /** @class */ (function () {
+    function Query_Implementation(table, client, trellis) {
         this.options = {};
         this.reduce_mode = Reduce_Mode.none;
         this.expansions = {};
@@ -23,24 +23,24 @@ class Query_Implementation {
         this.trellis = trellis;
         this.client = client;
         // Monkey patch for soft backwards compatibility
-        const self = this;
+        var self = this;
         self.firstOrNull = this.first;
         self.first_or_null = this.first;
     }
-    set_reduce_mode(value) {
+    Query_Implementation.prototype.set_reduce_mode = function (value) {
         if (this.reduce_mode == value)
             return;
         if (this.reduce_mode != Reduce_Mode.none && value != Reduce_Mode.single_value) {
             throw new Error("Reduce mode already set.");
         }
         this.reduce_mode = value;
-    }
-    get_other_collection(path) {
-        const reference = this.trellis.properties[path];
+    };
+    Query_Implementation.prototype.get_other_collection = function (path) {
+        var reference = this.trellis.properties[path];
         return reference.get_other_trellis().collection;
-    }
-    expand_cross_table(reference, identity) {
-        const where = {};
+    };
+    Query_Implementation.prototype.expand_cross_table = function (reference, identity) {
+        var where = {};
         where[utility_1.to_lower(reference.trellis.name)] = identity;
         return reference.other_property.trellis.oldTable.findAll({
             include: {
@@ -50,27 +50,30 @@ class Query_Implementation {
                 required: true
             }
         })
-            .then((result) => result.map((r) => utility_1.processFields(getData(r), reference.other_property.trellis)));
-    }
-    perform_expansion(path, data) {
-        const property = this.trellis.properties[path];
+            .then(function (result) { return result.map(function (r) { return utility_1.processFields(getData(r), reference.other_property.trellis); }); });
+    };
+    Query_Implementation.prototype.perform_expansion = function (path, data) {
+        var _a;
+        var property = this.trellis.properties[path];
         if (property.is_list()) {
             return property.other_property.is_list()
                 ? this.expand_cross_table(property, this.trellis.get_identity(data))
-                : this.get_other_collection(path).filter({ [property.other_property.name]: data });
+                : this.get_other_collection(path).filter((_a = {}, _a[property.other_property.name] = data, _a));
         }
         else {
             return this.get_other_collection(path).get(data[path]);
         }
-    }
-    handle_expansions(results) {
-        let promises = results.map((result) => Promise.all(this.get_expansions()
-            .map(path => this.perform_expansion(path, getData(result))
-            .then((child) => getData(result)[path] = child))));
+    };
+    Query_Implementation.prototype.handle_expansions = function (results) {
+        var _this = this;
+        var promises = results.map(function (result) { return Promise.all(_this.get_expansions()
+            .map(function (path) { return _this.perform_expansion(path, getData(result))
+            .then(function (child) { return getData(result)[path] = child; }); })); });
         return Promise.all(promises)
-            .then(() => results); // Not needed but a nice touch.
-    }
-    process_result(result) {
+            .then(function () { return results; }); // Not needed but a nice touch.
+    };
+    Query_Implementation.prototype.process_result = function (result) {
+        var _this = this;
         if (this.reduce_mode == Reduce_Mode.first) {
             if (result.length == 0) {
                 if (this.allow_null)
@@ -87,80 +90,82 @@ class Query_Implementation {
             }
             return getData(result[0])._value;
         }
-        return result.map((item) => utility_1.processFields(getData(item), this.trellis));
-    }
-    process_result_with_expansions(result) {
+        return result.map(function (item) { return utility_1.processFields(getData(item), _this.trellis); });
+    };
+    Query_Implementation.prototype.process_result_with_expansions = function (result) {
+        var _this = this;
         return this.handle_expansions(result)
-            .then(result => this.process_result(result));
-    }
-    get_expansions() {
+            .then(function (result) { return _this.process_result(result); });
+    };
+    Query_Implementation.prototype.get_expansions = function () {
         return Object.keys(this.expansions);
-    }
-    has_expansions() {
+    };
+    Query_Implementation.prototype.has_expansions = function () {
         return this.get_expansions().length > 0;
-    }
-    queryWithQueryGenerator() {
-        const legacyClient = this.client.getLegacyClient();
+    };
+    Query_Implementation.prototype.queryWithQueryGenerator = function () {
+        var legacyClient = this.client.getLegacyClient();
         if (legacyClient)
             return legacyClient.findAll(this.table, this.options);
-        const generator = new query_generator_1.QueryGenerator(this.trellis);
+        var generator = new query_generator_1.QueryGenerator(this.trellis);
         this.bundle = generator.generate(this.options);
         return this.client.query(this.bundle.sql, this.bundle.args)
-            .then(result => result.rows);
-    }
-    exec() {
+            .then(function (result) { return result.rows; });
+    };
+    Query_Implementation.prototype.exec = function () {
+        var _this = this;
         return this.queryWithQueryGenerator()
-            .then((result) => this.has_expansions()
-            ? this.process_result_with_expansions(result)
-            : this.process_result(result))
-            .catch((error) => {
-            if (this.bundle)
-                console.error(this.bundle);
+            .then(function (result) { return _this.has_expansions()
+            ? _this.process_result_with_expansions(result)
+            : _this.process_result(result); })
+            .catch(function (error) {
+            if (_this.bundle)
+                console.error(_this.bundle);
             else
-                console.error(this.options);
+                console.error(_this.options);
             throw error;
         });
-    }
-    expand(path) {
+    };
+    Query_Implementation.prototype.expand = function (path) {
         if (!this.trellis.properties[path])
             throw new Error("No such property: " + this.trellis.name + '.' + path + '.');
         this.expansions[path] = null;
         return this;
-    }
-    filter(filters) {
+    };
+    Query_Implementation.prototype.filter = function (filters) {
         for (var i in filters) {
-            const option = filters[i];
+            var option = filters[i];
             if (option && option[this.trellis.primary_keys[0].name]) {
                 filters[i] = option[this.trellis.primary_keys[0].name];
             }
         }
         this.options.where = filters;
         return this;
-    }
-    first(filters) {
+    };
+    Query_Implementation.prototype.first = function (filters) {
         this.set_reduce_mode(Reduce_Mode.first);
         return filters
             ? this.filter(filters)
             : this;
-    }
+    };
     // join<T2, O2>(collection: ICollection): QueryBuilder<T2, O2> {
     //   this.options.include = this.options.include || []
     //   // this.options.include.push(collection.get_sequelize())
     //   throw new Error("Not implemented.")
     //   // return this as any
     // }
-    range(start, length) {
+    Query_Implementation.prototype.range = function (start, length) {
         if (start)
             this.options.offset = start;
         if (length)
             this.options.limit = length;
         return this;
-    }
-    select(options) {
+    };
+    Query_Implementation.prototype.select = function (options) {
         if (typeof options === 'string')
             options = [options];
         if (options.length == 1) {
-            const entry = options[0];
+            var entry = options[0];
             options = Array.isArray(entry)
                 ? [[entry[0], '_value']]
                 : [[entry, '_value']];
@@ -168,16 +173,17 @@ class Query_Implementation {
         }
         this.options.attributes = options;
         return this;
-    }
-    sort(args) {
+    };
+    Query_Implementation.prototype.sort = function (args) {
         this.options.order = args;
         return this;
-    }
-    then(callback) {
+    };
+    Query_Implementation.prototype.then = function (callback) {
         return this.exec()
             .then(callback);
-    }
-}
+    };
+    return Query_Implementation;
+}());
 exports.Query_Implementation = Query_Implementation;
 function Path(path) {
     return sequelize.col(path);
