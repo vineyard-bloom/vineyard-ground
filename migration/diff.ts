@@ -154,9 +154,6 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
         trellis: first[name]
       })
     }
-    if (first[name].table.indexes!.length > 0 || second[name].table.indexes!.length > 0) {
-      result = result.concat(findChangedIndexes(name, first, second))
-    }
   }
   for (let name in second) {
     if (!first[name]) {
@@ -167,6 +164,11 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
     }
     else {
       result = result.concat(findChangedProperties(first[name].properties, second[name].properties))
+    }
+    if (first[name] && second[name]) {
+      if (first[name].table.indexes!.length > 0 || second[name].table.indexes!.length > 0) {
+        result = result.concat(findChangedIndexes(name, first, second))
+      }
     }
   }
 

@@ -27,6 +27,11 @@
         "type": "list",
         "trellis": "Tag"
       }
+    },
+    "table": {
+      "indexes": [
+        { "properties": ["name"] }
+      ]
     }
   },
   "Tag": {

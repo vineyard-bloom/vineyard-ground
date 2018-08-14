@@ -132,9 +132,6 @@ function findChangedTrellises(first, second) {
                 trellis: first[name]
             });
         }
-        if (first[name].table.indexes.length > 0 || second[name].table.indexes.length > 0) {
-            result = result.concat(findChangedIndexes(name, first, second));
-        }
     }
     for (var name in second) {
         if (!first[name]) {
@@ -145,6 +142,11 @@ function findChangedTrellises(first, second) {
         }
         else {
             result = result.concat(findChangedProperties(first[name].properties, second[name].properties));
+        }
+        if (first[name] && second[name]) {
+            if (first[name].table.indexes.length > 0 || second[name].table.indexes.length > 0) {
+                result = result.concat(findChangedIndexes(name, first, second));
+            }
         }
     }
     return result;
