@@ -1,10 +1,12 @@
-import {Property, Trellis} from "../source/types";
+import {Property, Trellis, Index} from "../source/types";
 
 export enum ChangeType {
   createTable,
   createField,
+  createIndex,
   deleteField,
   deleteTable,
+  deleteIndex,
   changeFieldType,
   changeFieldNullable,
 }
@@ -13,6 +15,8 @@ export interface Change {
   type: ChangeType
   trellis?: Trellis
   property?: Property
+  tableName?: string
+  propertyName?: string
 }
 
 export interface TableChange {

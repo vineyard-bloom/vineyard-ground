@@ -11,10 +11,12 @@ export declare class SqlSchemaBuilder {
     private renderPropertyCreations(trellis);
     private createTable(trellis, context);
     private createField(property);
+    private createIndex(tableName, propertyName);
     private changeFieldNullable(property);
     private changeFieldType(property);
     private deleteField(property);
     private deleteTable(trellis);
+    private deleteIndex(tableName, propertyName);
     private createForeignKey(trellis);
     private createCrossTable(property, context);
     private createCrossTables(properties, context);

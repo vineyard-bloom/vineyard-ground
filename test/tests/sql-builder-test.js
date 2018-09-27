@@ -54,6 +54,7 @@ var schema4 = new schema_1.Schema(require('../schema/game-4.json'));
 var schema5 = new schema_1.Schema(require('../schema/game-5.json'));
 var schema6 = new schema_1.Schema(require('../schema/game-6.json'));
 var schema7 = new schema_1.Schema(require('../schema/game-7.json'));
+var schema8 = new schema_1.Schema(require('../schema/game-8.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
 var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);
@@ -91,7 +92,7 @@ describe('sql-builder-test', function () {
                     case 2:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema2.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.createTable, 'The change should be to create a table');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "CREATE SEQUENCE characters_id_seq;\nCREATE TABLE IF NOT EXISTS characters (\n  \"id\" INTEGER DEFAULT nextval('characters_id_seq') NOT NULL,\n  \"name\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"profession\" CHARACTER VARYING(255) DEFAULT '' NOT NULL,\n  \"created\" TIMESTAMPTZ NOT NULL,\n  \"modified\" TIMESTAMPTZ NOT NULL,\n  CONSTRAINT \"characters_pkey\" PRIMARY KEY (\"id\")\n);\nALTER SEQUENCE characters_id_seq OWNED BY characters.\"id\";";
@@ -117,7 +118,7 @@ describe('sql-builder-test', function () {
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema2.trellises, schema.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.deleteTable, 'The change should be to delete a table');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "DROP TABLE IF EXISTS \"characters\" CASCADE;";
@@ -143,7 +144,7 @@ describe('sql-builder-test', function () {
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema3.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.createField, 'The change should be to create a field');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "ALTER TABLE \"creatures\"\n  ADD \"isFuzzy\" BOOLEAN DEFAULT false NOT NULL;";
@@ -180,7 +181,7 @@ describe('sql-builder-test', function () {
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema3.trellises, schema.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.deleteField, 'The change should be to delete a field');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "ALTER TABLE \"creatures\"\n  DROP COLUMN \"isFuzzy\";";
@@ -215,7 +216,7 @@ describe('sql-builder-test', function () {
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema4.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.changeFieldType, 'The change should be the field type');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "ALTER TABLE \"creatures\"\n  ALTER COLUMN \"health\" TYPE CHARACTER VARYING(255);";
@@ -250,7 +251,7 @@ describe('sql-builder-test', function () {
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema.trellises, schema5.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.changeFieldNullable, 'The change should be field nullability');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "ALTER TABLE \"tags\"\n  ALTER COLUMN \"name\" DROP NOT NULL;";
@@ -285,7 +286,7 @@ describe('sql-builder-test', function () {
                     case 1:
                         _a.sent();
                         changes = migration_1.findChangedTrellises(schema5.trellises, schema.trellises);
-                        assert.equal(changes.length, 1, 'There should only be one change');
+                        assert.equal(changes.length, 1, 'There should be one change');
                         assert.equal(changes[0].type, types_1.ChangeType.changeFieldNullable, 'The change should be field nullability');
                         sqlDiff = schemaBuilder.build(changes);
                         expected = "ALTER TABLE \"tags\"\n  ALTER COLUMN \"name\" SET NOT NULL;";
@@ -398,6 +399,80 @@ describe('sql-builder-test', function () {
                     case 6:
                         crossTableExists = _a.sent();
                         assert(crossTableExists[0].to_regclass, 'The cross table should exist in the DB');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can create an index by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var changes, sqlDiff, expected, indexes, error_7;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema.trellises, schema8.trellises);
+                        assert.equal(changes.length, 2, 'There should be two changes');
+                        assert.equal(changes[0].type, types_1.ChangeType.createIndex, 'The first change should be to create an index');
+                        assert.equal(changes[1].type, types_1.ChangeType.createIndex, 'The second change should be to create an index');
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = 'CREATE INDEX "creatures_health" ON "creatures" ("health");\nCREATE INDEX "tags_name" ON "tags" ("name");';
+                        assert.equal(sqlDiff, expected, 'Should generate SQL to create a new index on an existing table');
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("\n        SELECT ic.relname AS index_name\n        FROM pg_class bc,\n            pg_class ic,\n            pg_index i,\n            pg_attribute a,\n            pg_opclass oc,\n            pg_namespace n\n        WHERE i.indrelid = bc.oid AND\n              i.indexrelid = ic.oid AND\n              i.indkey[0] = a.attnum AND\n              i.indclass[0] = oc.oid AND\n              a.attrelid = bc.oid AND\n              n.oid = bc.relnamespace AND\n              bc.relname = 'tags' AND\n              a.attname = 'name';\n            ")];
+                    case 4:
+                        indexes = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_7 = _a.sent();
+                        console.log('SQL Database Error:', error_7.message);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        assert.equal(indexes.length, 1, 'The new tags_name index should exist on the table');
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
+    it('can delete an index by generating sql diff', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var modeler, changes, sqlDiff, expected, indexes, error_8;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        modeler = new modeler_1.DevModeler(schema8, client);
+                        return [4 /*yield*/, modeler.regenerate()];
+                    case 1:
+                        _a.sent();
+                        changes = migration_1.findChangedTrellises(schema8.trellises, schema.trellises);
+                        assert.equal(changes.length, 2, 'There should be two changes');
+                        assert.equal(changes[0].type, types_1.ChangeType.deleteIndex, 'The first change should be to delete an index');
+                        assert.equal(changes[1].type, types_1.ChangeType.deleteIndex, 'The second change should be to delete an index');
+                        sqlDiff = schemaBuilder.build(changes);
+                        expected = 'DROP INDEX "creatures_health";\nDROP INDEX "tags_name";';
+                        assert.equal(sqlDiff, expected, 'Should generate SQL to delete an index from an existing table');
+                        return [4 /*yield*/, modeler.query(sqlDiff)];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, modeler.query("\n        SELECT ic.relname AS index_name\n        FROM pg_class bc,\n            pg_class ic,\n            pg_index i,\n            pg_attribute a,\n            pg_opclass oc,\n            pg_namespace n\n        WHERE i.indrelid = bc.oid AND\n              i.indexrelid = ic.oid AND\n              i.indkey[0] = a.attnum AND\n              i.indclass[0] = oc.oid AND\n              a.attrelid = bc.oid AND\n              n.oid = bc.relnamespace AND\n              bc.relname = 'tags' AND\n              a.attname = 'name';\n            ")];
+                    case 4:
+                        indexes = _a.sent();
+                        return [3 /*break*/, 6];
+                    case 5:
+                        error_8 = _a.sent();
+                        console.log('SQL Database Error:', error_8.message);
+                        return [3 /*break*/, 6];
+                    case 6:
+                        assert.equal(indexes.length, 0, 'The index tags_name should have been deleted from the table');
                         return [2 /*return*/];
                 }
             });

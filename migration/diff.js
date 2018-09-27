@@ -55,6 +55,74 @@ function findChangedProperties(firstProperties, secondProperties) {
     }
     return result;
 }
+function findChangedIndexes(tableName, first, second) {
+    var result = [];
+    var firstIndexes = first[tableName].table.indexes;
+    var secondIndexes = second[tableName].table.indexes;
+    if (firstIndexes.length > 0 || secondIndexes.length > 0) {
+        // May not need this first part
+        if (firstIndexes.length > 0 && secondIndexes.length === 0) {
+            firstIndexes.forEach(function (indexItem) {
+                indexItem.properties.forEach(function (property) {
+                    result.push({
+                        type: types_1.ChangeType.deleteIndex,
+                        tableName: first[tableName].table.name,
+                        propertyName: property
+                    });
+                });
+            });
+        }
+        else if (secondIndexes.length > 0 && firstIndexes.length === 0) {
+            secondIndexes.forEach(function (indexItem) {
+                indexItem.properties.forEach(function (property) {
+                    result.push({
+                        type: types_1.ChangeType.createIndex,
+                        tableName: second[tableName].table.name,
+                        propertyName: property
+                    });
+                });
+            });
+        }
+        else {
+            result = result.concat(findChangedIndexProperties(first[tableName].table.name, firstIndexes, secondIndexes));
+        }
+    }
+    return result;
+}
+function findChangedIndexProperties(tableName, firstIndexes, secondIndexes) {
+    var result = [];
+    var firstProperties = [];
+    var secondProperties = [];
+    firstIndexes.forEach(function (indexItem) {
+        indexItem.properties.forEach(function (property) {
+            firstProperties.push(property);
+        });
+    });
+    secondIndexes.forEach(function (indexItem) {
+        indexItem.properties.forEach(function (property) {
+            secondProperties.push(property);
+        });
+    });
+    firstProperties.forEach(function (property) {
+        if (secondProperties.indexOf(property) === -1) {
+            result.push({
+                type: types_1.ChangeType.deleteIndex,
+                tableName: tableName,
+                propertyName: property
+            });
+        }
+    });
+    secondProperties.forEach(function (property) {
+        if (firstProperties.indexOf(property) === -1) {
+            result.push({
+                type: types_1.ChangeType.createIndex,
+                tableName: tableName,
+                propertyName: property
+            });
+        }
+    });
+    return result;
+}
 function findChangedTrellises(first, second) {
     var result = [];
     for (var name in first) {
@@ -74,6 +142,11 @@ function findChangedTrellises(first, second) {
         }
         else {
             result = result.concat(findChangedProperties(first[name].properties, second[name].properties));
+        }
+        if (first[name] && second[name]) {
+            if (first[name].table.indexes.length > 0 || second[name].table.indexes.length > 0) {
+                result = result.concat(findChangedIndexes(name, first, second));
+            }
         }
     }
     return result;

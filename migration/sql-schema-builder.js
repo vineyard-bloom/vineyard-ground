@@ -100,6 +100,11 @@ var SqlSchemaBuilder = (function () {
             "ALTER TABLE \"" + property.trellis.table.name + "\"\n  ADD " + formattedProperty + ";"
         ];
     };
+    SqlSchemaBuilder.prototype.createIndex = function (tableName, propertyName) {
+        return [
+            "CREATE INDEX \"" + tableName + "_" + propertyName + "\" ON \"" + tableName + "\" (\"" + propertyName + "\");"
+        ];
+    };
     SqlSchemaBuilder.prototype.changeFieldNullable = function (property) {
         var action = property.is_nullable ? 'DROP' : 'SET';
         return [
@@ -121,6 +126,11 @@ var SqlSchemaBuilder = (function () {
     SqlSchemaBuilder.prototype.deleteTable = function (trellis) {
         return [
             "DROP TABLE IF EXISTS \"" + trellis.table.name + "\" CASCADE;"
+        ];
+    };
+    SqlSchemaBuilder.prototype.deleteIndex = function (tableName, propertyName) {
+        return [
+            "DROP INDEX \"" + tableName + "_" + propertyName + "\";"
         ];
     };
     SqlSchemaBuilder.prototype.createForeignKey = function (trellis) {
@@ -157,10 +167,14 @@ var SqlSchemaBuilder = (function () {
                 return this.createTable(change.trellis, context);
             case types_1.ChangeType.createField:
                 return this.createField(change.property);
+            case types_1.ChangeType.createIndex:
+                return this.createIndex(change.tableName, change.propertyName);
             case types_1.ChangeType.deleteField:
                 return this.deleteField(change.property);
             case types_1.ChangeType.deleteTable:
                 return this.deleteTable(change.trellis);
+            case types_1.ChangeType.deleteIndex:
+                return this.deleteIndex(change.tableName, change.propertyName);
             case types_1.ChangeType.changeFieldType:
                 return this.changeFieldType(change.property);
             case types_1.ChangeType.changeFieldNullable:

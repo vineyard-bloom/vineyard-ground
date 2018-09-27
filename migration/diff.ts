@@ -1,6 +1,6 @@
 const shell = require('shelljs')
 import { Change, ChangeType, DiffBundle } from "./types";
-import { Property, Trellis_Map } from "../source";
+import { Property, Trellis_Map, Index } from "../source";
 import { Schema } from "../source/schema";
 import * as fs from 'fs'
 
@@ -34,6 +34,7 @@ type Property_Map = { [name: string]: Property }
 
 function findChangedProperties(firstProperties: Property_Map, secondProperties: Property_Map): Change [] {
   let result: Change[] = []
+
   for (let name in firstProperties) {
     if (!secondProperties[name]) {
       result.push({
@@ -42,6 +43,7 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
       })
     }
   }
+
   for (let name in secondProperties) {
     const first = firstProperties [name]
     const second = secondProperties [name]
@@ -65,10 +67,85 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
       }
     }
   }
+
   return result
 }
 
-export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change [] {
+function findChangedIndexes(tableName: string, first: Trellis_Map, second: Trellis_Map): Change[] {
+  let result: Change[] = []
+
+  const firstIndexes = first[tableName].table.indexes!
+  const secondIndexes = second[tableName].table.indexes!
+
+  if (firstIndexes.length > 0 || secondIndexes.length > 0) {
+    // May not need this first part
+    if (firstIndexes.length > 0 && secondIndexes.length === 0) {
+      firstIndexes.forEach(indexItem => {
+        indexItem.properties.forEach(property => {
+          result.push({
+            type: ChangeType.deleteIndex,
+            tableName: first[tableName].table.name,
+            propertyName: property
+          })
+        })
+      })
+    } else if (secondIndexes.length > 0 && firstIndexes.length === 0) {
+      secondIndexes.forEach(indexItem => {
+        indexItem.properties.forEach(property => {
+          result.push({
+            type: ChangeType.createIndex,
+            tableName: second[tableName].table.name,
+            propertyName: property
+          })
+        })
+      })
+    } else {
+      result = result.concat(findChangedIndexProperties(first[tableName].table.name, firstIndexes, secondIndexes))
+    }
+  }
+
+  return result
+}
+
+function findChangedIndexProperties(tableName: string, firstIndexes: Index[], secondIndexes: Index[]): Change[] {
+  let result: Change[] = []
+  let firstProperties: string[] = []
+  let secondProperties: string[] = []
+
+  firstIndexes.forEach(indexItem => {
+    indexItem.properties.forEach(property => {
+      firstProperties.push(property)
+    })
+  })
+  secondIndexes.forEach(indexItem => {
+    indexItem.properties.forEach(property => {
+      secondProperties.push(property)
+    })
+  })
+
+  firstProperties.forEach(property => {
+    if (secondProperties.indexOf(property) === -1) {
+      result.push({
+        type: ChangeType.deleteIndex,
+        tableName: tableName,
+        propertyName: property
+      })
+    }
+  })
+  secondProperties.forEach(property => {
+    if (firstProperties.indexOf(property) === -1) {
+      result.push({
+        type: ChangeType.createIndex,
+        tableName: tableName,
+        propertyName: property
+      })
+    }
+  })
+
+  return result
+}
+
+export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change[] {
   let result: Change[] = []
   for (let name in first) {
     if (!second[name]) {
@@ -88,7 +165,13 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
     else {
       result = result.concat(findChangedProperties(first[name].properties, second[name].properties))
     }
+    if (first[name] && second[name]) {
+      if (first[name].table.indexes!.length > 0 || second[name].table.indexes!.length > 0) {
+        result = result.concat(findChangedIndexes(name, first, second))
+      }
+    }
   }
+
   return result
 }
 

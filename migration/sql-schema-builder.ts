@@ -127,6 +127,12 @@ export class SqlSchemaBuilder {
     ]
   }
 
+  private createIndex(tableName: string, propertyName: string) {
+    return [
+      `CREATE INDEX "${tableName}_${propertyName}" ON "${tableName}" ("${propertyName}");`
+    ]
+  }
+
   private changeFieldNullable(property: Property) {
     const action = property.is_nullable ? 'DROP' : 'SET'
     return [
@@ -151,6 +157,12 @@ export class SqlSchemaBuilder {
   private deleteTable(trellis: Trellis) {
     return [
       `DROP TABLE IF EXISTS "${trellis.table.name}" CASCADE;`
+    ]
+  }
+
+  private deleteIndex(tableName: string, propertyName: string) {
+    return [
+      `DROP INDEX "${tableName}_${propertyName}";`
     ]
   }
 
@@ -195,6 +207,9 @@ export class SqlSchemaBuilder {
     
       case ChangeType.createField:
         return this.createField(change.property!)
+
+      case ChangeType.createIndex:
+        return this.createIndex(change.tableName!, change.propertyName!)
     
       case ChangeType.deleteField:
         return this.deleteField(change.property!)
@@ -202,6 +217,9 @@ export class SqlSchemaBuilder {
       case ChangeType.deleteTable:
         return this.deleteTable(change.trellis!)
     
+      case ChangeType.deleteIndex:
+        return this.deleteIndex(change.tableName!, change.propertyName!)
+
       case ChangeType.changeFieldType:
         return this.changeFieldType(change.property!)
 
