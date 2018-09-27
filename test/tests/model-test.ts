@@ -1,10 +1,9 @@
-import {to_lower_snake_case} from "../../source/utility";
-
 require('source-map-support').install()
-import {assert, expect} from 'chai'
-import {Schema} from '../../source/schema'
-import {DevModeler, Add, Remove, DatabaseClient, PostgresClient, SequelizeClient} from '../../source'
-import {BigNumber} from 'bignumber.js'
+import { to_lower_snake_case } from "../../source/utility";
+import { assert, expect } from 'chai'
+import { Schema } from '../../source/schema'
+import { Add, DatabaseClient, DevModeler, Remove, SequelizeClient } from '../../source'
+import { BigNumber } from 'bignumber.js'
 
 const config = require('../config/config.json')
 let mainWorld: any,
@@ -29,7 +28,7 @@ interface Creature {
 // createSuite('Postgres', new PostgresClient(config.database))
 
 // for (let i = 0; i < contexts.length; ++i) {
-const {name, client} = contexts[0]
+const { name, client } = contexts[0]
 
 describe('Sequelize Test', function () {
   this.timeout(5000)
@@ -91,11 +90,11 @@ describe('Sequelize Test', function () {
       const world = await model.World.first().expand('creatures')
       assert(Array.isArray(world.creatures))
       assert.equal(2, world.creatures.length)
-      const hero = await model.Creature.first({name: "hero"}).expand('tags')
+      const hero = await model.Creature.first({ name: "hero" }).expand('tags')
       assert.equal(hero.tags.length, 2)
 
       await model.Creature.remove(hero)
-      const hero2 = await model.Creature.first({name: "hero"})
+      const hero2 = await model.Creature.first({ name: "hero" })
       assert.isNull(hero2)
 
       const rawHero = await model.ground.querySingle(`SELECT * FROM creatures WHERE name = 'hero'`)
@@ -122,8 +121,8 @@ describe('Sequelize Test', function () {
         nullableDatetime: new Date("2017-10-23T18:24:05.026Z"),
         data: {
           frogs: [
-            {name: "Froggy"},
-            {name: "Pac Frog"}
+            { name: "Froggy" },
+            { name: "Pac Frog" }
           ]
         }
       })
@@ -159,8 +158,9 @@ describe('Sequelize Test', function () {
       expect(records).lengthOf(2)
 
       await model.OddRecord.update({
-        strange: 11,
-        unknown: "mist2"},
+          strange: 11,
+          unknown: "mist2"
+        },
         {
           data: {
             "something": "wow"
@@ -198,6 +198,18 @@ describe('Sequelize Test', function () {
       assert.deepEqual(expected, actual)
     })
   })
+
+  describe('Indexless Test', function () {
+    let model: any
+
+    before(async function () {
+      model = await initializeModel(client, 'indexless')
+    })
+
+    it('indexless', async function () {
+      assert(true)
+    })
+  })
 })
 
 describe('Simple unit tests', function () {
@@ -208,6 +220,7 @@ describe('Simple unit tests', function () {
     assert.equal(to_lower_snake_case('FirstSecond'), 'first_second')
   })
 })
+
 
 // }
 

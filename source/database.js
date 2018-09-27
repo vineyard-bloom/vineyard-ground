@@ -1,26 +1,23 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var schema_1 = require("./schema");
-var Sequelize = require('sequelize');
-var node_uuid = require('uuid');
+const schema_1 = require("./schema");
+const Sequelize = require('sequelize');
+const node_uuid = require('uuid');
 function get_field(property, library, dialect) {
-    var type = property.type;
+    const type = property.type;
     switch (type.get_category()) {
         case schema_1.Type_Category.primitive:
             if (type === library.types.long)
                 return {
-                    type: Sequelize.BIGINT,
-                    defaultValue: 0
+                    type: Sequelize.BIGINT
                 };
             if (type === library.types.int)
                 return {
-                    type: Sequelize.INTEGER,
-                    defaultValue: 0
+                    type: Sequelize.INTEGER
                 };
             if (type === library.types.string)
                 return {
-                    type: Sequelize.STRING,
-                    defaultValue: ""
+                    type: Sequelize.STRING
                 };
             if (type === library.types.text)
                 return {
@@ -32,8 +29,7 @@ function get_field(property, library, dialect) {
                     : { type: Sequelize.JSON };
             if (type === library.types.bool)
                 return {
-                    type: Sequelize.BOOLEAN,
-                    defaultValue: false
+                    type: Sequelize.BOOLEAN
                 };
             if (type === library.types.guid)
                 return {
@@ -41,8 +37,7 @@ function get_field(property, library, dialect) {
                 };
             if (type === library.types.float)
                 return {
-                    type: Sequelize.FLOAT,
-                    defaultValue: 0
+                    type: Sequelize.FLOAT
                 };
             if (type === library.types.date)
                 return {
@@ -58,30 +53,26 @@ function get_field(property, library, dialect) {
                 };
             if (type === library.types.colossal)
                 return {
-                    type: Sequelize.NUMERIC,
-                    defaultValue: 0
+                    type: Sequelize.NUMERIC
                 };
             if (type === library.types.bignumber)
                 return {
-                    type: Sequelize.NUMERIC,
-                    defaultValue: 0
+                    type: Sequelize.NUMERIC
                 };
             if (type === library.types.char)
                 return {
-                    type: Sequelize.CHAR,
-                    defaultValue: ""
+                    type: Sequelize.CHAR
                 };
             if (type === library.types.short)
                 return {
-                    type: Sequelize.SMALLINT,
-                    defaultValue: 0
+                    type: Sequelize.SMALLINT
                 };
             throw new Error("Unknown primitive: " + type.name + '.');
         case schema_1.Type_Category.list:
             return null;
         case schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
-                var field = type.trellis.primary_keys[0];
+                const field = type.trellis.primary_keys[0];
                 return get_field(field, library, dialect);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');
@@ -90,7 +81,7 @@ function get_field(property, library, dialect) {
     }
 }
 function create_field(property, library, dialect) {
-    var field = get_field(property, library, dialect);
+    const field = get_field(property, library, dialect);
     if (!field)
         return null;
     if (property.length)
@@ -103,12 +94,12 @@ function create_field(property, library, dialect) {
     return field;
 }
 function get_cross_table_name(trellises) {
-    return trellises.map(function (t) { return t.oldTable.getTableName(); }).sort().join('_');
+    return trellises.map(t => t.oldTable.getTableName()).sort().join('_');
 }
 function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
-    var table_trellises = [list.trellis, list.other_property.trellis];
-    var cross_table_name = get_cross_table_name(table_trellises);
-    var relationship = trellis.oldTable.belongsToMany(list.get_other_trellis().oldTable, {
+    const table_trellises = [list.trellis, list.other_property.trellis];
+    const cross_table_name = get_cross_table_name(table_trellises);
+    const relationship = trellis.oldTable.belongsToMany(list.get_other_trellis().oldTable, {
         as: list.name,
         otherKey: list.other_property.trellis.name.toLowerCase(),
         foreignKey: list.trellis.name.toLowerCase(),
@@ -119,9 +110,9 @@ function initialize_many_to_many(list, trellis, schema, tables, sequelize) {
 }
 function initialize_relationship(property, trellis, schema, tables, sequelize) {
     if (property.type.get_category() == schema_1.Type_Category.trellis) {
-        var reference = property;
+        const reference = property;
         if (!reference.other_property) {
-            var other_table = reference.get_other_trellis().oldTable;
+            const other_table = reference.get_other_trellis().oldTable;
             other_table.hasMany(trellis.oldTable, {
                 foreignKey: reference.name,
                 constraints: true
@@ -129,7 +120,7 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
         }
     }
     else if (property.type.get_category() == schema_1.Type_Category.list) {
-        var list = property;
+        const list = property;
         if (list.other_property.type.get_category() == schema_1.Type_Category.list) {
             initialize_many_to_many(list, trellis, schema, tables, sequelize);
         }
@@ -143,62 +134,57 @@ function initialize_relationship(property, trellis, schema, tables, sequelize) {
     }
 }
 function initialize_relationships(schema, tables, sequelize) {
-    for (var name in schema.trellises) {
-        var trellis = schema.trellises[name];
-        for (var i in trellis.properties) {
-            var property = trellis.properties[i];
+    for (let name in schema.trellises) {
+        const trellis = schema.trellises[name];
+        for (let i in trellis.properties) {
+            const property = trellis.properties[i];
             initialize_relationship(property, trellis, schema, tables, sequelize);
         }
     }
 }
 function create_table(trellis, schema, sequelize) {
-    var fields = {};
+    const fields = {};
     // Create the primary key field first for DB UX
-    for (var i = 0; i < trellis.primary_keys.length; ++i) {
-        var property = trellis.primary_keys[i];
-        var primary_key = fields[property.name] =
+    for (let i = 0; i < trellis.primary_keys.length; ++i) {
+        const property = trellis.primary_keys[i];
+        const primary_key = fields[property.name] =
             create_field(property, schema.library, sequelize.getDialect());
         primary_key.primaryKey = true;
         if (property.type === schema.library.types.uuid) {
             primary_key.defaultValue = sequelize.getDialect() == 'mysql'
-                ? function () { return node_uuid.v4().replace(/-/g, ''); }
+                ? () => node_uuid.v4().replace(/-/g, '')
                 : node_uuid.v4;
         }
         else if (property.type === schema.library.types.int ||
             property.type === schema.library.types.long) {
-            if (property.autoIncrement !== false)
+            if (property.autoIncrement)
                 primary_key.autoIncrement = true;
             delete primary_key.defaultValue;
         }
     }
-    var _loop_1 = function (i) {
-        if (trellis.primary_keys.some(function (k) { return k.name == i; }))
-            return "continue";
-        var property = trellis.properties[i];
-        var field = create_field(property, schema.library, sequelize.getDialect());
+    for (let i in trellis.properties) {
+        if (trellis.primary_keys.some(k => k.name == i))
+            continue;
+        const property = trellis.properties[i];
+        const field = create_field(property, schema.library, sequelize.getDialect());
         if (field) {
             fields[i] = field;
         }
-    };
-    for (var i in trellis.properties) {
-        _loop_1(i);
     }
-    var created = 'created';
-    var modified = 'modified';
-    var deleted = trellis.softDelete ? 'deleted' : false;
+    let created = 'created';
+    let modified = 'modified';
+    const deleted = trellis.softDelete ? 'deleted' : false;
     if (trellis.additional && Array.isArray(trellis.additional.autoFields)) {
-        var autoFields = trellis.additional.autoFields;
+        const autoFields = trellis.additional.autoFields;
         if (autoFields.indexOf('created') == -1)
             created = false;
         if (autoFields.indexOf('modified') == -1)
             modified = false;
     }
-    var indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(function (index) {
-        return ({
-            fields: index.properties
-        });
-    });
-    var oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
+    const indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(index => ({
+        fields: index.properties
+    }));
+    const oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {
         underscored: true,
         createdAt: created,
         updatedAt: modified,
@@ -209,8 +195,8 @@ function create_table(trellis, schema, sequelize) {
     return oldTable;
 }
 function vineyard_to_sequelize(schema, keys, sequelize) {
-    var tables = {};
-    for (var name in keys) {
+    const tables = {};
+    for (let name in keys) {
         tables[name] = create_table(schema.trellises[name], schema, sequelize);
     }
     initialize_relationships(schema, tables, sequelize);

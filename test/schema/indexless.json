@@ -1,0 +1,10 @@
+{
+  "Indexless": {
+    "primaryKeys": [],
+    "properties": {
+      "name": {
+        "type": "string"
+      }
+    }
+  }
+}

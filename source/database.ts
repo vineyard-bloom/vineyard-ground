@@ -15,20 +15,17 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.long)
         return {
-          type: Sequelize.BIGINT,
-          defaultValue: 0
+          type: Sequelize.BIGINT
         }
 
       if (type === library.types.int)
         return {
-          type: Sequelize.INTEGER,
-          defaultValue: 0
+          type: Sequelize.INTEGER
         }
 
       if (type === library.types.string)
         return {
-          type: Sequelize.STRING,
-          defaultValue: ""
+          type: Sequelize.STRING
         }
 
       if (type === library.types.text)
@@ -43,8 +40,7 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.bool)
         return {
-          type: Sequelize.BOOLEAN,
-          defaultValue: false
+          type: Sequelize.BOOLEAN
         }
 
       if (type === library.types.guid)
@@ -54,8 +50,7 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.float)
         return {
-          type: Sequelize.FLOAT,
-          defaultValue: 0
+          type: Sequelize.FLOAT
         }
 
       if (type === library.types.date)
@@ -75,26 +70,22 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.colossal)
         return {
-          type: Sequelize.NUMERIC,
-          defaultValue: 0
+          type: Sequelize.NUMERIC
         }
 
       if (type === library.types.bignumber)
         return {
-          type: Sequelize.NUMERIC,
-          defaultValue: 0
+          type: Sequelize.NUMERIC
         }
 
       if (type === library.types.char)
         return {
-          type: Sequelize.CHAR,
-          defaultValue: ""
+          type: Sequelize.CHAR
         }
 
       if (type === library.types.short)
         return {
-          type: Sequelize.SMALLINT,
-          defaultValue: 0
+          type: Sequelize.SMALLINT
         }
 
       throw new Error("Unknown primitive: " + type.name + '.')
@@ -206,7 +197,7 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
     }
     else if (property.type === schema.library.types.int ||
       property.type === schema.library.types.long) {
-      if (property.autoIncrement !== false)
+      if (property.autoIncrement)
         primary_key.autoIncrement = true
 
       delete primary_key.defaultValue

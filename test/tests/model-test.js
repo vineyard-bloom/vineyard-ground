@@ -8,8 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const utility_1 = require("../../source/utility");
 require('source-map-support').install();
+const utility_1 = require("../../source/utility");
 const chai_1 = require("chai");
 const schema_1 = require("../../source/schema");
 const source_1 = require("../../source");
@@ -172,6 +172,19 @@ describe('Sequelize Test', function () {
                     'CREATE INDEX odd_records_vast ON public.odd_records USING btree (vast)',
                 ];
                 chai_1.assert.deepEqual(expected, actual);
+            });
+        });
+    });
+    describe('Indexless Test', function () {
+        let model;
+        before(function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                model = yield initializeModel(client, 'indexless');
+            });
+        });
+        it('indexless', function () {
+            return __awaiter(this, void 0, void 0, function* () {
+                chai_1.assert(true);
             });
         });
     });

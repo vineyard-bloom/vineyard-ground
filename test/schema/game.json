@@ -34,7 +34,8 @@
   "Tag": {
     "properties": {
       "id": {
-        "type": "int"
+        "type": "int",
+        "autoIncrement": true
       },
       "name": {
         "type": "string"

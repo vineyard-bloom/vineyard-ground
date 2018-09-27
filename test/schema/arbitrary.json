@@ -3,7 +3,7 @@
     "table": {
       "indexes": [
         {
-          "properties": ["vast", "veryBig", "sampleDate", "sampleDatetime", "nullableDatetime", "data"]
+          "properties": ["vast", "veryBig", "sampleDate", "sampleDatetime", "nullableDatetime"]
         }
       ]
     },
