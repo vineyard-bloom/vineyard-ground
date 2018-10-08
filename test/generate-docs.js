@@ -1,6 +1,6 @@
 "use strict";
 require('source-map-support').install();
-var generateDocs = require('vineyard-docs').generateDocs;
+const { generateDocs } = require('vineyard-docs');
 generateDocs({
     paths: {
         src: ['source'],

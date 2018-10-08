@@ -1,13 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es5",
+    "target": "es2017",
     "strict": true,
     "sourceMap": true,
     "declaration": true,
-    "newLine": "lf",
-    "lib": [
-      "es2015"
-    ]
-  }
+    "newLine": "lf"
+  },
+  "include": [
+    "./migration/**/*",
+    "./src/**/*",
+    "./test/**/*"
+  ]
 }

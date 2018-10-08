@@ -5,7 +5,7 @@ import { Change, ChangeType, DiffBundle } from "./types";
 import { Index, Property, TrellisMap } from "vineyard-schema"
 import * as fs from 'fs'
 
-function shellCommand(command: string, echo: Boolean = false) {
+function shellCommand(command: string, echo: boolean = false) {
   if (echo)
     console.log('shell', command)
 

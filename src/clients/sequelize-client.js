@@ -1,62 +1,57 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var sequelize = require("sequelize");
-var SequelizeLegacyClient = /** @class */ (function () {
-    function SequelizeLegacyClient() {
-    }
-    SequelizeLegacyClient.prototype.findAll = function (table, options) {
+const sequelize = require("sequelize");
+class SequelizeLegacyClient {
+    findAll(table, options) {
         return table.getSequelizeModel().findAll(options);
-    };
-    return SequelizeLegacyClient;
-}());
+    }
+}
 exports.SequelizeLegacyClient = SequelizeLegacyClient;
-var SequelizeClient = /** @class */ (function () {
-    function SequelizeClient(databaseConfig) {
+class SequelizeClient {
+    constructor(databaseConfig) {
         this.sequelize = new sequelize(databaseConfig);
         this.legacyClient = new SequelizeLegacyClient();
     }
-    SequelizeClient.prototype.getLegacyClient = function () {
+    getLegacyClient() {
         return this.legacyClient;
-    };
-    SequelizeClient.prototype.getLegacyDatabaseInterface = function () {
+    }
+    getLegacyDatabaseInterface() {
         return this.sequelize;
-    };
-    SequelizeClient.prototype.query = function (sql, args) {
+    }
+    query(sql, args) {
         return this.sequelize.query(sql, { replacements: args });
-    };
-    SequelizeClient.prototype.createTableInterface = function (trellis, sequelizeModel) {
+    }
+    createTableInterface(trellis, sequelizeModel) {
         return new SequelizeTableClient(this, sequelizeModel);
-    };
-    return SequelizeClient;
-}());
+    }
+}
 exports.SequelizeClient = SequelizeClient;
-var SequelizeTableClient = /** @class */ (function () {
-    function SequelizeTableClient(client, sequelizeModel) {
+class SequelizeTableClient {
+    constructor(client, sequelizeModel) {
         this.client = client;
         this.sequelizeModel = sequelizeModel;
     }
-    SequelizeTableClient.prototype.getClient = function () {
+    getClient() {
         return this.client;
-    };
-    SequelizeTableClient.prototype.create = function (newSeed) {
+    }
+    create(newSeed) {
         return this.sequelizeModel.create(newSeed);
-    };
-    SequelizeTableClient.prototype.upsert = function (newSeed) {
+    }
+    upsert(newSeed) {
         return this.sequelizeModel.upsert(newSeed);
-    };
-    SequelizeTableClient.prototype.update = function (seed, filter) {
+    }
+    update(seed, filter) {
         return this.sequelizeModel.update(seed, {
             where: filter,
             returning: true
         });
-    };
-    SequelizeTableClient.prototype.remove = function (options) {
+    }
+    remove(options) {
         return this.sequelizeModel.destroy(options);
-    };
-    SequelizeTableClient.prototype.getSequelizeModel = function () {
+    }
+    getSequelizeModel() {
         return this.sequelizeModel;
-    };
-    return SequelizeTableClient;
-}());
+    }
+}
 exports.SequelizeTableClient = SequelizeTableClient;
 //# sourceMappingURL=sequelize-client.js.map

@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 function delimit(tokens, delimiter) {
-    var result = [];
-    for (var i = 0; i < tokens.length; ++i) {
+    let result = [];
+    for (let i = 0; i < tokens.length; ++i) {
         if (i > 0)
             result.push(delimiter);
         result.push(tokens[i]);
@@ -11,10 +11,10 @@ function delimit(tokens, delimiter) {
 }
 exports.delimit = delimit;
 function smartJoin(items) {
-    var result = '';
-    for (var i = 0; i < items.length; ++i) {
+    let result = '';
+    for (let i = 0; i < items.length; ++i) {
         if (i > 0) {
-            var previous = items[i - 1];
+            const previous = items[i - 1];
             if (previous[previous.length - 1] != '\n')
                 result += ' ';
         }
@@ -23,68 +23,62 @@ function smartJoin(items) {
     return result;
 }
 exports.smartJoin = smartJoin;
-var Flattener = /** @class */ (function () {
-    function Flattener() {
+class Flattener {
+    constructor() {
         this.args = [];
     }
-    Flattener.prototype.flatten = function (token) {
-        var _this = this;
+    flatten(token) {
         if (typeof token == 'string')
             return token;
         if (Array.isArray(token)) {
             return smartJoin(token
-                .map(function (t) { return _this.flatten(t); })
-                .filter(function (t) { return t != ''; }));
+                .map(t => this.flatten(t))
+                .filter(t => t != ''));
         }
         if (typeof token == 'object') {
             this.args.push(token.value);
             return '$' + this.args.length;
         }
         throw new Error("Invalid token type: " + typeof token);
-    };
-    return Flattener;
-}());
-exports.Flattener = Flattener;
-var SqlBuilder = /** @class */ (function () {
-    function SqlBuilder() {
     }
-    SqlBuilder.prototype.quote = function (text) {
+}
+exports.Flattener = Flattener;
+class SqlBuilder {
+    quote(text) {
         return '"' + text + '"';
-    };
-    SqlBuilder.prototype.sanitize = function (value) {
+    }
+    sanitize(value) {
         if (typeof value == 'string')
             return "'" + value + "'";
         return value;
-    };
-    SqlBuilder.prototype.flatten = function (token) {
-        var flattener = new Flattener();
-        var sql = flattener.flatten(token);
+    }
+    flatten(token) {
+        const flattener = new Flattener();
+        const sql = flattener.flatten(token);
         return {
             sql: sql,
             args: flattener.args
         };
-    };
-    SqlBuilder.prototype.getPath = function (property) {
+    }
+    getPath(property) {
         return property.trellis.table.name + '.' + this.quote(property.name);
-    };
-    SqlBuilder.prototype.getCrossTableName = function (property) {
+    }
+    getCrossTableName(property) {
         return [property.trellis.table.name, property.get_other_trellis().table.name]
             .sort()
             .join('_');
-    };
-    return SqlBuilder;
-}());
+    }
+}
 exports.SqlBuilder = SqlBuilder;
-var TrellisSqlGenerator = /** @class */ (function () {
-    function TrellisSqlGenerator(trellis) {
+class TrellisSqlGenerator {
+    constructor(trellis) {
         this.builder = new SqlBuilder();
         this.trellis = trellis;
         this.table = trellis.table;
     }
-    TrellisSqlGenerator.prototype.getTableName = function () {
+    getTableName() {
         return this.table.name;
-    };
-    return TrellisSqlGenerator;
-}());
+    }
+}
 exports.TrellisSqlGenerator = TrellisSqlGenerator;
 //# sourceMappingURL=sql-building.js.map

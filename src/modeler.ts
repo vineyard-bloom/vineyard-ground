@@ -28,10 +28,7 @@ export class Modeler {
   private client: DatabaseClient
 
   constructor(schema: SchemaClass | any, client: DatabaseClient) {
-    this.schema = schema instanceof SchemaClass
-      ? schema
-      : new SchemaClass(schema)
-
+    this.schema = schema
     this.db = client.getLegacyDatabaseInterface()
     this.client = client
     initializeTrellises(this.schema, this.collections, this.schema.trellises, this.db, this.client)

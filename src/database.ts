@@ -1,11 +1,8 @@
-import {TypeCategory, Trellis_Type, Library} from 'vineyard-schema'
-import {TableSource} from 'vineyard-schema'
+import { Library, Property, Schema, Table, TableSource, Trellis, Trellis_Type, TypeCategory } from 'vineyard-schema'
+import { SequelizeModel, SequelizeModelMap } from './clients/sequelize-client'
+import { SequelizeTables } from './types'
 
 const Sequelize = require('sequelize')
-import {Trellis, Property, Schema, Table} from 'vineyard-schema';
-import {SequelizeModel, SequelizeModelMap} from './clients/sequelize-client';
-import {to_lower_snake_case} from './utility';
-import {SequelizeTables} from './types'
 
 const node_uuid = require('uuid')
 
@@ -14,79 +11,77 @@ function get_field(property: Property, library: Library, dialect: string): any {
   switch (type.get_category()) {
     case TypeCategory.primitive:
 
-      if (type === library.types.long)
+      if (type === library.types.Long)
         return {
           type: Sequelize.BIGINT
         }
 
-      if (type === library.types.int)
+      if (type === library.types.Int)
         return {
           type: Sequelize.INTEGER
         }
 
-      if (type === library.types.string)
+      if (type === library.types.String)
         return {
           type: Sequelize.STRING
         }
 
-      if (type === library.types.text)
+      if (type === library.types.Text)
         return {
           type: Sequelize.TEXT
         }
 
-      if (type === library.types.json)
+      if (type === library.types.Json)
         return dialect == 'mysql'
-          ? {type: Sequelize.TEXT}
-          : {type: Sequelize.JSON}
+          ? { type: Sequelize.TEXT }
+          : { type: Sequelize.JSON }
+
+      if (type === library.types.Jsonb)
+        return { type: Sequelize.JSONB }
 
       if (type === library.types.bool)
         return {
           type: Sequelize.BOOLEAN
         }
 
-      if (type === library.types.guid)
-        return {
-          type: Sequelize.UUID
-        }
-
-      if (type === library.types.float)
+      if (type === library.types.Float)
         return {
           type: Sequelize.FLOAT
         }
 
-      if (type === library.types.date)
+      if (type === library.types.Date)
         return {
           type: Sequelize.DATEONLY
         }
 
-      if (type === library.types.datetime)
+      if (type === library.types.Datetime)
         return {
           type: Sequelize.DATE
         }
 
-      if (type === library.types.time)
+      if (type === library.types.Time)
         return {
           type: Sequelize.TIME
         }
 
-      if (type === library.types.colossal)
+      if (type === library.types.Bignumber)
         return {
           type: Sequelize.NUMERIC
         }
 
-      if (type === library.types.bignumber)
-        return {
-          type: Sequelize.NUMERIC
-        }
-
-      if (type === library.types.char)
+      if (type === library.types.Char)
         return {
           type: Sequelize.CHAR
         }
 
-      if (type === library.types.short)
+      if (type === library.types.Short)
         return {
           type: Sequelize.SMALLINT
+        }
+
+      if (type === library.types.Uuid)
+        return {
+          type: Sequelize.UUID
         }
 
       throw new Error('Unknown primitive: ' + type.name + '.')
@@ -191,7 +186,7 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any, tables: 
       create_field(property, schema.library, sequelize.getDialect())
 
     primary_key.primaryKey = true
-    if (property.type === schema.library.types.uuid) {
+    if (property.type === schema.library.types.Uuid) {
       primary_key.defaultValue = sequelize.getDialect() == 'mysql'
         ? () => node_uuid.v4().replace(/-/g, '')
         : node_uuid.v4
