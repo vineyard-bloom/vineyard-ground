@@ -1,7 +1,7 @@
 export declare enum Operation_Type {
-    add = 0,
-    clear = 1,
-    remove = 2
+    add = "add",
+    clear = "clear",
+    remove = "remove"
 }
 export interface Operation {
     type: Operation_Type;
