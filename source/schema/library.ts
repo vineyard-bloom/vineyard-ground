@@ -20,6 +20,7 @@ export class Library {
       guid: guid,
       int: new Primitive('int'),
       json: new Primitive('json'),
+      jsonb: new Primitive('jsonb'),
       short: new Primitive('short'),
       string: new Primitive('string'),
       time: new Primitive('time'),

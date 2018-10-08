@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var schema_1 = require("../schema");
+const schema_1 = require("../schema");
 function getFieldType(property, library) {
-    var type = property.type;
+    const type = property.type;
     switch (type.get_category()) {
         case schema_1.Type_Category.primitive:
             if (type.name === library.types.long.name)
@@ -26,6 +26,8 @@ function getFieldType(property, library) {
                 };
             if (type.name === library.types.json.name)
                 return { name: 'JSON' };
+            if (type.name === library.types.jsonb.name)
+                return { name: 'JSONB' };
             if (type.name === library.types.bool.name)
                 return {
                     name: 'BOOLEAN',
@@ -76,7 +78,7 @@ function getFieldType(property, library) {
             return null;
         case schema_1.Type_Category.trellis:
             if (library.types[type.name]) {
-                var field = type.trellis.primary_keys[0];
+                const field = type.trellis.primary_keys[0];
                 return getFieldType(field, library);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');

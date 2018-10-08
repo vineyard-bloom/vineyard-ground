@@ -33,6 +33,9 @@ export function getFieldType(property: Property, library: Library): any {
       if (type.name === library.types.json.name)
         return {name: 'JSON'}
 
+      if (type.name === library.types.jsonb.name)
+        return {name: 'JSONB'}
+
       if (type.name === library.types.bool.name)
         return {
           name: 'BOOLEAN',

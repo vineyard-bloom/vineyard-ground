@@ -1,10 +1,8 @@
-import {Type_Category, Trellis_Type, Library} from "./schema"
-import {Table_Source} from "./schema/loading"
+import { Library, Trellis_Type, Type_Category } from './schema'
+import { Property, Schema, Trellis } from './types'
+import { SequelizeModel, SequelizeModelMap } from './clients/sequelize-client'
 
 const Sequelize = require('sequelize')
-import {Table_Trellis, Trellis, Property, Schema, Table} from "./types";
-import {SequelizeModel, SequelizeModelMap} from "./clients/sequelize-client";
-import {to_lower_snake_case} from "./utility";
 
 const node_uuid = require('uuid')
 
@@ -35,8 +33,11 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.json)
         return dialect == 'mysql'
-          ? {type: Sequelize.TEXT}
-          : {type: Sequelize.JSON}
+          ? { type: Sequelize.TEXT }
+          : { type: Sequelize.JSON }
+
+      if (type === library.types.jsonb)
+        return { type: Sequelize.JSON }
 
       if (type === library.types.bool)
         return {
@@ -88,7 +89,7 @@ function get_field(property: Property, library: Library, dialect: string): any {
           type: Sequelize.SMALLINT
         }
 
-      throw new Error("Unknown primitive: " + type.name + '.')
+      throw new Error('Unknown primitive: ' + type.name + '.')
 
     case Type_Category.list:
       return null
@@ -99,10 +100,10 @@ function get_field(property: Property, library: Library, dialect: string): any {
         return get_field(field, library, dialect)
       }
 
-      throw new Error("Unknown trellis reference: " + type.name + '.')
+      throw new Error('Unknown trellis reference: ' + type.name + '.')
 
     default:
-      throw Error("Invalid type category: " + type.get_category() + '.')
+      throw Error('Invalid type category: ' + type.get_category() + '.')
   }
 }
 
@@ -229,10 +230,10 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any) {
   }
 
   const indexArray = !trellis.table.indexes ? [] : trellis.table.indexes.map(index =>
-      ({
-        fields: index.properties
-      })
-    )
+    ({
+      fields: index.properties
+    })
+  )
 
 
   const oldTable = trellis.oldTable = sequelize.define(trellis.table.name, fields, {

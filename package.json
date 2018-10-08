@@ -12,7 +12,6 @@
   "license": "MIT",
   "dependencies": {
     "bignumber.js": "^4.0.4",
-    "npm": "^6.0.0",
     "pg": "6.4.2",
     "pluralize": "^7.0.0",
     "sequelize": "^4.16.2",
