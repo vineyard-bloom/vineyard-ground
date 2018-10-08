@@ -143,27 +143,27 @@ export class Query_Implementation<T, O> implements QueryBuilder<T, O> {
     return reference.get_other_trellis().collection
   }
 
-  private expand_cross_table(tables: SequelizeTables, reference: Property, identity: any) {
+  private expand_crossTable(tables: SequelizeTables, reference: Property, identity: any) {
     const where: any = {}
     where[to_lower(reference.trellis.name)] = identity
 
-    return tables [reference.other_property!.trellis.table.name].findAll({
+    return tables [reference.otherProperty!.trellis.table.name].findAll({
       include: {
         model: tables [reference.trellis.table.name],
         through: {where: where},
-        as: reference.other_property!.name,
+        as: reference.otherProperty!.name,
         required: true
       }
     })
-      .then((result: any) => result.map((r: any) => processFields(getData(r), reference.other_property!.trellis)))
+      .then((result: any) => result.map((r: any) => processFields(getData(r), reference.otherProperty!.trellis)))
   }
 
   private perform_expansion(tables: SequelizeTables, path: string, data: any) {
     const property = this.trellis.properties[path]
     if (property.is_list()) {
-      return property.other_property!.is_list()
-        ? this.expand_cross_table(tables, property, this.trellis.get_identity(data))
-        : this.get_other_collection(path).filter({[property.other_property!.name]: data})
+      return property.otherProperty!.is_list()
+        ? this.expand_crossTable(tables, property, this.trellis.get_identity(data))
+        : this.get_other_collection(path).filter({[property.otherProperty!.name]: data})
     }
     else {
       return this.get_other_collection(path).get(data[path])

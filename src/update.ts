@@ -78,21 +78,21 @@ function perform_operation<T>(tables: SequelizeTables, identity: any, list: Prop
     case Operation_Type.add: {
       const fields: any = {}
       fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.other_property!.trellis.name)] = list.other_property!.trellis.get_identity(operation.item)
-      if (!list.cross_table)
+      fields [to_lower(list.otherProperty!.trellis.name)] = list.otherProperty!.trellis.get_identity(operation.item)
+      if (!list.crossTable)
         throw Error('List is missing cross table.')
 
-      return tables[list.cross_table.table.name].create(fields)
+      return tables[list.crossTable.table.name].create(fields)
     }
 
     case Operation_Type.remove: {
       const fields: any = {}
       fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.other_property!.trellis.name)] = list.other_property!.trellis.get_identity(operation.item)
-      if (!list.cross_table)
+      fields [to_lower(list.otherProperty!.trellis.name)] = list.otherProperty!.trellis.get_identity(operation.item)
+      if (!list.crossTable)
         throw Error('List is missing cross table.')
 
-      return tables[list.cross_table.table.name].destroy({
+      return tables[list.crossTable.table.name].destroy({
         where: fields,
         force: true
       })

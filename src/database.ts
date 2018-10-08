@@ -126,29 +126,29 @@ function create_field(property: Property, library: Library, dialect: string): an
   return field
 }
 
-function get_cross_table_name(trellises: Trellis []) {
+function get_crossTable_name(trellises: Trellis []) {
   return trellises.map(t => t.table.name).sort().join('_')
 }
 
 function initialize_many_to_many(tables: SequelizeTables, list: Property, trellis: Trellis, schema: Schema, sequelize: any) {
-  const table_trellises = [list.trellis, list.other_property!.trellis]
-  const cross_table_name = get_cross_table_name(table_trellises)
+  const table_trellises = [list.trellis, list.otherProperty!.trellis]
+  const crossTable_name = get_crossTable_name(table_trellises)
 
   const relationship = tables [trellis.table.name].belongsToMany(tables [list.get_other_trellis().table.name], {
     as: list.name,
-    otherKey: list.other_property!.trellis.name.toLowerCase(),
+    otherKey: list.otherProperty!.trellis.name.toLowerCase(),
     foreignKey: list.trellis.name.toLowerCase(),
     constraints: false,
-    through: cross_table_name
+    through: crossTable_name
   })
 
-  list.cross_table = relationship.through.model
+  list.crossTable = relationship.through.model
 }
 
 function initialize_relationship(tables: SequelizeTables, property: Property, trellis: Trellis, schema: Schema, sequelize: any) {
   if (property.type.get_category() == TypeCategory.trellis) {
     const reference = property as Property
-    if (!reference.other_property) {
+    if (!reference.otherProperty) {
       const other_table = tables[reference.get_other_trellis().table.name]
       other_table.hasMany(tables[trellis.table.name], {
         foreignKey: reference.name,
@@ -158,13 +158,13 @@ function initialize_relationship(tables: SequelizeTables, property: Property, tr
   }
   else if (property.type.get_category() == TypeCategory.list) {
     const list = property as Property
-    if (list.other_property!.type.get_category() == TypeCategory.list) {
+    if (list.otherProperty!.type.get_category() == TypeCategory.list) {
       initialize_many_to_many(tables, list, trellis, schema, sequelize)
     }
     else {
       tables[trellis.table.name].hasMany(tables[list.get_other_trellis().table.name], {
         as: list.name,
-        foreignKey: list.other_property!.name,
+        foreignKey: list.otherProperty!.name,
         constraints: true
       })
     }

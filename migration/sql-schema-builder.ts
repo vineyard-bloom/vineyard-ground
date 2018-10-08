@@ -99,11 +99,11 @@ export class SqlSchemaBuilder {
 
     for (let name in trellis.properties) {
       const property = trellis.properties [name]
-      if (property.is_list() && property.other_property!.is_list()) {
+      if (property.is_list() && property.otherProperty!.is_list()) {
         const crossTableName = this.builder.getCrossTableName(property)
-        context.crossTables[crossTableName] = property.trellis.name < property.other_property!.trellis.name
+        context.crossTables[crossTableName] = property.trellis.name < property.otherProperty!.trellis.name
           ? property
-          : property.other_property
+          : property.otherProperty
       }
     }
 

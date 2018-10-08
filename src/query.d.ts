@@ -71,7 +71,7 @@ export declare class Query_Implementation<T, O> implements QueryBuilder<T, O> {
     constructor(tables: SequelizeTables, table: TableClient<T>, client: DatabaseClient, trellis: CollectionTrellis<T>);
     private set_reduce_mode;
     private get_other_collection;
-    private expand_cross_table;
+    private expand_crossTable;
     private perform_expansion;
     private handle_expansions;
     private process_result;

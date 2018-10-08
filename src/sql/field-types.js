@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const vineyard_schema_1 = require("vineyard-schema");
+var vineyard_schema_1 = require("vineyard-schema");
 function getFieldType(property, library) {
-    const type = property.type;
+    var type = property.type;
     switch (type.get_category()) {
         case vineyard_schema_1.TypeCategory.primitive:
             if (type.name === library.types.long.name)
@@ -76,7 +76,7 @@ function getFieldType(property, library) {
             return null;
         case vineyard_schema_1.TypeCategory.trellis:
             if (library.types[type.name]) {
-                const field = type.trellis.primary_keys[0];
+                var field = type.trellis.primary_keys[0];
                 return getFieldType(field, library);
             }
             throw new Error("Unknown trellis reference: " + type.name + '.');

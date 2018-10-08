@@ -2,8 +2,8 @@
   "name": "vineyard-ground",
   "version": "1.4.0",
   "description": "SQL ORM for Node.js",
-  "main": "source/index.js",
-  "types": "source/index.d.ts",
+  "main": "src/index.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "test": "mocha"
   },
