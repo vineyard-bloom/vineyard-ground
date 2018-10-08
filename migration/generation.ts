@@ -1,6 +1,6 @@
 import { ChangeType, DiffBundle, TableChange } from "./types";
 import {SqlSchemaBuilder} from "./sql-schema-builder";
-import {Schema} from "../source";
+import {Schema} from 'vineyard-schema'
 
 export function generateInitializationSql(schema: Schema): string {
   let changes:TableChange[] = []

@@ -1,5 +1,5 @@
 require('source-map-support').install()
-import {generateDocs} from "vineyard-docs"
+const {generateDocs} = require('vineyard-docs')
 
 generateDocs({
   paths: {

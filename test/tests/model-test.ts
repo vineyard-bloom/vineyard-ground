@@ -1,8 +1,9 @@
+import {SchemaClass} from '../../src/scheming'
+
 require('source-map-support').install()
-import { to_lower_snake_case } from "../../source/utility";
+import { to_lower_snake_case } from "../../src/utility";
 import { assert, expect } from 'chai'
-import { Schema } from '../../source/schema'
-import { Add, DatabaseClient, DevModeler, Remove, SequelizeClient } from '../../source'
+import { Add, DatabaseClient, DevModeler, Remove, SequelizeClient } from '../../src'
 import { BigNumber } from 'bignumber.js'
 
 const config = require('../config/config.json')
@@ -221,11 +222,10 @@ describe('Simple unit tests', function () {
   })
 })
 
-
 // }
 
 async function initializeModel(client: DatabaseClient, schemaName: string) {
-  const schema = new Schema(require('../schema/' + schemaName + '.json'))
+  const schema = new SchemaClass(require('../schema/' + schemaName + '.json'))
   const modeler = new DevModeler(schema, client)
   const model: any = modeler.collections
   model.ground = modeler

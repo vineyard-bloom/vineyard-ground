@@ -1,8 +1,7 @@
-import { Change, ChangeType } from "./types"
-import { SqlBuilder } from "../source/sql/sql-building"
-import { getFieldType } from "../source/sql/field-types"
-import { Property, Schema, Trellis } from "../source/types"
-import { TrellisImplementation, StandardProperty } from "../source/schema"
+import {Change, ChangeType} from './types'
+import {SqlBuilder} from '../src/sql/sql-building'
+import {getFieldType} from '../src/sql/field-types'
+import {Property, Schema, Trellis, TrellisImplementation, StandardProperty} from 'vineyard-schema'
 
 const indent = '  '
 
@@ -23,9 +22,9 @@ export class SqlSchemaBuilder {
     return property.type.name == 'int' || property.type.name == 'long'
   }
 
-  getDefaultValue(type:any, sequence: string | null = null) {
+  getDefaultValue(type: any, sequence: string | null = null) {
     if (sequence)
-      return "DEFAULT nextval('" + sequence + "')"
+      return 'DEFAULT nextval(\'' + sequence + '\')'
 
     if (type.defaultValue !== undefined)
       return 'DEFAULT ' + type.defaultValue
@@ -46,7 +45,7 @@ export class SqlSchemaBuilder {
 
     if (property.trellis.table.isCross)
       defaultValue = ''
-    
+
     return [
       indent + this.builder.quote(property.name),
       type.name,
@@ -81,7 +80,7 @@ export class SqlSchemaBuilder {
       + trellis.primary_keys.map(p => this.builder.quote(p.name)).join(', ')
       + ')\n'
     )
-    return tokens.join(",\n")
+    return tokens.join(',\n')
   }
 
   private createTable(trellis: Trellis, context: Context) {
@@ -179,7 +178,8 @@ export class SqlSchemaBuilder {
 
     const trellis = new TrellisImplementation(name, {
       name: name,
-      isCross: true
+      isCross: true,
+      indexes: []
     })
 
     trellis.properties = {
@@ -187,7 +187,7 @@ export class SqlSchemaBuilder {
       [second.name]: second
     }
     trellis.primary_keys = [first, second]
-    
+
     const result = this.createTable(trellis, context)
     return this.builder.flatten(result).sql
   }
@@ -204,19 +204,19 @@ export class SqlSchemaBuilder {
     switch (change.type) {
       case ChangeType.createTable:
         return this.createTable(change.trellis!, context)
-    
+
       case ChangeType.createField:
         return this.createField(change.property!)
 
       case ChangeType.createIndex:
         return this.createIndex(change.tableName!, change.propertyName!)
-    
+
       case ChangeType.deleteField:
         return this.deleteField(change.property!)
-    
+
       case ChangeType.deleteTable:
         return this.deleteTable(change.trellis!)
-    
+
       case ChangeType.deleteIndex:
         return this.deleteIndex(change.tableName!, change.propertyName!)
 

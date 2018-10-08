@@ -1,7 +1,8 @@
+import {SchemaClass} from '../src'
+
 const shell = require('shelljs')
 import { Change, ChangeType, DiffBundle } from "./types";
-import { Property, Trellis_Map, Index } from "../source";
-import { Schema } from "../source/schema";
+import { Index, Property, TrellisMap } from "vineyard-schema"
 import * as fs from 'fs'
 
 function shellCommand(command: string, echo: Boolean = false) {
@@ -27,7 +28,7 @@ function getJson(commit: string, path: string) {
 interface Bundle {
   first: any
   second: any
-  trellises: Trellis_Map
+  trellises: TrellisMap
 }
 
 type Property_Map = { [name: string]: Property }
@@ -71,7 +72,7 @@ function findChangedProperties(firstProperties: Property_Map, secondProperties: 
   return result
 }
 
-function findChangedIndexes(tableName: string, first: Trellis_Map, second: Trellis_Map): Change[] {
+function findChangedIndexes(tableName: string, first: TrellisMap, second: TrellisMap): Change[] {
   let result: Change[] = []
 
   const firstIndexes = first[tableName].table.indexes!
@@ -145,7 +146,7 @@ function findChangedIndexProperties(tableName: string, firstIndexes: Index[], se
   return result
 }
 
-export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): Change[] {
+export function findChangedTrellises(first: TrellisMap, second: TrellisMap): Change[] {
   let result: Change[] = []
   for (let name in first) {
     if (!second[name]) {
@@ -175,11 +176,11 @@ export function findChangedTrellises(first: Trellis_Map, second: Trellis_Map): C
   return result
 }
 
-function loadSchemaFromCommit(path: string, hash: string): Schema {
+function loadSchemaFromCommit(path: string, hash: string): SchemaClass {
   const pathOffset = (shellCommand('git rev-parse --show-prefix') as string).trim()
   const fullPath = pathOffset + path
   const firstJson = getJson(hash, fullPath)
-  return new Schema(firstJson)
+  return new SchemaClass(firstJson)
 }
 
 export function getDiff(path: string, firstCommit: string, secondCommit: string): DiffBundle {
@@ -199,7 +200,7 @@ export function getCommitHashes(path: string, limit: number = 1): string[] {
 }
 
 interface SchemaBundle {
-  schema: Schema,
+  schema: SchemaClass,
   name: string
 }
 
@@ -230,7 +231,7 @@ function routeSchemaGathering(path: string, commitHashes: string[]): [SchemaBund
     : loadSchemaBundleFromCommit(path, commits[1])
 
   const current = {
-    schema: new Schema(JSON.parse(fs.readFileSync(path, 'utf8'))),
+    schema: new SchemaClass(JSON.parse(fs.readFileSync(path, 'utf8'))),
     name: 'current'
   }
 

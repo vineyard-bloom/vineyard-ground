@@ -14,8 +14,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -35,18 +35,18 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+var scheming_1 = require("../../src/scheming");
 require('source-map-support').install();
-var utility_1 = require("../../source/utility");
+var utility_1 = require("../../src/utility");
 var chai_1 = require("chai");
-var schema_1 = require("../../source/schema");
-var source_1 = require("../../source");
+var src_1 = require("../../src");
 var bignumber_js_1 = require("bignumber.js");
 var config = require('../config/config.json');
 var mainWorld, dangerousTag, flyingTag;
 var contexts = [
     {
         name: 'Sequelize',
-        client: new source_1.SequelizeClient(config.database),
+        client: new src_1.SequelizeClient(config.database),
     }
 ];
 // createSuite('Sequelize', new SequelizeClient(config.database))
@@ -101,7 +101,7 @@ describe('Sequelize Test', function () {
                             dangerousTag = _a.sent();
                             return [4 /*yield*/, model.Creature.update(ogre, {
                                     health: 10,
-                                    tags: source_1.Add(dangerousTag)
+                                    tags: src_1.Add(dangerousTag)
                                 })];
                         case 6:
                             creature = _a.sent();
@@ -113,7 +113,7 @@ describe('Sequelize Test', function () {
                             chai_1.assert.equal(1, creature.tags.length);
                             chai_1.assert.equal('dangerous', creature.tags[0].name);
                             return [4 /*yield*/, model.Creature.update(ogre, {
-                                    tags: source_1.Remove(dangerousTag)
+                                    tags: src_1.Remove(dangerousTag)
                                 })];
                         case 8:
                             _a.sent();
@@ -126,7 +126,7 @@ describe('Sequelize Test', function () {
                                     name: "hero",
                                     world: mainWorld,
                                     health: 4,
-                                    tags: [source_1.Add(flyingTag), heroicTag]
+                                    tags: [src_1.Add(flyingTag), heroicTag]
                                 })];
                         case 10:
                             _a.sent();
@@ -330,8 +330,8 @@ function initializeModel(client, schemaName) {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    schema = new schema_1.Schema(require('../schema/' + schemaName + '.json'));
-                    modeler = new source_1.DevModeler(schema, client);
+                    schema = new scheming_1.SchemaClass(require('../schema/' + schemaName + '.json'));
+                    modeler = new src_1.DevModeler(schema, client);
                     model = modeler.collections;
                     model.ground = modeler;
                     return [4 /*yield*/, modeler.regenerate()];

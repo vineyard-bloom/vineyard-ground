@@ -14,8 +14,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
         while (_) try {
-            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [0, t.value];
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
                 case 0: case 1: t = op; break;
                 case 4: _.label++; return { value: op[1], done: false };
@@ -37,24 +37,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var migration_1 = require("../../migration");
 require('source-map-support').install();
-var query_generator_1 = require("../../source/sql/query-generator");
+var query_generator_1 = require("../../src/sql/query-generator");
 var assert = require("assert");
-var modeler_1 = require("../../source/modeler");
+var modeler_1 = require("../../src/modeler");
 var Sequelize = require('sequelize');
 var diff_1 = require("../utility/diff");
-var schema_1 = require("../../source/schema");
-var sequelize_client_1 = require("../../source/clients/sequelize-client");
+var sequelize_client_1 = require("../../src/clients/sequelize-client");
 var sql_schema_builder_1 = require("../../migration/sql-schema-builder");
 var types_1 = require("../../migration/types");
+var scheming_1 = require("../../src/scheming");
 var config = require('../config/config.json');
-var schema = new schema_1.Schema(require('../schema/game.json'));
-var schema2 = new schema_1.Schema(require('../schema/game-2.json'));
-var schema3 = new schema_1.Schema(require('../schema/game-3.json'));
-var schema4 = new schema_1.Schema(require('../schema/game-4.json'));
-var schema5 = new schema_1.Schema(require('../schema/game-5.json'));
-var schema6 = new schema_1.Schema(require('../schema/game-6.json'));
-var schema7 = new schema_1.Schema(require('../schema/game-7.json'));
-var schema8 = new schema_1.Schema(require('../schema/game-8.json'));
+var schema = new scheming_1.SchemaClass(require('../schema/game.json'));
+var schema2 = new scheming_1.SchemaClass(require('../schema/game-2.json'));
+var schema3 = new scheming_1.SchemaClass(require('../schema/game-3.json'));
+var schema4 = new scheming_1.SchemaClass(require('../schema/game-4.json'));
+var schema5 = new scheming_1.SchemaClass(require('../schema/game-5.json'));
+var schema6 = new scheming_1.SchemaClass(require('../schema/game-6.json'));
+var schema7 = new scheming_1.SchemaClass(require('../schema/game-7.json'));
+var schema8 = new scheming_1.SchemaClass(require('../schema/game-8.json'));
 var client = new sequelize_client_1.SequelizeClient(config.database);
 var modeler = new modeler_1.DevModeler(schema, client);
 var schemaBuilder = new sql_schema_builder_1.SqlSchemaBuilder(schema);

@@ -1,25 +1,25 @@
 import {generateInitializationSql, findChangedTrellises} from '../../migration'
 
 require('source-map-support').install()
-import {QueryGenerator} from '../../source/sql/query-generator'
+import {QueryGenerator} from '../../src/sql/query-generator'
 import * as assert from 'assert'
-import {DevModeler} from '../../source/modeler'
+import {DevModeler} from '../../src/modeler'
 const Sequelize = require('sequelize')
 import {checkDiff} from '../utility/diff'
-import {Schema} from '../../source/schema'
-import { SequelizeClient } from '../../source/clients/sequelize-client'
+import { SequelizeClient } from '../../src/clients/sequelize-client'
 import { SqlSchemaBuilder } from '../../migration/sql-schema-builder'
 import { ChangeType } from '../../migration/types'
+import {SchemaClass} from '../../src/scheming'
 
 const config = require('../config/config.json')
-const schema = new Schema(require('../schema/game.json'))
-const schema2 = new Schema(require('../schema/game-2.json'))
-const schema3 = new Schema(require('../schema/game-3.json'))
-const schema4 = new Schema(require('../schema/game-4.json'))
-const schema5 = new Schema(require('../schema/game-5.json'))
-const schema6 = new Schema(require('../schema/game-6.json'))
-const schema7 = new Schema(require('../schema/game-7.json'))
-const schema8 = new Schema(require('../schema/game-8.json'))
+const schema = new SchemaClass(require('../schema/game.json'))
+const schema2 = new SchemaClass(require('../schema/game-2.json'))
+const schema3 = new SchemaClass(require('../schema/game-3.json'))
+const schema4 = new SchemaClass(require('../schema/game-4.json'))
+const schema5 = new SchemaClass(require('../schema/game-5.json'))
+const schema6 = new SchemaClass(require('../schema/game-6.json'))
+const schema7 = new SchemaClass(require('../schema/game-7.json'))
+const schema8 = new SchemaClass(require('../schema/game-8.json'))
 const client = new SequelizeClient(config.database)
 const modeler = new DevModeler(schema, client)
 
