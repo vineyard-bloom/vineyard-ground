@@ -1,6 +1,7 @@
 import { Library, Property, Schema, Table, TableSource, Trellis, Trellis_Type, TypeCategory } from 'vineyard-schema'
 import { SequelizeModel, SequelizeModelMap } from './clients/sequelize-client'
 import { SequelizeTables } from './types'
+import {SchemaClass} from './scheming'
 
 const Sequelize = require('sequelize')
 
@@ -244,16 +245,14 @@ function create_table(trellis: Trellis, schema: Schema, sequelize: any, tables: 
   return oldTable
 }
 
-export function vineyard_to_sequelize(schema: Schema, keys: any, sequelize: any): SequelizeModelMap {
+export function vineyard_to_sequelize(schema: SchemaClass, keys: any, sequelize: any): SequelizeModelMap {
   const tables: { [key: string]: SequelizeModel } = {}
 
-  const oldTables: SequelizeTables = {}
-
   for (let name in keys) {
-    tables [name] = create_table(schema.trellises [name], schema, sequelize, oldTables)
+    tables [name] = create_table(schema.trellises [name], schema, sequelize, schema.tables)
   }
 
-  initialize_relationships(schema, oldTables, sequelize)
+  initialize_relationships(schema, schema.tables, sequelize)
 
   return tables
 }

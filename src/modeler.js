@@ -10,6 +10,7 @@ function sync_collections(schema, collections, keys, sequelize_models, client) {
     }
 }
 function initializeTrellises(schema, collections, keys, db, client) {
+    schema.tables = schema.tables || {};
     const sequelize_models = database_1.vineyard_to_sequelize(schema, schema.trellises, db);
     sync_collections(schema, collections, keys, sequelize_models, client);
 }

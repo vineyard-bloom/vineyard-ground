@@ -17,6 +17,7 @@ function sync_collections(schema: SchemaClass, collections: Collection_Map, keys
 }
 
 function initializeTrellises(schema: SchemaClass, collections: Collection_Map, keys: any, db: any, client: DatabaseClient) {
+  schema.tables = schema.tables || {}
   const sequelize_models = vineyard_to_sequelize(schema as any, schema.trellises, db)
   sync_collections(schema, collections, keys, sequelize_models, client)
 }

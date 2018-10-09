@@ -195,11 +195,10 @@ function create_table(trellis, schema, sequelize, tables) {
 }
 function vineyard_to_sequelize(schema, keys, sequelize) {
     const tables = {};
-    const oldTables = {};
     for (let name in keys) {
-        tables[name] = create_table(schema.trellises[name], schema, sequelize, oldTables);
+        tables[name] = create_table(schema.trellises[name], schema, sequelize, schema.tables);
     }
-    initialize_relationships(schema, oldTables, sequelize);
+    initialize_relationships(schema, schema.tables, sequelize);
     return tables;
 }
 exports.vineyard_to_sequelize = vineyard_to_sequelize;
