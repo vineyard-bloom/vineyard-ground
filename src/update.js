@@ -66,7 +66,7 @@ function perform_operation(tables, identity, list, operationOrIdentity) {
             fields[utility_1.to_lower(list.otherProperty.trellis.name)] = list.otherProperty.trellis.get_identity(operation.item);
             if (!list.crossTable)
                 throw Error('List is missing cross table.');
-            return tables[list.crossTable.table.name].create(fields);
+            return tables[list.crossTable].create(fields);
         }
         case list_operations_1.Operation_Type.remove: {
             const fields = {};
@@ -74,7 +74,7 @@ function perform_operation(tables, identity, list, operationOrIdentity) {
             fields[utility_1.to_lower(list.otherProperty.trellis.name)] = list.otherProperty.trellis.get_identity(operation.item);
             if (!list.crossTable)
                 throw Error('List is missing cross table.');
-            return tables[list.crossTable.table.name].destroy({
+            return tables[list.crossTable].destroy({
                 where: fields,
                 force: true
             });
@@ -125,7 +125,13 @@ function update(tables, seed, trellis, table, changes) {
         ? identity
         : { [primary_key]: identity };
     return table.update(newSeed, filter)
-        .then((result) => post_process(tables, result[1][0], identity, changes, trellis, table));
+        .then((result) => {
+        const resultRecords = result[1];
+        const record = Array.isArray(resultRecords) && resultRecords.length > 0
+            ? result[1][0]
+            : newSeed;
+        return post_process(tables, record, identity, changes, trellis, table);
+    });
 }
 exports.update = update;
 //# sourceMappingURL=update.js.map

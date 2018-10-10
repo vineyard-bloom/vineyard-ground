@@ -82,7 +82,7 @@ function perform_operation<T>(tables: SequelizeTables, identity: any, list: Prop
       if (!list.crossTable)
         throw Error('List is missing cross table.')
 
-      return tables[list.crossTable.table.name].create(fields)
+      return tables[list.crossTable].create(fields)
     }
 
     case Operation_Type.remove: {
@@ -92,7 +92,7 @@ function perform_operation<T>(tables: SequelizeTables, identity: any, list: Prop
       if (!list.crossTable)
         throw Error('List is missing cross table.')
 
-      return tables[list.crossTable.table.name].destroy({
+      return tables[list.crossTable].destroy({
         where: fields,
         force: true
       })
@@ -153,6 +153,13 @@ export function update<T>(tables: SequelizeTables, seed: any, trellis: Trellis, 
     : {[primary_key]: identity}
 
   return table.update(newSeed, filter)
-    .then((result: any) => post_process(tables, result[1][0], identity, changes, trellis, table))
+    .then((result: any) => {
+      const resultRecords = result[1]
+      const record = Array.isArray(resultRecords) && resultRecords.length > 0
+        ? result[1][0]
+        : newSeed
+
+      return post_process(tables, record, identity, changes, trellis, table)
+    })
 
 }

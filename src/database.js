@@ -96,15 +96,16 @@ function get_crossTable_name(trellises) {
 }
 function initialize_many_to_many(tables, list, trellis, schema, sequelize) {
     const table_trellises = [list.trellis, list.otherProperty.trellis];
-    const crossTable_name = get_crossTable_name(table_trellises);
+    const crossTableName = get_crossTable_name(table_trellises);
     const relationship = tables[trellis.table.name].belongsToMany(tables[list.get_other_trellis().table.name], {
         as: list.name,
         otherKey: list.otherProperty.trellis.name.toLowerCase(),
         foreignKey: list.trellis.name.toLowerCase(),
         constraints: false,
-        through: crossTable_name
+        through: crossTableName
     });
-    list.crossTable = relationship.through.model;
+    tables[crossTableName] = relationship.through.model;
+    list.crossTable = crossTableName;
 }
 function initialize_relationship(tables, property, trellis, schema, sequelize) {
     if (property.type.get_category() == vineyard_schema_1.TypeCategory.trellis) {

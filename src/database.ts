@@ -1,6 +1,6 @@
-import { Library, Property, Schema, Table, TableSource, Trellis, Trellis_Type, TypeCategory } from 'vineyard-schema'
-import { SequelizeModel, SequelizeModelMap } from './clients/sequelize-client'
-import { SequelizeTables } from './types'
+import {Library, Property, Schema, Table, TableSource, Trellis, Trellis_Type, TypeCategory} from 'vineyard-schema'
+import {SequelizeModel, SequelizeModelMap} from './clients/sequelize-client'
+import {SequelizeTables} from './types'
 import {SchemaClass} from './scheming'
 
 const Sequelize = require('sequelize')
@@ -34,11 +34,11 @@ function get_field(property: Property, library: Library, dialect: string): any {
 
       if (type === library.types.Json)
         return dialect == 'mysql'
-          ? { type: Sequelize.TEXT }
-          : { type: Sequelize.JSON }
+          ? {type: Sequelize.TEXT}
+          : {type: Sequelize.JSON}
 
       if (type === library.types.Jsonb)
-        return { type: Sequelize.JSONB }
+        return {type: Sequelize.JSONB}
 
       if (type === library.types.bool)
         return {
@@ -128,17 +128,17 @@ function get_crossTable_name(trellises: Trellis []) {
 
 function initialize_many_to_many(tables: SequelizeTables, list: Property, trellis: Trellis, schema: Schema, sequelize: any) {
   const table_trellises = [list.trellis, list.otherProperty!.trellis]
-  const crossTable_name = get_crossTable_name(table_trellises)
+  const crossTableName = get_crossTable_name(table_trellises)
 
   const relationship = tables [trellis.table.name].belongsToMany(tables [list.get_other_trellis().table.name], {
     as: list.name,
     otherKey: list.otherProperty!.trellis.name.toLowerCase(),
     foreignKey: list.trellis.name.toLowerCase(),
     constraints: false,
-    through: crossTable_name
+    through: crossTableName
   })
-
-  list.crossTable = relationship.through.model
+  tables[crossTableName] = relationship.through.model
+  list.crossTable = crossTableName
 }
 
 function initialize_relationship(tables: SequelizeTables, property: Property, trellis: Trellis, schema: Schema, sequelize: any) {
