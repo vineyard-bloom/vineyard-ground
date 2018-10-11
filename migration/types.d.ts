@@ -7,7 +7,7 @@ export declare enum ChangeType {
     deleteTable = 4,
     deleteIndex = 5,
     changeFieldType = 6,
-    changeFieldNullable = 7,
+    changeFieldNullable = 7
 }
 export interface Change {
     type: ChangeType;

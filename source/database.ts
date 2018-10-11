@@ -37,7 +37,7 @@ function get_field(property: Property, library: Library, dialect: string): any {
           : { type: Sequelize.JSON }
 
       if (type === library.types.jsonb)
-        return { type: Sequelize.JSON }
+        return { type: Sequelize.JSONB }
 
       if (type === library.types.bool)
         return {

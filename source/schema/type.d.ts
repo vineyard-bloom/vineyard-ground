@@ -3,7 +3,7 @@ export declare enum Type_Category {
     decimal = 1,
     primitive = 2,
     list = 3,
-    trellis = 4,
+    trellis = 4
 }
 export declare abstract class Type {
     name: string;
