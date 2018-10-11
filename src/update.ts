@@ -73,29 +73,36 @@ function formatOperation(operation: Operation | any): Operation {
 function perform_operation<T>(tables: SequelizeTables, identity: any, list: Property, operationOrIdentity: Operation | any) {
   const operation = formatOperation(operationOrIdentity)
 
+  const itemId = list.otherProperty!.trellis.get_identity(operation.item)
+
   switch (operation.type) {
 
     case Operation_Type.add: {
-      const fields: any = {}
-      fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.otherProperty!.trellis.name)] = list.otherProperty!.trellis.get_identity(operation.item)
-      if (!list.crossTable)
-        throw Error('List is missing cross table.')
-
-      return tables[list.crossTable].create(fields)
+      if (list.crossTable) {
+        const fields: any = {}
+        fields [to_lower(list.trellis.name)] = identity
+        fields [to_lower(list.otherProperty!.trellis.name)] = itemId
+        return tables[list.crossTable].create(fields)
+      }
+      else {
+        return list.get_other_trellis().collection.update(itemId, {[list.otherProperty!.name]: identity})
+      }
     }
 
     case Operation_Type.remove: {
-      const fields: any = {}
-      fields [to_lower(list.trellis.name)] = identity
-      fields [to_lower(list.otherProperty!.trellis.name)] = list.otherProperty!.trellis.get_identity(operation.item)
-      if (!list.crossTable)
-        throw Error('List is missing cross table.')
+      if (list.crossTable) {
+        const fields: any = {}
+        fields [to_lower(list.trellis.name)] = identity
+        fields [to_lower(list.otherProperty!.trellis.name)] = itemId
 
-      return tables[list.crossTable].destroy({
-        where: fields,
-        force: true
-      })
+        return tables[list.crossTable].destroy({
+          where: fields,
+          force: true
+        })
+      }
+      else {
+        return list.get_other_trellis().collection.update(itemId, {[list.otherProperty!.name]: null})
+      }
     }
 
     default:

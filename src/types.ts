@@ -9,7 +9,7 @@ export interface SequelizeTable extends Table {
 
   belongsToMany(table: Table, options: any): any
 
-  hasMany(table: Table, options: any): void
+  hasMany(table: Table, options: any): any
 
   create(fields: any): any
 

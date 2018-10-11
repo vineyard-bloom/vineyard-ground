@@ -59,25 +59,32 @@ function formatOperation(operation) {
 }
 function perform_operation(tables, identity, list, operationOrIdentity) {
     const operation = formatOperation(operationOrIdentity);
+    const itemId = list.otherProperty.trellis.get_identity(operation.item);
     switch (operation.type) {
         case list_operations_1.Operation_Type.add: {
-            const fields = {};
-            fields[utility_1.to_lower(list.trellis.name)] = identity;
-            fields[utility_1.to_lower(list.otherProperty.trellis.name)] = list.otherProperty.trellis.get_identity(operation.item);
-            if (!list.crossTable)
-                throw Error('List is missing cross table.');
-            return tables[list.crossTable].create(fields);
+            if (list.crossTable) {
+                const fields = {};
+                fields[utility_1.to_lower(list.trellis.name)] = identity;
+                fields[utility_1.to_lower(list.otherProperty.trellis.name)] = itemId;
+                return tables[list.crossTable].create(fields);
+            }
+            else {
+                return list.get_other_trellis().collection.update(itemId, { [list.otherProperty.name]: identity });
+            }
         }
         case list_operations_1.Operation_Type.remove: {
-            const fields = {};
-            fields[utility_1.to_lower(list.trellis.name)] = identity;
-            fields[utility_1.to_lower(list.otherProperty.trellis.name)] = list.otherProperty.trellis.get_identity(operation.item);
-            if (!list.crossTable)
-                throw Error('List is missing cross table.');
-            return tables[list.crossTable].destroy({
-                where: fields,
-                force: true
-            });
+            if (list.crossTable) {
+                const fields = {};
+                fields[utility_1.to_lower(list.trellis.name)] = identity;
+                fields[utility_1.to_lower(list.otherProperty.trellis.name)] = itemId;
+                return tables[list.crossTable].destroy({
+                    where: fields,
+                    force: true
+                });
+            }
+            else {
+                return list.get_other_trellis().collection.update(itemId, { [list.otherProperty.name]: null });
+            }
         }
         default:
             throw new Error('Not implemented.');
